@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #000000;
+  --foreground: #ededed;
 }
 
 @theme inline {
@@ -12,15 +12,92 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Seamless scroll container */
+.scroll-container {
+  scroll-snap-type: y mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Intro gradient page */
+.intro-gradient {
+  background: radial-gradient(ellipse at 50% 0%, #1a1a2e 0%, #0a0a0a 50%, #000000 100%);
+}
+
+.intro-gradient::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 30% 40%,
+    rgba(56, 189, 248, 0.08) 0%,
+    transparent 50%
+  ),
+  radial-gradient(
+    circle at 70% 60%,
+    rgba(139, 92, 246, 0.06) 0%,
+    transparent 50%
+  );
+  pointer-events: none;
+}
+
+/* Glossy black card with white sheen glare hover */
+.glossy-card {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0) 50%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.4s ease;
+}
+
+.glossy-card:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 0 30px rgba(255, 255, 255, 0.04),
+    0 8px 32px rgba(0, 0, 0, 0.6);
+  transform: translateY(-2px);
+}
+
+.glossy-card-inner {
+  background: #000000;
+}
+
+.glossy-sheen {
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.03) 45%,
+    rgba(255, 255, 255, 0.12) 50%,
+    rgba(255, 255, 255, 0.03) 55%,
+    transparent 60%
+  );
+  background-size: 250% 100%;
+  background-position: 200% center;
+  transition: background-position 0.7s ease;
+}
+
+.glossy-card:hover .glossy-sheen {
+  background-position: -50% center;
+}
+
+/* Transition fade between intro and main */
+main {
+  background: linear-gradient(
+    to bottom,
+    #000000 0%,
+    #0a0a0a 8%,
+    #000000 100%
+  );
 }
