@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Proof of Human Demo</title>
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; padding: 40px; }
+      .post { border:1px solid #ddd; padding:16px; border-radius:8px; margin-bottom:12px }
+      .btn { padding:8px 12px; border-radius:999px; border:1px solid #333; cursor:pointer }
+      .on { background:#16a34a; color:white }
+    </style>
+  </head>
+  <body>
+    <h1>Proof of Human — Demo</h1>
+    <div class="post" id="p1">
+      <div id="t1">Hello everyone — excited to share my weekend photos!</div>
+      <div style="margin-top:8px">
+        <button class="btn" id="b1">Toggle detection</button>
+        <span id="r1" style="margin-left:12px;color:#666">Idle</span>
+      </div>
+    </div>
+
+    <script>
+      async function simulate(buttonId, resultId, text, delay=800){
+        const b = document.getElementById(buttonId);
+        const r = document.getElementById(resultId);
+        b.addEventListener('click', async ()=>{
+          b.classList.add('on'); b.textContent='AI detection: ON'; r.textContent='Checking...';
+          await new Promise(s=>setTimeout(s, delay));
+          // simple simulated result
+          const res = /As an AI/.test(text) ? 'ai' : 'human';
+          r.textContent = 'Result: '+res;
+        });
+      }
+      simulate('b1','r1', document.getElementById('t1').textContent);
+      // auto click for recording
+      setTimeout(()=>document.getElementById('b1').click(), 1000);
+    </script>
+  </body>
+ </html>

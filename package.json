@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "record-demo": "node scripts/record-demo.js",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
@@ -21,6 +22,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
     "tailwindcss": "^4",
+    "playwright": "^1.40.0",
     "typescript": "^5"
   }
 }
