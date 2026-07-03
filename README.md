@@ -45,3 +45,16 @@ You can also run the Next.js app and see the widget at the homepage:
 npm run dev
 ```
 
+## Environment Variables
+
+Set these in Vercel (or locally via `.env.local`). See `.env.example` for the full list.
+
+| Variable | Required | Description |
+|---|---|---|
+| `X_BEARER_TOKEN` | No | X API v2 bearer token for live post fetching |
+| `X_DEFAULT_USERNAME` | No | X username to fetch posts from (default: `natte`) |
+| `AI_DETECTOR_URL` | No | External AI detector endpoint |
+| `AI_DETECTOR_KEY` | No | API key for the external detector |
+
+Without `X_BEARER_TOKEN`, the app falls back to demo post data.
+

@@ -40,13 +40,15 @@ export default function AIParserToggle({ text }: Props) {
     <div className="flex items-center gap-3">
       <button
         onClick={toggle}
-        className={`px-3 py-1 rounded-full border transition-colors ${
-          on ? "bg-green-600 text-white" : "bg-white text-black"
+        className={`rounded-full border px-3 py-1 transition-colors ${
+          on
+            ? "border-emerald-500/50 bg-emerald-600 text-white"
+            : "border-white/20 bg-white/5 text-white/80 hover:bg-white/10"
         }`}
       >
         {on ? "AI detection: ON" : "AI detection: OFF"}
       </button>
-      <div className="text-sm text-zinc-600">
+      <div className="text-sm text-white/50">
         {loading ? "Checking..." : result ? `Result: ${result}` : "Idle"}
       </div>
     </div>
