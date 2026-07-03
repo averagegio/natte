@@ -7,7 +7,8 @@
     "record-demo": "node scripts/record-demo.js",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:migrate": "node scripts/migrate.js"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

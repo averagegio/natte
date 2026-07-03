@@ -1,4 +1,6 @@
--- Same as migrate.sql — use scripts/migrate.sql or: npm run db:migrate
+-- Proof of Human / NATTES — Neon database setup
+-- Safe to run multiple times in Neon SQL Editor.
+-- Or run from terminal: npm run db:migrate
 
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
@@ -40,3 +42,7 @@ CREATE TABLE IF NOT EXISTS widget_connections (
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_subscriptions_user_id ON subscriptions(user_id);
 CREATE INDEX IF NOT EXISTS idx_widget_connections_user_id ON widget_connections(user_id);
+
+-- If you previously ran the old schema and subscriptions failed on "interval",
+-- run this one line separately:
+-- ALTER TABLE subscriptions RENAME COLUMN interval TO billing_interval;

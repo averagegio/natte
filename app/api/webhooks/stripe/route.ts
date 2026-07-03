@@ -38,10 +38,10 @@ export async function POST(request: Request) {
 
         if (userId && tierId && interval && session.subscription) {
           await sql`
-            INSERT INTO subscriptions (user_id, stripe_subscription_id, tier, interval, status)
+            INSERT INTO subscriptions (user_id, stripe_subscription_id, tier, billing_interval, status)
             VALUES (${userId}, ${String(session.subscription)}, ${tierId}, ${interval}, 'active')
             ON CONFLICT (stripe_subscription_id) DO UPDATE
-            SET status = 'active', tier = ${tierId}, interval = ${interval}, updated_at = NOW()
+            SET status = 'active', tier = ${tierId}, billing_interval = ${interval}, updated_at = NOW()
           `;
         }
         break;
