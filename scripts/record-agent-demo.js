@@ -7,7 +7,7 @@ async function record() {
   const outDir = path.resolve(__dirname, "../demo/videos");
   fs.mkdirSync(outDir, { recursive: true });
 
-  const demoPath = "file://" + path.resolve(__dirname, "../demo/agent-builder-demo.html");
+  const demoPath = "file://" + path.resolve(__dirname, "../demo/natte-feature-demo.html");
   const browser = await chromium.launch();
   const context = await browser.newContext({
     viewport: { width: 1280, height: 720 },
@@ -15,16 +15,16 @@ async function record() {
   });
   const page = await context.newPage();
   await page.goto(demoPath);
-  // Full demo cycle: ~27s total
-  await page.waitForTimeout(28000);
+  // Full demo cycle: ~33s total
+  await page.waitForTimeout(34000);
   const video = page.video();
   await context.close();
   await browser.close();
 
   if (video) {
     const tempPath = await video.path();
-    const webmPath = path.join(outDir, "agent-builder-demo.webm");
-    const mp4Path = path.join(outDir, "agent-builder-demo.mp4");
+    const webmPath = path.join(outDir, "natte-feature-demo.webm");
+    const mp4Path = path.join(outDir, "natte-feature-demo.mp4");
     fs.renameSync(tempPath, webmPath);
 
     execFileSync("ffmpeg", [
@@ -40,7 +40,7 @@ async function record() {
       mp4Path,
     ], { stdio: "inherit" });
 
-    console.log(`Agent Builder demo saved to ${mp4Path}`);
+    console.log(`n.a.t.t.e. feature demo saved to ${mp4Path}`);
   }
 }
 

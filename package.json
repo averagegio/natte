@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "record-demo": "node scripts/record-demo.js",
     "record-agent-demo": "node scripts/record-agent-demo.js",
+    "record-demo": "node scripts/record-demo.js",
+    "record-natte-demo": "node scripts/record-agent-demo.js",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"

@@ -2,41 +2,26 @@
 
 import { useEffect, useState } from "react";
 
-const SCENE_DURATIONS = [3500, 3000, 4500, 5500, 3000, 2500, 3000];
+const SCENE_DURATIONS = [3500, 4000, 3500, 4500, 5000, 4500, 3000, 2500, 3000];
 
-const AGENTS = [
+const FEATURES = [
   {
-    name: "Sales Qualifier",
-    gradient: "from-teal-400 via-emerald-500 to-cyan-600",
+    name: "Slop Detection",
+    gradient: "from-rose-500 via-red-500 to-orange-600",
   },
   {
-    name: "Service Dispatch",
+    name: "Turing Test",
     gradient: "from-fuchsia-500 via-purple-500 to-violet-600",
   },
   {
-    name: "Customer Support",
-    gradient: "from-violet-700 via-purple-800 to-slate-700",
+    name: "Human Proof",
+    gradient: "from-emerald-400 via-teal-500 to-cyan-600",
   },
 ];
 
-function WaveformIcon({ className = "" }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      width="32"
-      height="32"
-      viewBox="0 0 32 32"
-      fill="none"
-      aria-hidden="true"
-    >
-      <rect x="4" y="12" width="3" height="8" rx="1.5" fill="currentColor" />
-      <rect x="10" y="8" width="3" height="16" rx="1.5" fill="currentColor" />
-      <rect x="16" y="5" width="3" height="22" rx="1.5" fill="currentColor" />
-      <rect x="22" y="10" width="3" height="12" rx="1.5" fill="currentColor" />
-      <rect x="28" y="14" width="3" height="4" rx="1.5" fill="currentColor" />
-    </svg>
-  );
-}
+const SLOP_POST =
+  "As an AI assistant, I can generate text that mimics human writing.";
+const HUMAN_POST = "Hello everyone — excited to share my weekend photos!";
 
 function IntroducingScene({ visible }: { visible: boolean }) {
   return (
@@ -76,19 +61,61 @@ function IntroducingScene({ visible }: { visible: boolean }) {
 function BrandingScene({ visible }: { visible: boolean }) {
   return (
     <div
-      className={`absolute inset-0 flex items-center justify-center bg-white transition-opacity duration-700 ${
+      className={`absolute inset-0 flex flex-col items-center justify-center bg-white px-8 transition-opacity duration-700 ${
         visible ? "opacity-100" : "pointer-events-none opacity-0"
       }`}
     >
       <div className="flex items-center gap-3">
-        <WaveformIcon className="text-black" />
-        <span className="text-3xl font-semibold tracking-tight text-black">Agent Builder</span>
+        <svg
+          width="32"
+          height="32"
+          viewBox="0 0 32 32"
+          fill="none"
+          className="text-black"
+          aria-hidden="true"
+        >
+          <path
+            d="M16 3l9 4v7c0 5-3.5 8.5-9 10.5C10.5 22.5 7 19 7 14V7l9-4z"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          />
+          <path
+            d="M11.5 15.5l3 3 6.5-6.5"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+        <span className="text-3xl font-semibold tracking-tight text-black">n.a.t.t.e.</span>
       </div>
+      <p className="mt-4 max-w-[260px] text-center text-xs leading-relaxed tracking-wide text-[#536471] uppercase">
+        Normative AI Turing Test that Eliminates slop
+      </p>
     </div>
   );
 }
 
-function AgentPillsScene({ visible, activeIndex }: { visible: boolean; activeIndex: number }) {
+function SlopTaglineScene({ visible }: { visible: boolean }) {
+  return (
+    <div
+      className={`absolute inset-0 flex flex-col items-center justify-center bg-black px-8 transition-opacity duration-700 ${
+        visible ? "opacity-100" : "pointer-events-none opacity-0"
+      }`}
+    >
+      <p className="text-center text-3xl font-bold leading-tight tracking-tight text-white">
+        The slop
+        <br />
+        <span className="text-white/50">stops here.</span>
+      </p>
+      <p className="mt-4 text-center text-sm text-white/40">
+        Real-time AI detection on X
+      </p>
+    </div>
+  );
+}
+
+function FeaturePillsScene({ visible, activeIndex }: { visible: boolean; activeIndex: number }) {
   return (
     <div
       className={`absolute inset-0 bg-black transition-opacity duration-700 ${
@@ -120,11 +147,11 @@ function AgentPillsScene({ visible, activeIndex }: { visible: boolean; activeInd
       </div>
 
       <div className="relative flex h-full flex-col items-center justify-center gap-3 px-6">
-        {AGENTS.map((agent, i) => {
+        {FEATURES.map((feature, i) => {
           const active = i === activeIndex;
           return (
             <div
-              key={agent.name}
+              key={feature.name}
               className={`flex w-full max-w-[280px] items-center gap-3 rounded-full border px-4 py-3 transition-all duration-500 ${
                 active
                   ? "border-white/25 bg-white/[0.08] shadow-[0_0_20px_rgba(255,255,255,0.06)]"
@@ -132,9 +159,9 @@ function AgentPillsScene({ visible, activeIndex }: { visible: boolean; activeInd
               }`}
             >
               <div
-                className={`h-9 w-9 shrink-0 rounded-full bg-gradient-to-br ${agent.gradient}`}
+                className={`h-9 w-9 shrink-0 rounded-full bg-gradient-to-br ${feature.gradient}`}
               />
-              <span className="flex-1 text-sm font-medium text-white">{agent.name}</span>
+              <span className="flex-1 text-sm font-medium text-white">{feature.name}</span>
               <svg
                 width="16"
                 height="16"
@@ -155,43 +182,50 @@ function AgentPillsScene({ visible, activeIndex }: { visible: boolean; activeInd
   );
 }
 
-function VoiceAgentFormScene({
+function XPostScene({
   visible,
-  agentName,
-  goal,
+  post,
+  detectionOn,
+  result,
+  checking,
 }: {
   visible: boolean;
-  agentName: string;
-  goal: string;
+  post: string;
+  detectionOn: boolean;
+  result: "ai" | "human" | null;
+  checking: boolean;
 }) {
+  const resultColor =
+    result === "ai" ? "text-rose-500" : result === "human" ? "text-emerald-500" : "text-[#536471]";
+
   return (
     <div
-      className={`absolute inset-0 flex items-center justify-center bg-[#f7f9f9] p-6 transition-opacity duration-700 ${
+      className={`absolute inset-0 flex items-center justify-center bg-[#f7f9f9] p-5 transition-opacity duration-700 ${
         visible ? "opacity-100" : "pointer-events-none opacity-0"
       }`}
     >
-      <div className="w-full max-w-[300px] rounded-2xl border border-black/[0.08] bg-white p-5 shadow-sm">
-        <h3 className="text-lg font-bold text-black">Create a Voice Agent</h3>
-
-        <label className="mt-5 block">
-          <span className="text-xs font-medium text-[#536471]">Agent name</span>
-          <div className="mt-1.5 rounded-xl border border-black/10 px-3 py-2.5 text-sm text-black">
-            {agentName}
-            {visible && agentName.length < 16 && (
-              <span className="ml-px inline-block h-4 w-px animate-pulse bg-black" />
-            )}
+      <div className="w-full max-w-[300px] rounded-2xl border border-black/[0.08] bg-white p-4 shadow-sm">
+        <div className="mb-3 flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-black text-xs font-bold text-white">
+            X
           </div>
-        </label>
-
-        <label className="mt-4 block">
-          <span className="text-xs font-medium text-[#536471]">Goal (optional)</span>
-          <div className="mt-1.5 min-h-[80px] rounded-xl border border-black/10 px-3 py-2.5 text-sm leading-relaxed text-black">
-            {goal}
-            {visible && goal.length > 0 && goal.length < 45 && (
-              <span className="ml-px inline-block h-4 w-px animate-pulse bg-black" />
-            )}
-          </div>
-        </label>
+          <span className="text-sm font-semibold text-black">@natte</span>
+        </div>
+        <p className="text-sm leading-relaxed text-black">{post}</p>
+        <div className="mt-4 flex items-center gap-3">
+          <span
+            className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+              detectionOn
+                ? "border-emerald-500/50 bg-emerald-600 text-white"
+                : "border-black/10 bg-black/[0.04] text-black/70"
+            }`}
+          >
+            {detectionOn ? "AI detection: ON" : "AI detection: OFF"}
+          </span>
+          <span className={`text-xs font-medium ${resultColor}`}>
+            {checking ? "Checking..." : result ? `Result: ${result}` : "Idle"}
+          </span>
+        </div>
       </div>
     </div>
   );
@@ -199,26 +233,29 @@ function VoiceAgentFormScene({
 
 function TabNavScene({ visible }: { visible: boolean }) {
   const tabs = [
-    { icon: "chat", active: false },
+    { icon: "chat", active: true },
     { icon: "wrench", active: true },
     { icon: "sliders", active: true },
-    { icon: "book", active: true },
-    { icon: "shield", active: false },
+    { icon: "book", active: false },
+    { icon: "shield", active: true },
   ];
 
   return (
     <div
-      className={`absolute inset-0 flex items-center justify-center bg-white transition-opacity duration-700 ${
+      className={`absolute inset-0 flex flex-col items-center justify-center bg-white transition-opacity duration-700 ${
         visible ? "opacity-100" : "pointer-events-none opacity-0"
       }`}
     >
+      <p className="mb-8 text-xs font-medium tracking-wide text-[#536471] uppercase">
+        Built for X
+      </p>
       <div className="relative flex items-end gap-8 px-4">
         {tabs.map((tab, i) => (
           <div key={i} className="flex flex-col items-center">
             <TabIcon type={tab.icon} muted={!tab.active} />
           </div>
         ))}
-        <div className="absolute -bottom-1 left-[calc(20%-4px)] h-0.5 w-[60%] rounded-full bg-[#f97316]" />
+        <div className="absolute -bottom-1 left-[calc(12%-4px)] h-0.5 w-[76%] rounded-full bg-[#f97316]" />
       </div>
     </div>
   );
@@ -287,10 +324,13 @@ function TabIcon({ type, muted }: { type: string; muted: boolean }) {
 function ProgressScene({ visible, progress }: { visible: boolean; progress: number }) {
   return (
     <div
-      className={`absolute inset-0 flex items-center justify-center bg-white px-10 transition-opacity duration-700 ${
+      className={`absolute inset-0 flex flex-col items-center justify-center bg-white px-10 transition-opacity duration-700 ${
         visible ? "opacity-100" : "pointer-events-none opacity-0"
       }`}
     >
+      <p className="mb-6 text-xs font-medium tracking-wide text-[#536471] uppercase">
+        Detection sensitivity
+      </p>
       <div className="relative h-0.5 w-full max-w-[240px] rounded-full bg-[#f97316]">
         <div
           className="absolute top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-black transition-all duration-300"
@@ -309,10 +349,10 @@ function ProgressScene({ visible, progress }: { visible: boolean; progress: numb
   );
 }
 
-function CreateAgentScene({ visible, pressed }: { visible: boolean; pressed: boolean }) {
+function CtaScene({ visible, pressed }: { visible: boolean; pressed: boolean }) {
   return (
     <div
-      className={`absolute inset-0 flex items-center justify-center bg-white transition-opacity duration-700 ${
+      className={`absolute inset-0 flex flex-col items-center justify-center bg-white transition-opacity duration-700 ${
         visible ? "opacity-100" : "pointer-events-none opacity-0"
       }`}
     >
@@ -323,22 +363,24 @@ function CreateAgentScene({ visible, pressed }: { visible: boolean; pressed: boo
         }`}
         tabIndex={-1}
       >
-        Create Agent +
+        Stop the Slop +
       </button>
+      <p className="mt-4 text-xs text-[#536471]">n.a.t.t.e. for X</p>
     </div>
   );
 }
 
-export default function AgentBuilderDemo({ autoPlay = true }: { autoPlay?: boolean }) {
+export default function NatteFeatureDemo({ autoPlay = true }: { autoPlay?: boolean }) {
   const [scene, setScene] = useState(0);
-  const [activeAgent, setActiveAgent] = useState(0);
-  const [agentName, setAgentName] = useState("");
-  const [goal, setGoal] = useState("");
+  const [activeFeature, setActiveFeature] = useState(0);
+  const [slopDetectionOn, setSlopDetectionOn] = useState(false);
+  const [slopChecking, setSlopChecking] = useState(false);
+  const [slopResult, setSlopResult] = useState<"ai" | "human" | null>(null);
+  const [humanDetectionOn, setHumanDetectionOn] = useState(false);
+  const [humanChecking, setHumanChecking] = useState(false);
+  const [humanResult, setHumanResult] = useState<"ai" | "human" | null>(null);
   const [progress, setProgress] = useState(35);
   const [pressed, setPressed] = useState(false);
-
-  const fullAgentName = "Customer Support";
-  const fullGoal = "You are a friendly customer support agent.";
 
   useEffect(() => {
     if (!autoPlay) return;
@@ -352,51 +394,56 @@ export default function AgentBuilderDemo({ autoPlay = true }: { autoPlay?: boole
   }, [scene, autoPlay]);
 
   useEffect(() => {
-    if (scene !== 2) {
-      setActiveAgent(0);
+    if (scene !== 3) {
+      setActiveFeature(0);
       return;
     }
 
     const timers = [
-      setTimeout(() => setActiveAgent(1), 1200),
-      setTimeout(() => setActiveAgent(2), 2800),
+      setTimeout(() => setActiveFeature(1), 1200),
+      setTimeout(() => setActiveFeature(2), 2800),
     ];
     return () => timers.forEach(clearTimeout);
   }, [scene]);
 
   useEffect(() => {
-    if (scene !== 3) {
-      setAgentName("");
-      setGoal("");
+    if (scene !== 4) {
+      setSlopDetectionOn(false);
+      setSlopChecking(false);
+      setSlopResult(null);
       return;
     }
 
-    let nameIdx = 0;
-    let goalIdx = 0;
-    let phase: "name" | "goal" | "done" = "name";
+    const t1 = setTimeout(() => setSlopDetectionOn(true), 800);
+    const t2 = setTimeout(() => setSlopChecking(true), 1200);
+    const t3 = setTimeout(() => {
+      setSlopChecking(false);
+      setSlopResult("ai");
+    }, 2200);
 
-    const interval = setInterval(() => {
-      if (phase === "name") {
-        nameIdx++;
-        setAgentName(fullAgentName.slice(0, nameIdx));
-        if (nameIdx >= fullAgentName.length) {
-          phase = "goal";
-        }
-      } else if (phase === "goal") {
-        goalIdx++;
-        setGoal(fullGoal.slice(0, goalIdx));
-        if (goalIdx >= fullGoal.length) {
-          phase = "done";
-          clearInterval(interval);
-        }
-      }
-    }, 60);
-
-    return () => clearInterval(interval);
+    return () => [t1, t2, t3].forEach(clearTimeout);
   }, [scene]);
 
   useEffect(() => {
     if (scene !== 5) {
+      setHumanDetectionOn(false);
+      setHumanChecking(false);
+      setHumanResult(null);
+      return;
+    }
+
+    const t1 = setTimeout(() => setHumanDetectionOn(true), 800);
+    const t2 = setTimeout(() => setHumanChecking(true), 1200);
+    const t3 = setTimeout(() => {
+      setHumanChecking(false);
+      setHumanResult("human");
+    }, 2200);
+
+    return () => [t1, t2, t3].forEach(clearTimeout);
+  }, [scene]);
+
+  useEffect(() => {
+    if (scene !== 7) {
       setProgress(35);
       return;
     }
@@ -412,7 +459,7 @@ export default function AgentBuilderDemo({ autoPlay = true }: { autoPlay?: boole
   }, [scene]);
 
   useEffect(() => {
-    if (scene !== 6) {
+    if (scene !== 8) {
       setPressed(false);
       return;
     }
@@ -434,11 +481,25 @@ export default function AgentBuilderDemo({ autoPlay = true }: { autoPlay?: boole
 
         <IntroducingScene visible={scene === 0} />
         <BrandingScene visible={scene === 1} />
-        <AgentPillsScene visible={scene === 2} activeIndex={activeAgent} />
-        <VoiceAgentFormScene visible={scene === 3} agentName={agentName} goal={goal} />
-        <TabNavScene visible={scene === 4} />
-        <ProgressScene visible={scene === 5} progress={progress} />
-        <CreateAgentScene visible={scene === 6} pressed={pressed} />
+        <SlopTaglineScene visible={scene === 2} />
+        <FeaturePillsScene visible={scene === 3} activeIndex={activeFeature} />
+        <XPostScene
+          visible={scene === 4}
+          post={SLOP_POST}
+          detectionOn={slopDetectionOn}
+          checking={slopChecking}
+          result={slopResult}
+        />
+        <XPostScene
+          visible={scene === 5}
+          post={HUMAN_POST}
+          detectionOn={humanDetectionOn}
+          checking={humanChecking}
+          result={humanResult}
+        />
+        <TabNavScene visible={scene === 6} />
+        <ProgressScene visible={scene === 7} progress={progress} />
+        <CtaScene visible={scene === 8} pressed={pressed} />
 
         <div className="absolute inset-x-0 bottom-0 z-20 flex justify-center gap-1.5 pb-3">
           {SCENE_DURATIONS.map((_, i) => (
@@ -456,7 +517,7 @@ export default function AgentBuilderDemo({ autoPlay = true }: { autoPlay?: boole
       </div>
 
       <p className="text-center text-sm text-white/40">
-        Agent Builder — tap dots to jump between scenes
+        n.a.t.t.e. — normative AI Turing test that eliminates slop
       </p>
     </div>
   );
