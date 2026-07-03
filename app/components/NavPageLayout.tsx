@@ -12,7 +12,7 @@ interface NavPageLayoutProps {
 
 export default function NavPageLayout({ title, children, wide = false }: NavPageLayoutProps) {
   return (
-    <div className="relative min-h-screen bg-black">
+    <div className="relative min-h-screen overflow-x-hidden bg-black">
       <SideDrawer />
 
       <div className="pointer-events-none fixed inset-0 z-0">

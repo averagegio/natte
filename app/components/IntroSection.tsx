@@ -6,7 +6,7 @@ interface IntroSectionProps {
 
 export default function IntroSection({ onEnter }: IntroSectionProps) {
   return (
-    <section className="intro-gradient relative flex h-screen w-full snap-start snap-always flex-col items-center justify-center overflow-hidden">
+    <section className="intro-gradient relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden">
       <div className="relative z-10 flex flex-col items-center px-6 text-center">
         <span className="mb-6 inline-flex rounded-full border border-white/20 bg-white/5 px-5 py-1.5 text-xs font-semibold tracking-[0.2em] text-white/70 uppercase backdrop-blur-sm">
           Proof of Human

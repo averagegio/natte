@@ -27,30 +27,19 @@ const features = [
 ];
 
 export default function LandingPage() {
-  const scrollRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLElement>(null);
 
   const scrollToMain = () => {
-    const container = scrollRef.current;
-    const main = mainRef.current;
-    if (container && main) {
-      container.scrollTo({ top: main.offsetTop, behavior: "smooth" });
-    }
+    mainRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
-    <div
-      ref={scrollRef}
-      className="scroll-container h-screen overflow-y-scroll scroll-smooth"
-    >
+    <div className="relative bg-black">
       <SideDrawer />
 
       <IntroSection onEnter={scrollToMain} />
 
-      <main
-        ref={mainRef}
-        className="relative min-h-screen snap-start snap-always"
-      >
+      <main ref={mainRef} className="relative">
         <div className="pointer-events-none fixed inset-0 z-0 bg-black">
           <StarConstellation />
         </div>
