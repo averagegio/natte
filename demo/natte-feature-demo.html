@@ -56,8 +56,8 @@
       .acts{display:flex;gap:28px;color:var(--muted);font-size:12px}
       .acts svg{width:16px;height:16px;fill:currentColor;vertical-align:-3px;margin-right:3px}
 
-      .chat-head{display:flex;align-items:center;justify-content:space-between;padding:8px 16px 10px;border-bottom:1px solid var(--border)}
-      .chat-head h1{font-size:20px;font-weight:800;color:var(--text)}
+      .chat-head{display:flex;align-items:center;justify-content:space-between;padding:8px 16px 10px;border-bottom:1px solid var(--border);gap:8px}
+      .chat-head h1{font-size:20px;font-weight:800;color:var(--text);flex:1;text-align:center}
       .chat-head .filter{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center}
       .chat-head .filter svg{width:18px;height:18px;fill:var(--text)}
       .dm{display:flex;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);align-items:center}
@@ -78,46 +78,64 @@
 
       .bd{position:absolute;inset:0;background:rgba(91,112,131,.4);opacity:0;pointer-events:none;transition:opacity .45s;z-index:40}
       .bd.on{opacity:1}
-      .sb{position:absolute;top:0;left:0;bottom:0;width:82%;background:var(--bg);z-index:50;transform:translateX(-105%);transition:transform .5s cubic-bezier(.33,1,.68,1);padding:54px 8px 20px}
+      .sb{position:absolute;top:0;left:0;bottom:0;width:82%;background:var(--bg);z-index:50;transform:translateX(-105%);transition:transform .38s cubic-bezier(.34,1.45,.64,1);padding:54px 8px 20px}
       .sb.on{transform:none}
-      .sb-item{display:flex;align-items:center;gap:18px;padding:12px 18px;font-size:19px;color:var(--text);border-radius:999px}
+      .sb-item{display:flex;align-items:center;gap:18px;padding:12px 18px;font-size:19px;color:var(--text);border-radius:999px;transition:transform .15s cubic-bezier(.34,1.45,.64,1),background .15s}
+      .sb-item.flash{transform:scale(.96);background:rgba(255,255,255,.08)}
       .sb-item svg{width:24px;height:24px;fill:currentColor}
       .sb-item.natte .ni{width:28px;height:28px;border-radius:50%;background:#fff;color:#000;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center}
       .sb-item.natte.glow{background:rgba(29,155,240,.12);box-shadow:0 0 0 2px var(--blue)}
 
       .sbg{position:absolute;inset:0;background:rgba(0,0,0,.55);opacity:0;z-index:55;transition:opacity .4s}
       .sbg.on{opacity:1}
-      .sheet{position:absolute;left:0;right:0;bottom:0;z-index:56;background:var(--elevated);border-radius:18px 18px 0 0;border-top:1px solid var(--border);padding:10px 18px 24px;transform:translateY(105%);transition:transform .55s cubic-bezier(.33,1,.68,1);max-height:92%}
+      .sheet{position:absolute;left:0;right:0;bottom:0;z-index:56;background:var(--elevated);border-radius:18px 18px 0 0;border-top:1px solid var(--border);padding:10px 18px 24px;transform:translateY(105%);transition:transform .42s cubic-bezier(.34,1.45,.64,1);max-height:92%}
       .sheet.on{transform:none}
       .grab{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 14px}
       .sheet h2{font-size:18px;font-weight:800;color:var(--text)}
       .sheet .sub{font-size:14px;color:var(--muted);margin:2px 0 14px}
       .pick{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px}
-      .pick div{padding:12px 14px;font-size:14px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)}
+      .pick div{padding:12px 14px;font-size:14px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border);transition:transform .12s cubic-bezier(.34,1.45,.64,1),background .12s}
+      .pick div.flash{transform:scale(.98);background:rgba(255,255,255,.06)}
       .pick div:last-child{border-bottom:none}
       .pick .sel{background:rgba(29,155,240,.08);color:var(--blue)}
       .fl{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
       .rail{position:relative;height:3px;background:var(--orange);border-radius:99px;margin-bottom:18px}
-      .rail .dot,.rail .thumb{position:absolute;top:50%;transform:translate(-50%,-50%);left:30%;transition:left 1.4s cubic-bezier(.33,1,.68,1)}
+      .rail .dot,.rail .thumb{position:absolute;top:50%;transform:translate(-50%,-50%);left:30%;transition:left .65s cubic-bezier(.34,1.45,.64,1)}
       .rail .dot{width:7px;height:7px;background:#fff;border-radius:50%}
       .rail .thumb{width:20px;height:20px;border:2.5px solid #fff;border-radius:50%;background:var(--bg)}
       .rail.go .dot,.rail.go .thumb{left:72%}
       .togs{display:flex;gap:8px;margin-bottom:14px}
-      .tog{flex:1;padding:12px;text-align:center;border-radius:999px;font-size:14px;font-weight:700;border:1px solid var(--border);color:var(--text);transition:all .35s}
+      .tog{flex:1;padding:12px;text-align:center;border-radius:999px;font-size:14px;font-weight:700;border:1px solid var(--border);color:var(--text);transition:all .2s cubic-bezier(.34,1.45,.64,1)}
       .tog.on{background:#fff;color:#000;border-color:#fff}
+      .tog.flash{transform:scale(.94)}
       .dur-wrap{margin-bottom:14px}
       .dur-wheel{position:relative;height:108px;overflow:hidden}
       .dur-wheel::before,.dur-wheel::after{content:"";position:absolute;left:0;right:0;height:36px;z-index:2;pointer-events:none}
       .dur-wheel::before{top:0;background:linear-gradient(var(--elevated),transparent)}
       .dur-wheel::after{bottom:0;background:linear-gradient(transparent,var(--elevated))}
       .dur-lines{position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);height:36px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);z-index:1;pointer-events:none}
-      .dur-track{transition:transform .9s cubic-bezier(.33,1,.68,1)}
+      .dur-track{transition:transform .55s cubic-bezier(.34,1.45,.64,1)}
       .dur-track div{height:36px;line-height:36px;text-align:center;font-size:15px;color:var(--muted);opacity:.45;transition:opacity .4s,font-size .4s,color .4s}
       .dur-track .active{font-size:20px;font-weight:700;color:var(--text);opacity:1}
-      .go-btn{padding:14px;border-radius:999px;background:#fff;color:#000;font-size:16px;font-weight:700;text-align:center}
+      .go-btn{padding:14px;border-radius:999px;background:#fff;color:#000;font-size:16px;font-weight:700;text-align:center;transition:transform .12s cubic-bezier(.34,1.45,.64,1)}
+      .go-btn.flash{transform:scale(.95)}
+      .chip .hide{transition:transform .12s cubic-bezier(.34,1.45,.64,1)}
+      .chip .hide.flash{transform:scale(.9)}
+      .dm{transition:transform .12s cubic-bezier(.34,1.45,.64,1),background .2s}
+      .dm.flash{transform:scale(.98);background:rgba(255,255,255,.04)}
+      .menu-btn{transition:transform .12s cubic-bezier(.34,1.45,.64,1)}
+      .menu-btn.flash{transform:scale(.88)}
+
+      /* Tap finger */
+      .finger{position:absolute;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.28);border:2.5px solid rgba(255,255,255,.75);z-index:200;opacity:0;pointer-events:none;transform:translate(-50%,-50%) scale(.4);box-shadow:0 2px 12px rgba(0,0,0,.4)}
+      .finger.show{opacity:1;transform:translate(-50%,-50%) scale(1);transition:opacity .12s,transform .28s cubic-bezier(.34,1.55,.64,1),left .32s cubic-bezier(.34,1.45,.64,1),top .32s cubic-bezier(.34,1.45,.64,1)}
+      .finger.down{transform:translate(-50%,-50%) scale(.82);transition:transform .08s}
+      .finger .ripple{position:absolute;inset:-8px;border-radius:50%;border:2px solid rgba(255,255,255,.5);opacity:0}
+      .finger.pop .ripple{animation:ripplePop .4s ease-out forwards}
+      @keyframes ripplePop{0%{transform:scale(.6);opacity:.9}100%{transform:scale(2.2);opacity:0}}
 
       /* Kinetic typography */
-      .ktype{position:absolute;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.78);opacity:0;pointer-events:none;transition:opacity .35s}
+      .ktype{position:absolute;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.78);opacity:0;pointer-events:none;transition:opacity .22s}
       .ktype.on{opacity:1}
       .ktype-inner{text-align:center;line-height:1.05}
       .ktype .w{display:inline-block;font-size:54px;font-weight:800;color:#fff;letter-spacing:-.03em;opacity:0;transform:translateY(32px) scale(.92);margin-right:.18em}
@@ -143,12 +161,12 @@
           <div class="panel" id="panel-feed">
             <div class="status"><span>9:41</span><span>5G 🔋</span></div>
             <header class="topbar">
-              <svg viewBox="0 0 24 24"><path d="M3 7h18v2H3V7zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/></svg>
+              <div class="menu-btn" id="menu-btn"><svg viewBox="0 0 24 24"><path d="M3 7h18v2H3V7zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/></svg></div>
               <span class="x-mark">𝕏</span>
               <img class="top-av" src="assets/avatars/sama.jpg" alt="" />
             </header>
             <div class="tabs"><div class="tab">Following</div><div class="tab on">For You</div></div>
-            <div class="chip" id="chip-feed"><span class="n">n</span><span class="lbl">n.a.t.t.e.</span><span class="meta" id="meta-feed">4 AI posts marked</span><span class="hide">Hide AI</span></div>
+            <div class="chip" id="chip-feed"><span class="n">n</span><span class="lbl">n.a.t.t.e.</span><span class="meta" id="meta-feed">4 AI posts marked</span><span class="hide" id="hide-feed">Hide AI</span></div>
             <div class="spin" id="spin-feed"></div>
             <div class="scroll" id="scroll-feed">
               <article class="tweet" id="f1">
@@ -188,7 +206,11 @@
 
           <div class="panel off" id="panel-chat">
             <div class="status"><span>9:41</span><span>5G 🔋</span></div>
-            <div class="chat-head"><h1>Chat</h1><div class="filter"><svg viewBox="0 0 24 24"><path d="M10 18h11M4 6h17M4 12h17" stroke="currentColor" stroke-width="2" fill="none"/></svg></div></div>
+            <div class="chat-head">
+              <div class="menu-btn" id="menu-btn-chat"><svg viewBox="0 0 24 24"><path d="M3 7h18v2H3V7zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/></svg></div>
+              <h1>Chat</h1>
+              <div class="filter"><svg viewBox="0 0 24 24"><path d="M10 18h11M4 6h17M4 12h17" stroke="currentColor" stroke-width="2" fill="none"/></svg></div>
+            </div>
             <div id="chat-list">
               <div class="dm" id="dm1"><img class="av" src="assets/avatars/paulg.jpg" alt="" /><div class="preview"><div class="top"><span class="nm">Paul Graham</span><span class="tm">1h</span></div><div class="msg">It's not cheating to use tools.</div></div></div>
               <div class="dm glow" id="dm2"><img class="av" src="assets/avatars/elonmusk.jpg" alt="" /><div class="preview"><div class="top"><span class="nm">Elon Musk</span><span class="tm">2h</span></div><div class="msg">As an AI, I can generate...</div></div></div>
@@ -200,7 +222,7 @@
               <div class="bubble in marked" id="cb-ai">As an AI language model, I can help you draft engaging replies for your audience.</div>
               <div class="bubble in" id="cb-real">Nice. Does it work in Chat too?</div>
             </div>
-            <div class="chip" id="chip-chat" style="margin-top:8px"><span class="n">n</span><span class="lbl">n.a.t.t.e.</span><span class="meta" id="meta-chat">1 AI message marked</span><span class="hide">Hide AI</span></div>
+            <div class="chip" id="chip-chat" style="margin-top:8px"><span class="n">n</span><span class="lbl">n.a.t.t.e.</span><span class="meta" id="meta-chat">1 AI message marked</span><span class="hide" id="hide-chat">Hide AI</span></div>
           </div>
 
           <div class="bd" id="bd"></div>
@@ -215,14 +237,14 @@
             <div class="grab"></div>
             <h2 id="sec-title">Proof of Human</h2>
             <p class="sub">AI slop blocker</p>
-            <div class="pick" id="sec-pick"><div>Proof of Human</div><div class="sel">AI slop blocker</div></div>
+            <div class="pick" id="sec-pick"><div>Proof of Human</div><div class="sel" id="pick-slop">AI slop blocker</div></div>
             <p class="fl" id="sec-sens-label">Sensitivity</p>
             <div class="rail" id="rail"><div class="dot"></div><div class="thumb"></div></div>
             <p class="fl" id="tog-label">Activate on feed</p>
             <div class="togs" id="sec-togs"><div class="tog" id="ta">Following</div><div class="tog on" id="tb">For You</div></div>
             <div class="dur-wrap" id="sec-dur">
               <p class="fl">Duration</p>
-              <div class="dur-wheel">
+              <div class="dur-wheel" id="dur-wheel">
                 <div class="dur-lines"></div>
                 <div class="dur-track" id="dur-track">
                   <div>5 minutes</div>
@@ -237,6 +259,7 @@
         </div>
       </div>
 
+      <div class="finger" id="finger"><div class="ripple"></div></div>
       <div class="ktype" id="kt1"><div class="ktype-inner"><span class="w" style="animation-delay:.05s">Proof</span><span class="w" style="animation-delay:.15s">of</span><span class="w" style="animation-delay:.25s">Human</span><span class="sub-w">Normative AI Turing Test</span></div></div>
       <div class="ktype" id="kt2"><div class="ktype-inner"><span class="w" style="animation-delay:.05s">Mark</span><span class="w" style="animation-delay:.18s">AI</span><span class="w" style="animation-delay:.31s">slop</span></div></div>
       <div class="ktype" id="kt3"><div class="ktype-inner"><span class="w" style="animation-delay:.05s">On</span><span class="w" style="animation-delay:.15s">X</span><span class="w" style="animation-delay:.25s">Chat</span><span class="w" style="animation-delay:.35s">too</span></div></div>
@@ -247,18 +270,22 @@
     <script>
       const $ = (id) => document.getElementById(id);
       const vp = $("vp");
+      const finger = $("finger");
       const AI_FEED = ["f2", "f4", "f6", "f8"];
 
-      function ease(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2; }
+      function easeOutBack(t) {
+        const c = 1.70158;
+        return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2);
+      }
 
-      function cam(to, dur = 900, origin = [640, 360]) {
+      function cam(to, dur = 520, origin = [640, 360]) {
         const from = cam._s || { s: 1, x: 0, y: 0 };
         const start = performance.now();
         vp.style.transformOrigin = `${origin[0]}px ${origin[1]}px`;
         return new Promise((resolve) => {
           function step(now) {
             const t = Math.min((now - start) / dur, 1);
-            const e = ease(t);
+            const e = easeOutBack(t);
             const s = from.s + (to.s - from.s) * e;
             const x = from.x + (to.x - from.x) * e;
             const y = from.y + (to.y - from.y) * e;
@@ -273,6 +300,46 @@
 
       function wait(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
+      function center(el) {
+        const stage = document.querySelector(".stage");
+        const sr = stage.getBoundingClientRect();
+        const er = el.getBoundingClientRect();
+        return {
+          x: er.left + er.width / 2 - sr.left,
+          y: er.top + er.height / 2 - sr.top,
+        };
+      }
+
+      async function moveFinger(el) {
+        const { x, y } = center(el);
+        finger.style.left = `${x}px`;
+        finger.style.top = `${y}px`;
+        if (!finger.classList.contains("show")) finger.classList.add("show");
+        await wait(220);
+      }
+
+      async function tap(el, action) {
+        await moveFinger(el);
+        finger.classList.add("down");
+        el.classList.add("flash");
+        await wait(90);
+        finger.classList.add("pop");
+        finger.classList.remove("down");
+        if (action) action();
+        await wait(160);
+        el.classList.remove("flash");
+        finger.classList.remove("pop");
+        await wait(40);
+      }
+
+      function hideFinger() {
+        finger.classList.remove("show", "down", "pop");
+      }
+
+      async function camSheet(y, scale = 1.3, dur = 480) {
+        return cam({ s: scale, x: 0, y }, dur, [640, 500]);
+      }
+
       function ktype(id, on) {
         const el = $(id);
         el.classList.toggle("on", on);
@@ -285,39 +352,40 @@
         }
       }
 
-      async function focusSection(el, scale = 1.42) {
-        const stage = document.querySelector(".stage");
-        const sr = stage.getBoundingClientRect();
-        const er = el.getBoundingClientRect();
-        const cx = er.left + er.width / 2 - sr.left;
-        const cy = er.top + er.height / 2 - sr.top;
-        const tx = (640 - cx) * 0.55;
-        const ty = (360 - cy) * 0.55;
-        await cam({ s: scale, x: tx, y: ty }, 850, [cx, cy]);
+      async function ktypeBeat(id, ms = 750) {
+        ktype(id, true);
+        await wait(ms);
+        ktype(id, false);
       }
 
-      async function sheetFlow() {
-        await focusSection($("sec-title"), 1.38);
-        await wait(700);
-        await focusSection($("sec-pick"), 1.4);
-        await wait(600);
-        await focusSection($("sec-sens-label"), 1.42);
-        await wait(300);
-        await focusSection($("rail"), 1.44);
-        $("rail").classList.add("go");
-        await wait(1600);
-        await focusSection($("sec-togs"), 1.44);
-        await wait(500);
-        $("tb").classList.add("on");
-        await wait(600);
-        await focusSection($("sec-dur"), 1.46);
-        await wait(400);
-        $("dur-hr").classList.remove("active");
-        $("dur-day").classList.add("active");
-        $("dur-track").style.transform = "translateY(-36px)";
-        await wait(1400);
-        await focusSection($("sec-go"), 1.4);
-        await wait(500);
+      async function sheetFlow(isChat = false) {
+        await camSheet(-35, 1.28, 420);
+        await tap($("pick-slop"));
+        await Promise.all([
+          camSheet(-58, 1.3, 380),
+          (async () => {
+            await tap($("rail"), () => $("rail").classList.add("go"));
+            await wait(420);
+          })(),
+        ]);
+        await camSheet(-82, 1.32, 360);
+        if (isChat) {
+          await tap($("ta"), () => { $("ta").classList.add("on"); $("tb").classList.remove("on"); });
+        } else {
+          await tap($("tb"), () => $("tb").classList.add("on"));
+        }
+        await camSheet(-108, 1.34, 360);
+        await tap($("dur-wheel"), () => {
+          $("dur-hr").classList.remove("active");
+          $("dur-day").classList.add("active");
+          $("dur-track").style.transform = "translateY(-36px)";
+        });
+        await wait(380);
+        await camSheet(-118, 1.32, 340);
+        await tap($("sec-go"), () => {
+          $("sheet").classList.remove("on");
+          $("sbg").classList.remove("on");
+        });
       }
 
       async function run() {
@@ -327,51 +395,47 @@
         $("dur-hr").classList.add("active");
         $("dur-day").classList.remove("active");
         $("rail").classList.remove("go");
+        $("ta").classList.remove("on");
+        $("tb").classList.add("on");
 
         // ── FEED ──
-        await wait(2400);
-        $("sb").classList.add("on"); $("bd").classList.add("on");
-        await cam({ s: 1.25, x: 85, y: 15 }, 950, [500, 360]);
         await wait(900);
-        $("natte").classList.add("glow");
-        await cam({ s: 1.5, x: 115, y: 40 }, 1000, [470, 390]);
-        await wait(600);
-        $("sheet").classList.add("on"); $("sbg").classList.add("on");
-        await wait(500);
-        ktype("kt1", true); await wait(1500); ktype("kt1", false);
-        await wait(250);
-        await sheetFlow();
-        await wait(200);
-        $("sheet").classList.remove("on"); $("sbg").classList.remove("on");
+        await tap($("menu-btn"), () => { $("sb").classList.add("on"); $("bd").classList.add("on"); });
+        await cam({ s: 1.22, x: 75, y: 10 }, 480, [480, 360]);
+        await tap($("natte"), () => {
+          $("natte").classList.add("glow");
+          $("sheet").classList.add("on");
+          $("sbg").classList.add("on");
+        });
+        hideFinger();
+        await ktypeBeat("kt1", 680);
+        await sheetFlow(false);
+        hideFinger();
         $("sb").classList.remove("on"); $("bd").classList.remove("on");
         $("natte").classList.remove("glow");
-        await cam({ s: 1, x: 0, y: 0 }, 1000);
-        await wait(500);
-        ktype("kt2", true); await wait(1600); ktype("kt2", false);
-        await wait(300);
-        await cam({ s: 1.3, x: 0, y: 55 }, 850, [640, 220]);
+        await cam({ s: 1, x: 0, y: 0 }, 520);
+        await ktypeBeat("kt2", 650);
         $("scroll-feed").classList.add("pull"); $("spin-feed").classList.add("on");
-        await wait(1300);
+        await cam({ s: 1.22, x: 0, y: 45 }, 420, [640, 200]);
+        await wait(700);
         $("scroll-feed").classList.remove("pull"); $("spin-feed").classList.remove("on");
-        for (let i = 0; i < AI_FEED.length; i++) {
-          await wait(180);
-          $(AI_FEED[i]).classList.add("marked");
+        for (const id of AI_FEED) {
+          $(id).classList.add("marked");
+          await wait(70);
         }
-        await wait(500);
-        await cam({ s: 1.42, x: -10, y: 75 }, 900, [640, 280]);
-        await wait(600);
+        await cam({ s: 1.28, x: 0, y: 52 }, 380, [640, 200]);
         $("chip-feed").classList.add("on");
-        await wait(1000);
-        for (let i = 0; i < AI_FEED.length; i++) {
-          await wait(120);
-          $(AI_FEED[i]).classList.add("hide");
-        }
-        $("meta-feed").textContent = "AI hidden";
-        await cam({ s: 1, x: 0, y: 0 }, 900);
-        await wait(1400);
+        await wait(280);
+        await tap($("hide-feed"), () => {
+          AI_FEED.forEach((id) => $(id).classList.add("hide"));
+          $("meta-feed").textContent = "AI hidden";
+        });
+        hideFinger();
+        await cam({ s: 1, x: 0, y: 0 }, 480);
+        await wait(600);
 
-        // ── TRANSITION TO CHAT ──
-        ktype("kt3", true); await wait(1700); ktype("kt3", false);
+        // ── CHAT ──
+        await ktypeBeat("kt3", 700);
         $("panel-feed").classList.add("off");
         $("panel-chat").classList.remove("off");
         $("tog-label").textContent = "Activate on Chat";
@@ -379,49 +443,48 @@
         $("ta").textContent = "This Chat";
         cam._s = { s: 1, x: 0, y: 0 };
         vp.style.transform = "translate(0,0) scale(1)";
-        await wait(1000);
-
-        // ── CHAT ──
-        await cam({ s: 1.18, x: 0, y: 25 }, 850);
-        await wait(800);
-        $("sb").classList.add("on"); $("bd").classList.add("on");
-        await cam({ s: 1.3, x: 90, y: 30 }, 950, [500, 360]);
-        await wait(800);
-        $("natte").classList.add("glow");
-        $("sheet").classList.add("on"); $("sbg").classList.add("on");
-        await wait(400);
+        await wait(500);
+        await tap($("menu-btn-chat"), () => { $("sb").classList.add("on"); $("bd").classList.add("on"); });
+        await cam({ s: 1.18, x: 72, y: 8 }, 460, [480, 360]);
+        await tap($("natte"), () => {
+          $("natte").classList.add("glow");
+          $("sheet").classList.add("on");
+          $("sbg").classList.add("on");
+        });
         $("rail").classList.remove("go");
         $("dur-track").style.transform = "";
         $("dur-hr").classList.add("active");
         $("dur-day").classList.remove("active");
-        await wait(50);
-        await sheetFlow();
-        $("ta").classList.add("on"); $("tb").classList.remove("on");
-        await wait(400);
-        $("sheet").classList.remove("on"); $("sbg").classList.remove("on");
+        $("ta").classList.remove("on");
+        $("tb").classList.add("on");
+        hideFinger();
+        await sheetFlow(true);
+        hideFinger();
         $("sb").classList.remove("on"); $("bd").classList.remove("on");
         $("natte").classList.remove("glow");
-        await cam({ s: 1, x: 0, y: 0 }, 950);
-        await wait(500);
-        $("chat-list").style.display = "none";
-        $("convo").style.display = "flex";
+        await cam({ s: 1, x: 0, y: 0 }, 480);
+        await tap($("dm2"), () => {
+          $("chat-list").style.display = "none";
+          $("convo").style.display = "flex";
+        });
         $("cb-ai").classList.add("marked");
-        await cam({ s: 1.38, x: -8, y: 70 }, 900, [640, 380]);
-        await wait(800);
+        await cam({ s: 1.26, x: 0, y: 55 }, 420, [640, 380]);
         $("chip-chat").classList.add("on");
-        await wait(900);
-        $("cb-ai").classList.add("hide");
-        $("meta-chat").textContent = "AI hidden";
-        await cam({ s: 1, x: 0, y: 0 }, 850);
-        await wait(600);
-        ktype("kt4", true); await wait(1500); ktype("kt4", false);
-        await wait(500);
+        await wait(240);
+        await tap($("hide-chat"), () => {
+          $("cb-ai").classList.add("hide");
+          $("meta-chat").textContent = "AI hidden";
+        });
+        hideFinger();
+        await cam({ s: 1, x: 0, y: 0 }, 460);
+        await ktypeBeat("kt4", 650);
+        await wait(300);
         $("end").classList.add("on");
       }
 
       Promise.all([...document.images].map((img) =>
         img.complete ? Promise.resolve() : new Promise((r) => { img.onload = img.onerror = r; })
-      )).then(() => setTimeout(run, 400));
+      )).then(() => setTimeout(run, 300));
     </script>
   </body>
 </html>
