@@ -10,24 +10,37 @@ export async function GET() {
     }
 
     const sql = getDb();
-    const users = await sql`
-      SELECT id, email, name, profile_pic, created_at
-      FROM users WHERE id = ${userId}
-    `;
+    let users;
+    try {
+      users = await sql`
+        SELECT id, email, name, profile_pic, created_at
+        FROM users WHERE id = ${userId}
+      `;
+    } catch {
+      users = await sql`
+        SELECT id, email, name, created_at
+        FROM users WHERE id = ${userId}
+      `;
+    }
 
     if (users.length === 0) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const connections = await sql`
-      SELECT id, provider, x_username, status, created_at, updated_at
-      FROM widget_connections
-      WHERE user_id = ${userId} AND status != 'disconnected'
-      ORDER BY created_at DESC
-    `;
+    let connections: unknown[] = [];
+    try {
+      connections = await sql`
+        SELECT id, provider, x_username, status, created_at, updated_at
+        FROM widget_connections
+        WHERE user_id = ${userId} AND status != 'disconnected'
+        ORDER BY created_at DESC
+      `;
+    } catch {
+      connections = [];
+    }
 
     return NextResponse.json({
-      user: users[0],
+      user: { ...users[0], profile_pic: users[0].profile_pic ?? null },
       connections,
     });
   } catch (err) {

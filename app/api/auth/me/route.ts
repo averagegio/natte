@@ -11,7 +11,7 @@ export async function GET() {
 
     const sql = getDb();
     const rows = await sql`
-      SELECT id, email, name, profile_pic, created_at FROM users WHERE id = ${userId}
+      SELECT id, email, name, created_at FROM users WHERE id = ${userId}
     `;
 
     if (rows.length === 0) {

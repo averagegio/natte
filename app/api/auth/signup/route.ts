@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { hashPassword, createSessionToken, setSessionCookie } from "@/lib/auth";
+import { assertAuthConfigured, getAuthErrorMessage } from "@/lib/auth-errors";
 
 export async function POST(request: Request) {
   try {
+    assertAuthConfigured();
+
     const { email, password, name } = await request.json();
 
     if (!email || !password) {
@@ -35,9 +38,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ user: { id: user.id, email: user.email, name: user.name } });
   } catch (err) {
     console.error("Signup error:", err);
-    const message = err instanceof Error && err.message.includes("DATABASE_URL")
-      ? "Database is not configured"
-      : "Failed to create account";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json(
+      { error: getAuthErrorMessage(err, "Failed to create account") },
+      { status: 500 }
+    );
   }
 }
