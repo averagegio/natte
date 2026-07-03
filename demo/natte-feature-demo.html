@@ -2,530 +2,333 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>n.a.t.t.e.</title>
     <style>
       :root {
-        --bg: #000;
-        --elevated: #16181c;
-        --border: #2f3336;
-        --text: #e7e9ea;
-        --muted: #71767b;
-        --blue: #1d9bf0;
-        --red: #f4212e;
-        --orange: #ff7a00;
+        --bg:#000; --elevated:#16181c; --border:#2f3336;
+        --text:#e7e9ea; --muted:#71767b; --blue:#1d9bf0; --red:#f4212e; --orange:#ff7a00;
+        --chat-in:#2f3336; --chat-out:#1d9bf0;
       }
-      * { box-sizing: border-box; margin: 0; padding: 0; }
-      html, body {
-        width: 100%; height: 100%;
-        background: #000;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        -webkit-font-smoothing: antialiased;
-        overflow: hidden;
-      }
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{background:#000;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+      .stage{width:1280px;height:720px;background:#000;position:relative;overflow:hidden}
+      .viewport{position:absolute;inset:0;will-change:transform;transform-origin:640px 360px}
+      .ui{position:absolute;inset:0;background:var(--bg);width:393px;left:50%;margin-left:-196.5px}
 
-      /* Cinematic stage — no device chrome */
-      .stage {
-        width: 1920px; height: 1080px;
-        background: #000;
-        position: relative;
-        overflow: hidden;
-      }
+      .status{display:flex;justify-content:space-between;padding:14px 22px 0;font-size:15px;font-weight:600;color:var(--text)}
+      .topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 16px 4px}
+      .topbar svg{width:22px;height:22px;fill:var(--text)}
+      .x-mark{font-size:26px;font-weight:800;color:var(--text)}
+      .top-av{width:32px;height:32px;border-radius:50%;object-fit:cover}
 
-      /* App fills height, centered — like X launch videos */
-      .app-shell {
-        position: absolute;
-        top: 0; left: 50%;
-        width: 430px; height: 1080px;
-        margin-left: -215px;
-        overflow: hidden;
-      }
+      .tabs{display:flex;border-bottom:1px solid var(--border)}
+      .tab{flex:1;text-align:center;padding:12px 0 10px;font-size:15px;color:var(--muted);position:relative}
+      .tab.on{color:var(--text);font-weight:700}
+      .tab.on::after{content:"";position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:56px;height:4px;background:var(--blue);border-radius:2px}
 
-      /* Fluid camera — single transform layer */
-      .world {
-        position: absolute; inset: 0;
-        transform-origin: 50% 50%;
-        transition: transform 1.05s cubic-bezier(0.33, 1, 0.68, 1);
-        will-change: transform;
-      }
-      .world.cam-feed     { transform: scale(1) translate(0, 0); }
-      .world.cam-sidebar  { transform: scale(1.35) translate(12%, 4%); }
-      .world.cam-natte    { transform: scale(2.2) translate(18%, 14%); }
-      .world.cam-slider   { transform: scale(2.85) translate(6%, 32%); }
-      .world.cam-refresh  { transform: scale(1.55) translate(0, -14%); }
-      .world.cam-marked   { transform: scale(1.75) translate(-2%, 8%); }
-      .world.cam-chip     { transform: scale(2.1) translate(0, -18%); }
+      .chip{display:flex;align-items:center;gap:8px;margin:8px 14px 4px;padding:9px 12px;background:var(--elevated);border:1px solid var(--border);border-radius:999px;opacity:0;transform:translateY(-10px);transition:opacity .5s,transform .5s cubic-bezier(.34,1.3,.64,1)}
+      .chip.on{opacity:1;transform:none}
+      .chip .n{width:20px;height:20px;border-radius:50%;background:#fff;color:#000;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center}
+      .chip .lbl{font-size:13px;font-weight:700;color:var(--text)}
+      .chip .meta{flex:1;font-size:12px;color:var(--muted)}
+      .chip .hide{padding:5px 12px;border-radius:999px;background:#fff;color:#000;font-size:12px;font-weight:700}
 
-      /* Typography beats — XChat style */
-      .hero-type {
-        position: absolute; inset: 0; z-index: 80;
-        display: flex; align-items: center; justify-content: center;
-        pointer-events: none;
-        opacity: 0;
-        transition: opacity 0.65s ease, transform 0.85s cubic-bezier(0.33, 1, 0.68, 1);
-        transform: scale(0.92);
-        background: rgba(0,0,0,0.55);
-        backdrop-filter: blur(2px);
-      }
-      .hero-type.on { opacity: 1; transform: scale(1); }
-      .hero-type h1 {
-        font-size: 52px; font-weight: 800; color: #fff;
-        letter-spacing: -0.03em; text-align: center; line-height: 1.05;
-        padding: 0 24px;
-      }
-      .hero-type p {
-        margin-top: 12px; font-size: 17px; color: var(--muted);
-        text-align: center; font-weight: 500;
-      }
+      .scroll{height:calc(100% - 120px);overflow:hidden;transition:transform .55s cubic-bezier(.33,1,.68,1)}
+      .scroll.pull{transform:translateY(48px)}
+      .spin{position:absolute;top:108px;left:50%;transform:translateX(-50%);width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--blue);border-radius:50%;opacity:0;z-index:5}
+      .spin.on{opacity:1;animation:spin .6s linear infinite}
+      @keyframes spin{to{transform:translateX(-50%) rotate(360deg)}}
 
-      .end-card {
-        position: absolute; inset: 0; z-index: 90;
-        background: #000;
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        opacity: 0; pointer-events: none;
-        transition: opacity 0.8s ease;
-      }
-      .end-card.on { opacity: 1; }
-      .end-logo {
-        width: 88px; height: 88px; border-radius: 22px;
-        background: var(--text); color: var(--bg);
-        display: flex; align-items: center; justify-content: center;
-        font-size: 36px; font-weight: 800;
-        box-shadow: 0 0 80px rgba(255,255,255,0.08);
-      }
-      .end-card h2 { margin-top: 24px; font-size: 32px; font-weight: 800; color: #fff; }
-      .end-card p { margin-top: 8px; font-size: 15px; color: var(--muted); }
+      .tweet{display:flex;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);position:relative;transition:opacity .45s,transform .45s,max-height .45s}
+      .tweet.hide{opacity:0;transform:scale(.98);max-height:0;padding:0;overflow:hidden;border:none}
+      .tweet.marked{background:linear-gradient(90deg,rgba(244,33,46,.1),transparent 38%)}
+      .tweet.marked::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--red)}
+      .ai-pill{display:none;margin-left:4px;padding:1px 5px;border-radius:4px;background:rgba(244,33,46,.15);color:var(--red);font-size:10px;font-weight:800}
+      .tweet.marked .ai-pill{display:inline-block}
+      .av{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0}
+      .av-bot{width:40px;height:40px;border-radius:50%;background:#262626;display:flex;align-items:center;justify-content:center;color:#525252;font-size:13px;flex-shrink:0}
+      .body{flex:1;min-width:0}
+      .row1{display:flex;flex-wrap:wrap;align-items:center;gap:2px;font-size:15px;margin-bottom:2px}
+      .name{font-weight:700;color:var(--text)} .handle,.dot,.time{color:var(--muted)}
+      .verified{width:17px;height:17px}
+      .txt{font-size:15px;line-height:20px;color:var(--text);margin-bottom:10px}
+      .acts{display:flex;gap:28px;color:var(--muted);font-size:12px}
+      .acts svg{width:16px;height:16px;fill:currentColor;vertical-align:-3px;margin-right:3px}
 
-      /* ── X UI ── */
-      .ui { position: absolute; inset: 0; background: var(--bg); }
+      /* X Chat */
+      .chat-head{display:flex;align-items:center;justify-content:space-between;padding:8px 16px 10px;border-bottom:1px solid var(--border)}
+      .chat-head h1{font-size:20px;font-weight:800;color:var(--text)}
+      .chat-head .filter{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center}
+      .chat-head .filter svg{width:18px;height:18px;fill:var(--text)}
+      .dm{display:flex;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);align-items:center}
+      .dm .preview{flex:1;min-width:0}
+      .dm .top{display:flex;justify-content:space-between;align-items:center}
+      .dm .nm{font-size:15px;font-weight:700;color:var(--text)}
+      .dm .tm{font-size:13px;color:var(--muted)}
+      .dm .msg{font-size:15px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+      .dm.glow{background:rgba(29,155,240,.08);box-shadow:inset 0 0 0 1px rgba(29,155,240,.3)}
 
-      .status {
-        display: flex; justify-content: space-between; padding: 16px 22px 0;
-        font-size: 15px; font-weight: 600; color: var(--text);
-      }
+      .convo{padding:16px;display:flex;flex-direction:column;gap:10px;height:calc(100% - 56px);overflow:hidden}
+      .bubble{max-width:78%;padding:10px 14px;border-radius:20px;font-size:15px;line-height:20px}
+      .bubble.in{align-self:flex-start;background:var(--chat-in);color:var(--text);border-bottom-left-radius:4px}
+      .bubble.out{align-self:flex-end;background:var(--chat-out);color:#fff;border-bottom-right-radius:4px}
+      .bubble.marked{outline:2px solid var(--red);position:relative}
+      .bubble.marked::after{content:"AI";position:absolute;top:-8px;right:8px;background:var(--red);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px}
+      .bubble.hide{opacity:.12;transform:scale(.96);filter:blur(1px)}
 
-      .topbar {
-        display: flex; align-items: center; justify-content: space-between;
-        padding: 10px 16px 6px;
-      }
-      .topbar svg { width: 22px; height: 22px; fill: var(--text); }
-      .x-mark { font-size: 26px; font-weight: 800; color: var(--text); }
-      .top-av { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+      .bd{position:absolute;inset:0;background:rgba(91,112,131,.4);opacity:0;pointer-events:none;transition:opacity .45s;z-index:40}
+      .bd.on{opacity:1}
+      .sb{position:absolute;top:0;left:0;bottom:0;width:82%;background:var(--bg);z-index:50;transform:translateX(-105%);transition:transform .5s cubic-bezier(.33,1,.68,1);padding:54px 8px 20px}
+      .sb.on{transform:none}
+      .sb-item{display:flex;align-items:center;gap:18px;padding:12px 18px;font-size:19px;color:var(--text);border-radius:999px}
+      .sb-item svg{width:24px;height:24px;fill:currentColor}
+      .sb-item.natte .ni{width:28px;height:28px;border-radius:50%;background:#fff;color:#000;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center}
+      .sb-item.natte.glow{background:rgba(29,155,240,.12);box-shadow:0 0 0 2px var(--blue)}
 
-      .tabs { display: flex; border-bottom: 1px solid var(--border); }
-      .tab {
-        flex: 1; text-align: center; padding: 14px 0 12px;
-        font-size: 15px; font-weight: 500; color: var(--muted); position: relative;
-      }
-      .tab.on { color: var(--text); font-weight: 700; }
-      .tab.on::after {
-        content: ""; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-        width: 56px; height: 4px; background: var(--blue); border-radius: 2px;
-      }
+      .sbg{position:absolute;inset:0;background:rgba(0,0,0,.55);opacity:0;z-index:55;transition:opacity .4s}
+      .sbg.on{opacity:1}
+      .sheet{position:absolute;left:0;right:0;bottom:0;z-index:56;background:var(--elevated);border-radius:18px 18px 0 0;border-top:1px solid var(--border);padding:10px 18px 32px;transform:translateY(105%);transition:transform .55s cubic-bezier(.33,1,.68,1)}
+      .sheet.on{transform:none}
+      .grab{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 14px}
+      .sheet h2{font-size:18px;font-weight:800;color:var(--text)}
+      .sheet .sub{font-size:14px;color:var(--muted);margin:2px 0 16px}
+      .pick{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:18px}
+      .pick div{padding:12px 14px;font-size:14px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)}
+      .pick div:last-child{border-bottom:none}
+      .pick .sel{background:rgba(29,155,240,.08);color:var(--blue)}
+      .fl{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+      .rail{position:relative;height:3px;background:var(--orange);border-radius:99px;margin-bottom:22px}
+      .rail .dot,.rail .thumb{position:absolute;top:50%;transform:translate(-50%,-50%);left:30%;transition:left 1.4s cubic-bezier(.33,1,.68,1)}
+      .rail .dot{width:7px;height:7px;background:#fff;border-radius:50%}
+      .rail .thumb{width:20px;height:20px;border:2.5px solid #fff;border-radius:50%;background:var(--bg)}
+      .rail.go .dot,.rail.go .thumb{left:72%}
+      .togs{display:flex;gap:8px;margin-bottom:16px}
+      .tog{flex:1;padding:12px;text-align:center;border-radius:999px;font-size:14px;font-weight:700;border:1px solid var(--border);color:var(--text);transition:all .35s}
+      .tog.on{background:#fff;color:#000;border-color:#fff}
+      .go-btn{padding:14px;border-radius:999px;background:#fff;color:#000;font-size:16px;font-weight:700;text-align:center}
 
-      .chip {
-        display: flex; align-items: center; gap: 8px;
-        margin: 10px 16px 6px; padding: 10px 14px;
-        background: var(--elevated); border: 1px solid var(--border);
-        border-radius: 999px;
-        opacity: 0; transform: translateY(-12px);
-        transition: opacity 0.55s cubic-bezier(0.34, 1.4, 0.64, 1),
-                    transform 0.55s cubic-bezier(0.34, 1.4, 0.64, 1);
-      }
-      .chip.on { opacity: 1; transform: translateY(0); }
-      .chip .n {
-        width: 22px; height: 22px; border-radius: 50%; background: #fff; color: #000;
-        font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center;
-      }
-      .chip .lbl { font-size: 14px; font-weight: 700; color: var(--text); }
-      .chip .meta { flex: 1; font-size: 13px; color: var(--muted); }
-      .chip .hide {
-        padding: 6px 14px; border-radius: 999px; background: #fff; color: #000;
-        font-size: 13px; font-weight: 700;
-        transition: transform 0.2s;
-      }
-      .chip.tap .hide { transform: scale(0.92); }
+      .hero{position:absolute;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);opacity:0;pointer-events:none;transition:opacity .55s}
+      .hero.on{opacity:1}
+      .hero h1{font-size:56px;font-weight:800;color:#fff;text-align:center;line-height:1.02;letter-spacing:-.03em}
+      .hero p{margin-top:10px;font-size:18px;color:var(--muted);text-align:center}
 
-      .feed {
-        height: calc(100% - 128px);
-        overflow: hidden;
-        transition: transform 0.6s cubic-bezier(0.33, 1, 0.68, 1);
-      }
-      .feed.pull { transform: translateY(56px); }
-      .pull-spin {
-        position: absolute; top: 118px; left: 50%; transform: translateX(-50%);
-        width: 22px; height: 22px; border: 2.5px solid var(--border);
-        border-top-color: var(--blue); border-radius: 50%;
-        opacity: 0; transition: opacity 0.3s; z-index: 12;
-      }
-      .pull-spin.on { opacity: 1; animation: spin 0.65s linear infinite; }
-      @keyframes spin { to { transform: translateX(-50%) rotate(360deg); } }
+      .end{position:absolute;inset:0;z-index:100;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;transition:opacity .7s}
+      .end.on{opacity:1}
+      .end .logo{width:80px;height:80px;border-radius:20px;background:#fff;color:#000;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:800}
+      .end h2{margin-top:20px;font-size:28px;font-weight:800;color:#fff}
+      .end p{margin-top:6px;font-size:14px;color:var(--muted)}
 
-      .tweet {
-        display: flex; gap: 12px; padding: 12px 16px;
-        border-bottom: 1px solid var(--border);
-        transition: opacity 0.55s ease, transform 0.55s ease, max-height 0.55s ease;
-      }
-      .tweet.hide {
-        opacity: 0; transform: scale(0.97); max-height: 0; padding: 0; margin: 0;
-        overflow: hidden; border: none;
-      }
-      .tweet.marked {
-        background: linear-gradient(90deg, rgba(244,33,46,0.1), transparent 40%);
-        animation: markIn 0.6s cubic-bezier(0.34, 1.2, 0.64, 1);
-      }
-      @keyframes markIn {
-        from { background-size: 0% 100%; opacity: 0.6; }
-        to { background-size: 100% 100%; opacity: 1; }
-      }
-      .tweet.marked::before {
-        content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--red);
-      }
-      .tweet { position: relative; }
-      .ai-pill {
-        display: none; margin-left: 4px;
-        padding: 1px 6px; border-radius: 4px;
-        background: rgba(244,33,46,0.15); color: var(--red);
-        font-size: 11px; font-weight: 800;
-      }
-      .tweet.marked .ai-pill { display: inline-block; }
-
-      .av { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
-      .av-bot {
-        width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
-        background: #262626; display: flex; align-items: center; justify-content: center;
-        color: #525252; font-size: 14px;
-      }
-      .body { flex: 1; min-width: 0; }
-      .row1 { display: flex; align-items: center; flex-wrap: wrap; gap: 2px; font-size: 15px; margin-bottom: 2px; }
-      .name { font-weight: 700; color: var(--text); }
-      .verified { width: 18px; height: 18px; }
-      .handle, .dot, .time { color: var(--muted); }
-      .more { position: absolute; top: 12px; right: 16px; color: var(--muted); }
-      .txt { font-size: 15px; line-height: 20px; color: var(--text); margin-bottom: 12px; }
-      .card {
-        border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-bottom: 12px;
-      }
-      .card-img {
-        height: 120px; background: url('assets/avatars/BenedictEvans.jpg') center/cover;
-        filter: brightness(0.5);
-      }
-      .card-b { padding: 10px 12px; background: var(--elevated); }
-      .card-t { font-size: 14px; color: var(--text); }
-      .card-u { font-size: 13px; color: var(--muted); margin-top: 2px; }
-      .photo {
-        height: 200px; border-radius: 16px; margin-bottom: 12px;
-        background: url('assets/avatars/naval.jpg') center/cover;
-        border: 1px solid var(--border);
-      }
-      .acts { display: flex; justify-content: space-between; max-width: 100%; padding-right: 20px; }
-      .act { display: flex; align-items: center; gap: 4px; color: var(--muted); font-size: 13px; }
-      .act svg { width: 18px; height: 18px; fill: currentColor; }
-
-      /* Sidebar */
-      .bd {
-        position: absolute; inset: 0; background: rgba(91,112,131,0.4);
-        opacity: 0; pointer-events: none; transition: opacity 0.5s ease; z-index: 40;
-      }
-      .bd.on { opacity: 1; }
-      .sb {
-        position: absolute; top: 0; left: 0; bottom: 0; width: 82%;
-        background: var(--bg); z-index: 50;
-        transform: translateX(-105%);
-        transition: transform 0.55s cubic-bezier(0.33, 1, 0.68, 1);
-        padding: 58px 10px 24px;
-      }
-      .sb.on { transform: translateX(0); }
-      .sb-prof { display: flex; gap: 12px; padding: 12px 16px 20px; align-items: center; }
-      .sb-prof img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-      .sb-prof .n { font-size: 17px; font-weight: 700; color: var(--text); }
-      .sb-prof .h { font-size: 15px; color: var(--muted); }
-      .sb-item {
-        display: flex; align-items: center; gap: 20px;
-        padding: 14px 20px; font-size: 20px; color: var(--text); border-radius: 999px;
-        transition: background 0.35s, box-shadow 0.35s;
-      }
-      .sb-item svg { width: 26px; height: 26px; fill: currentColor; }
-      .sb-item.natte .ni {
-        width: 30px; height: 30px; border-radius: 50%; background: #fff; color: #000;
-        font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center;
-      }
-      .sb-item.natte.glow {
-        background: rgba(29,155,240,0.12);
-        box-shadow: 0 0 0 2px var(--blue), 0 0 24px rgba(29,155,240,0.25);
-      }
-
-      /* Sheet */
-      .sbg {
-        position: absolute; inset: 0; background: rgba(0,0,0,0.55);
-        opacity: 0; pointer-events: none; z-index: 55;
-        transition: opacity 0.45s;
-      }
-      .sbg.on { opacity: 1; }
-      .sheet {
-        position: absolute; left: 0; right: 0; bottom: 0; z-index: 56;
-        background: var(--elevated);
-        border-radius: 20px 20px 0 0;
-        border-top: 1px solid var(--border);
-        padding: 12px 20px 40px;
-        transform: translateY(105%);
-        transition: transform 0.6s cubic-bezier(0.33, 1, 0.68, 1);
-      }
-      .sheet.on { transform: translateY(0); }
-      .grab { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 18px; }
-      .sheet h2 { font-size: 20px; font-weight: 800; color: var(--text); }
-      .sheet .sub { font-size: 15px; color: var(--muted); margin: 4px 0 20px; }
-      .pick { border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-bottom: 24px; }
-      .pick div { padding: 14px 16px; font-size: 15px; font-weight: 600; color: var(--text); border-bottom: 1px solid var(--border); }
-      .pick div:last-child { border-bottom: none; }
-      .pick .sel { background: rgba(29,155,240,0.08); color: var(--blue); }
-      .pick .d { font-size: 13px; font-weight: 400; color: var(--muted); margin-top: 3px; }
-
-      .flabel {
-        font-size: 13px; font-weight: 600; color: var(--muted);
-        text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 14px;
-      }
-      .sens { margin-bottom: 28px; }
-      .sens-ends { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-bottom: 14px; }
-      .rail {
-        position: relative; height: 4px; background: var(--orange); border-radius: 99px;
-        box-shadow: 0 0 20px rgba(255,122,0,0.35);
-      }
-      .rail .dot {
-        position: absolute; top: 50%; width: 8px; height: 8px; background: #fff;
-        border-radius: 50%; transform: translate(-50%, -50%); left: 28%;
-        transition: left 1.2s cubic-bezier(0.33, 1, 0.68, 1);
-      }
-      .rail .thumb {
-        position: absolute; top: 50%; width: 22px; height: 22px;
-        border: 2.5px solid #fff; border-radius: 50%; background: var(--bg);
-        transform: translate(-50%, -50%); left: 28%;
-        transition: left 1.2s cubic-bezier(0.33, 1, 0.68, 1);
-        box-shadow: 0 2px 12px rgba(0,0,0,0.4);
-      }
-      .rail .thumb::after {
-        content: ""; position: absolute; top: 50%; left: 50%;
-        width: 10px; height: 2px; background: #fff; transform: translate(-50%, -50%);
-      }
-      .rail.go .dot, .rail.go .thumb { left: 74%; }
-
-      .togs { display: flex; gap: 10px; margin-bottom: 20px; }
-      .tog {
-        flex: 1; padding: 14px; text-align: center; border-radius: 999px;
-        font-size: 15px; font-weight: 700; color: var(--text);
-        border: 1px solid var(--border);
-        transition: all 0.4s cubic-bezier(0.34, 1.2, 0.64, 1);
-      }
-      .tog.on { background: #fff; color: #000; border-color: #fff; transform: scale(1.02); }
-      .go-btn {
-        padding: 16px; border-radius: 999px; background: #fff; color: #000;
-        font-size: 17px; font-weight: 700; text-align: center;
-      }
-
-      .fab {
-        position: absolute; bottom: 24px; right: 20px;
-        width: 56px; height: 56px; border-radius: 50%; background: var(--blue);
-        display: flex; align-items: center; justify-content: center;
-        box-shadow: 0 4px 20px rgba(29,155,240,0.45); z-index: 10;
-      }
-      .fab svg { width: 26px; height: 26px; fill: #fff; }
+      .panel{position:absolute;inset:0;opacity:1;transition:opacity .6s}
+      .panel.off{opacity:0;pointer-events:none}
     </style>
   </head>
   <body>
     <div class="stage">
-      <div class="app-shell">
-        <div class="world cam-feed" id="world">
-          <div class="ui">
-            <div class="status"><span>9:41</span><span>●●●○ 5G 🔋</span></div>
+      <div class="viewport" id="vp">
+        <div class="ui">
+          <!-- FEED -->
+          <div class="panel" id="panel-feed">
+            <div class="status"><span>9:41</span><span>5G 🔋</span></div>
             <header class="topbar">
               <svg viewBox="0 0 24 24"><path d="M3 7h18v2H3V7zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/></svg>
               <span class="x-mark">𝕏</span>
               <img class="top-av" src="assets/avatars/sama.jpg" alt="" />
             </header>
-            <div class="tabs">
-              <div class="tab">Following</div>
-              <div class="tab on">For You</div>
-            </div>
-            <div class="chip" id="chip">
-              <span class="n">n</span>
-              <span class="lbl">n.a.t.t.e.</span>
-              <span class="meta" id="chip-meta">2 AI posts marked</span>
-              <span class="hide">Hide AI</span>
-            </div>
-            <div class="pull-spin" id="pull"></div>
-            <div class="feed" id="feed">
-              <article class="tweet" id="t1">
+            <div class="tabs"><div class="tab">Following</div><div class="tab on">For You</div></div>
+            <div class="chip" id="chip-feed"><span class="n">n</span><span class="lbl">n.a.t.t.e.</span><span class="meta" id="meta-feed">2 AI posts marked</span><span class="hide">Hide AI</span></div>
+            <div class="spin" id="spin-feed"></div>
+            <div class="scroll" id="scroll-feed">
+              <article class="tweet" id="f1">
                 <img class="av" src="assets/avatars/BenedictEvans.jpg" alt="" />
-                <div class="body">
-                  <span class="more">𝕏</span>
-                  <div class="row1">
-                    <span class="name">Benedict Evans</span>
-                    <svg class="verified" viewBox="0 0 22 22"><path fill="#1d9bf0" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.085-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.69-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.636.433 1.221.878 1.69.47.445 1.054.751 1.69.882.636.13 1.295.083 1.902-.14.27.586.702 1.087 1.24 1.44.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816z"/><path fill="#fff" d="M9.5 14.2l-2.8-2.8 1-1 1.8 1.8 4.2-4.2 1 1-5.2 5.2z"/></svg>
-                    <span class="handle">@BenedictEvans</span><span class="dot">·</span><span class="time">1h</span>
-                  </div>
-                  <p class="txt">Every wave of technology looks like a toy, and then it's infrastructure.</p>
-                  <div class="card"><div class="card-img"></div><div class="card-b"><div class="card-t">AI and the next platform shift</div><div class="card-u">ben-evans.com</div></div></div>
-                  <div class="acts">
-                    <span class="act"><svg viewBox="0 0 24 24"><path d="M1.751 10c0-4.42 3.58-8 8-8h4.5c4.42 0 8 3.58 8 8v1h-2v-1c0-3.31-2.69-6-6-6h-4.5c-3.31 0-6 2.69-6 6v8c0 3.31 2.69 6 6 6h4.5c3.31 0 6-2.69 6-6v-1h2v1c0 4.42-3.58 8-8 8h-4.5c-4.42 0-8-3.58-8-8v-8z"/></svg>142</span>
-                    <span class="act"><svg viewBox="0 0 24 24"><path d="M4.5 3.88l4.432 4.14-1.364 1.46L5.5 7.55V16c0 1.1.896 2 2 2H13v2H7.5c-2.209 0-4-1.79-4-4V7.55L1.432 9.48.068 8.02 4.5 3.88z"/></svg>891</span>
-                    <span class="act"><svg viewBox="0 0 24 24"><path d="M16.697 5.5c-1.222-.06-2.679.51-3.89 2.16l-.805 1.09H8.886L4.379 5.5H2.113l5.34 7.24L2.5 21h2.366l3.988-5.09 1.585 2.04 4.34 5.09h2.366l-5.931-7.68 5.48-7.16h-2.037z"/></svg>4.2K</span>
-                  </div>
-                </div>
+                <div class="body"><div class="row1"><span class="name">Benedict Evans</span><svg class="verified" viewBox="0 0 22 22"><path fill="#1d9bf0" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.085-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.69-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.636.433 1.221.878 1.69.47.445 1.054.751 1.69.882.636.13 1.295.083 1.902-.14.27.586.702 1.087 1.24 1.44.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816z"/><path fill="#fff" d="M9.5 14.2l-2.8-2.8 1-1 1.8 1.8 4.2-4.2 1 1-5.2 5.2z"/></svg><span class="handle">@BenedictEvans</span><span class="dot">·</span><span class="time">1h</span></div><p class="txt">Every wave of technology looks like a toy, and then it's infrastructure.</p></div>
               </article>
-              <article class="tweet" id="t2">
+              <article class="tweet" id="f2">
                 <div class="av-bot">⌘</div>
-                <div class="body">
-                  <div class="row1">
-                    <span class="name">Viral Growth AI</span><span class="ai-pill">AI</span>
-                    <span class="handle">@viralgrowth_ai</span><span class="dot">·</span><span class="time">2h</span>
-                  </div>
-                  <p class="txt">As an AI language model, I'm thrilled to share 10 proven frameworks for maximizing engagement in 2026. Thread 🧵👇</p>
-                  <div class="acts">
-                    <span class="act"><svg viewBox="0 0 24 24"><path d="M1.751 10c0-4.42 3.58-8 8-8h4.5c4.42 0 8 3.58 8 8v1h-2v-1c0-3.31-2.69-6-6-6h-4.5c-3.31 0-6 2.69-6 6v8c0 3.31 2.69 6 6 6h4.5c3.31 0 6-2.69 6-6v-1h2v1c0 4.42-3.58 8-8 8h-4.5c-4.42 0-8-3.58-8-8v-8z"/></svg>2</span>
-                    <span class="act"><svg viewBox="0 0 24 24"><path d="M16.697 5.5c-1.222-.06-2.679.51-3.89 2.16l-.805 1.09H8.886L4.379 5.5H2.113l5.34 7.24L2.5 21h2.366l3.988-5.09 1.585 2.04 4.34 5.09h2.366l-5.931-7.68 5.48-7.16h-2.037z"/></svg>1</span>
-                  </div>
-                </div>
+                <div class="body"><div class="row1"><span class="name">Viral Growth AI</span><span class="ai-pill">AI</span><span class="handle">@viralgrowth_ai</span><span class="dot">·</span><span class="time">2h</span></div><p class="txt">As an AI language model, I'm thrilled to share 10 proven frameworks for maximizing engagement.</p></div>
               </article>
-              <article class="tweet" id="t3">
+              <article class="tweet" id="f3">
                 <img class="av" src="assets/avatars/naval.jpg" alt="" />
-                <div class="body">
-                  <div class="row1">
-                    <span class="name">Naval</span>
-                    <svg class="verified" viewBox="0 0 22 22"><path fill="#1d9bf0" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.085-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.69-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.636.433 1.221.878 1.69.47.445 1.054.751 1.69.882.636.13 1.295.083 1.902-.14.27.586.702 1.087 1.24 1.44.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816z"/><path fill="#fff" d="M9.5 14.2l-2.8-2.8 1-1 1.8 1.8 4.2-4.2 1 1-5.2 5.2z"/></svg>
-                    <span class="handle">@naval</span><span class="dot">·</span><span class="time">3h</span>
-                  </div>
-                  <p class="txt">The internet means you can learn anything. The hard part is figuring out what to learn.</p>
-                  <div class="photo"></div>
-                </div>
+                <div class="body"><div class="row1"><span class="name">Naval</span><svg class="verified" viewBox="0 0 22 22"><path fill="#1d9bf0" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.085-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.69-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.636.433 1.221.878 1.69.47.445 1.054.751 1.69.882.636.13 1.295.083 1.902-.14.27.586.702 1.087 1.24 1.44.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816z"/><path fill="#fff" d="M9.5 14.2l-2.8-2.8 1-1 1.8 1.8 4.2-4.2 1 1-5.2 5.2z"/></svg><span class="handle">@naval</span><span class="dot">·</span><span class="time">3h</span></div><p class="txt">The internet means you can learn anything.</p></div>
               </article>
-              <article class="tweet" id="t4">
+              <article class="tweet" id="f4">
                 <div class="av-bot">◆</div>
-                <div class="body">
-                  <div class="row1">
-                    <span class="name">Content Engine Pro</span><span class="ai-pill">AI</span>
-                    <span class="handle">@contentengine_ai</span><span class="dot">·</span><span class="time">4h</span>
-                  </div>
-                  <p class="txt">In today's fast-paced digital landscape, leveraging AI-generated thought leadership is essential 🚀</p>
-                </div>
+                <div class="body"><div class="row1"><span class="name">Content Engine Pro</span><span class="ai-pill">AI</span><span class="handle">@contentengine_ai</span><span class="dot">·</span><span class="time">4h</span></div><p class="txt">In today's fast-paced digital landscape, leveraging AI-generated thought leadership is essential.</p></div>
               </article>
-              <article class="tweet" id="t5">
-                <img class="av" src="assets/avatars/paulg.jpg" alt="" />
-                <div class="body">
-                  <div class="row1">
-                    <span class="name">Paul Graham</span>
-                    <svg class="verified" viewBox="0 0 22 22"><path fill="#1d9bf0" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.085-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.69-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.636.433 1.221.878 1.69.47.445 1.054.751 1.69.882.636.13 1.295.083 1.902-.14.27.586.702 1.087 1.24 1.44.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816z"/><path fill="#fff" d="M9.5 14.2l-2.8-2.8 1-1 1.8 1.8 4.2-4.2 1 1-5.2 5.2z"/></svg>
-                    <span class="handle">@paulg</span><span class="dot">·</span><span class="time">5h</span>
-                  </div>
-                  <p class="txt">It's not cheating to use tools. It's cheating to pretend you didn't.</p>
-                </div>
-              </article>
-            </div>
-            <div class="fab"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.5" stroke-linecap="round" fill="none"/></svg></div>
-
-            <div class="bd" id="bd"></div>
-            <nav class="sb" id="sb">
-              <div class="sb-prof">
-                <img src="assets/avatars/sama.jpg" alt="" />
-                <div><div class="n">Sam Altman</div><div class="h">@sama</div></div>
-              </div>
-              <div class="sb-item"><svg viewBox="0 0 24 24"><path d="M12 1.696L1.393 8.69v7.517l10.607 6.994L22.607 16.2V8.69L12 1.696z"/></svg> Home</div>
-              <div class="sb-item"><svg viewBox="0 0 24 24"><path d="M10.25 3.75c-3.59 0-6.5 2.91-6.5 6.5s2.91 6.5 6.5 6.5c1.795 0 3.419-.726 4.596-1.904 1.178-1.177 1.904-2.801 1.904-4.596 0-3.59-2.91-6.5-6.5-6.5zm-8.5 6.5c0-4.694 3.806-8.5 8.5-8.5s8.5 3.806 8.5 8.5c0 1.986-.682 3.815-1.824 5.262l4.781 4.781-1.414 1.414-4.781-4.781A8.456 8.456 0 0110.25 18.75c-4.694 0-8.5-3.806-8.5-8.5z"/></svg> Explore</div>
-              <div class="sb-item"><svg viewBox="0 0 24 24"><path d="M11.996 2c-4.062 0-7.49 3.021-7.999 7.051L2.866 18H7.1c.463 2.282 2.481 4 4.9 4s4.437-1.718 4.9-4h4.236l-1.143-8.949C19.48 5.017 16.054 2 11.996 2z"/></svg> Notifications</div>
-              <div class="sb-item natte" id="natte"><span class="ni">n</span> n.a.t.t.e.</div>
-              <div class="sb-item"><svg viewBox="0 0 24 24"><path d="M5.651 19h12.698c-.337-1.8-1.023-3.21-1.945-4.19C15.318 13.687 13.838 13 12 13s-3.317.687-4.404 1.81c-.922.98-1.608 2.39-1.945 4.19zm.486-5.56C7.627 11.85 9.648 11 12 11s4.373.85 5.863 2.44c1.477 1.58 2.366 3.8 2.632 6.46l.11 1.1H3.395l.11-1.1c.266-2.66 1.155-4.88 2.632-6.46zM12 4c-1.105 0-2 .895-2 2s.895 2 2 2 2-.895 2-2-.895-2-2-2z"/></svg> Profile</div>
-            </nav>
-
-            <div class="sbg" id="sbg"></div>
-            <div class="sheet" id="sheet">
-              <div class="grab"></div>
-              <h2>Proof of Human</h2>
-              <p class="sub">AI slop blocker</p>
-              <div class="pick">
-                <div>Proof of Human</div>
-                <div class="sel">AI slop blocker<div class="d">Normative AI Turing Test</div></div>
-              </div>
-              <p class="flabel">Sensitivity</p>
-              <div class="sens">
-                <div class="sens-ends"><span>Lenient</span><span>Strict</span></div>
-                <div class="rail" id="rail"><div class="dot"></div><div class="thumb"></div></div>
-              </div>
-              <p class="flabel">Activate on feed</p>
-              <div class="togs">
-                <div class="tog" id="tf">Following</div>
-                <div class="tog" id="ty">For You</div>
-              </div>
-              <div class="go-btn">Activate</div>
             </div>
           </div>
-        </div>
 
-        <div class="hero-type" id="hero1">
-          <div><h1>Proof of<br>Human</h1><p>Normative AI Turing Test</p></div>
-        </div>
-        <div class="hero-type" id="hero2">
-          <div><h1>The slop<br>stops here</h1></div>
+          <!-- CHAT -->
+          <div class="panel off" id="panel-chat">
+            <div class="status"><span>9:41</span><span>5G 🔋</span></div>
+            <div class="chat-head"><h1>Chat</h1><div class="filter"><svg viewBox="0 0 24 24"><path d="M10 18h11M4 6h17M4 12h17" stroke="currentColor" stroke-width="2" fill="none"/></svg></div></div>
+            <div id="chat-list">
+              <div class="dm" id="dm1"><img class="av" src="assets/avatars/paulg.jpg" alt="" /><div class="preview"><div class="top"><span class="nm">Paul Graham</span><span class="tm">1h</span></div><div class="msg">It's not cheating to use tools.</div></div></div>
+              <div class="dm glow" id="dm2"><img class="av" src="assets/avatars/elonmusk.jpg" alt="" /><div class="preview"><div class="top"><span class="nm">Elon Musk</span><span class="tm">2h</span></div><div class="msg">As an AI, I can generate...</div></div></div>
+              <div class="dm"><img class="av" src="assets/avatars/naval.jpg" alt="" /><div class="preview"><div class="top"><span class="nm">Naval</span><span class="tm">3h</span></div><div class="msg">Read the docs.</div></div></div>
+            </div>
+            <div class="convo off" id="convo" style="display:none">
+              <div class="bubble in">Hey — saw your post about slop detection.</div>
+              <div class="bubble out">Yeah, we shipped n.a.t.t.e.</div>
+              <div class="bubble in marked" id="cb-ai">As an AI language model, I can help you draft engaging replies for your audience.</div>
+              <div class="bubble in" id="cb-real">Nice. Does it work in Chat too?</div>
+            </div>
+            <div class="chip" id="chip-chat" style="margin-top:8px"><span class="n">n</span><span class="lbl">n.a.t.t.e.</span><span class="meta" id="meta-chat">1 AI message marked</span><span class="hide">Hide AI</span></div>
+          </div>
+
+          <div class="bd" id="bd"></div>
+          <nav class="sb" id="sb">
+            <div class="sb-item"><svg viewBox="0 0 24 24"><path d="M12 1.696L1.393 8.69v7.517l10.607 6.994L22.607 16.2V8.69L12 1.696z"/></svg> Home</div>
+            <div class="sb-item"><svg viewBox="0 0 24 24"><path d="M11.996 2c-4.062 0-7.49 3.021-7.999 7.051L2.866 18H7.1c.463 2.282 2.481 4 4.9 4s4.437-1.718 4.9-4h4.236l-1.143-8.949C19.48 5.017 16.054 2 11.996 2z"/></svg> Notifications</div>
+            <div class="sb-item natte" id="natte"><span class="ni">n</span> n.a.t.t.e.</div>
+            <div class="sb-item"><svg viewBox="0 0 24 24"><path d="M5.651 19h12.698c-.337-1.8-1.023-3.21-1.945-4.19C15.318 13.687 13.838 13 12 13s-3.317.687-4.404 1.81c-.922.98-1.608 2.39-1.945 4.19zm.486-5.56C7.627 11.85 9.648 11 12 11s4.373.85 5.863 2.44c1.477 1.58 2.366 3.8 2.632 6.46l.11 1.1H3.395l.11-1.1c.266-2.66 1.155-4.88 2.632-6.46zM12 4c-1.105 0-2 .895-2 2s.895 2 2 2 2-.895 2-2-.895-2-2-2z"/></svg> Profile</div>
+          </nav>
+          <div class="sbg" id="sbg"></div>
+          <div class="sheet" id="sheet">
+            <div class="grab"></div>
+            <h2>Proof of Human</h2>
+            <p class="sub">AI slop blocker</p>
+            <div class="pick"><div>Proof of Human</div><div class="sel">AI slop blocker</div></div>
+            <p class="fl">Sensitivity</p>
+            <div class="rail" id="rail"><div class="dot"></div><div class="thumb"></div></div>
+            <p class="fl" id="tog-label">Activate on feed</p>
+            <div class="togs"><div class="tog" id="ta">Following</div><div class="tog on" id="tb">For You</div></div>
+            <div class="go-btn">Activate</div>
+          </div>
         </div>
       </div>
 
-      <div class="end-card" id="end">
-        <div class="end-logo">n</div>
-        <h2>n.a.t.t.e.</h2>
-        <p>Now on X</p>
-      </div>
+      <div class="hero" id="h1"><div><h1>Proof of<br>Human</h1><p>Normative AI Turing Test</p></div></div>
+      <div class="hero" id="h2"><div><h1>The slop<br>stops here</h1></div></div>
+      <div class="hero" id="h3"><div><h1>On X Chat<br>too</h1></div></div>
+      <div class="hero" id="h4"><div><h1>Human<br>verified</h1></div></div>
+      <div class="end" id="end"><div class="logo">n</div><h2>n.a.t.t.e.</h2><p>Feed & Chat · Now on X</p></div>
     </div>
 
     <script>
       const $ = (id) => document.getElementById(id);
-      const cam = (cls) => { $("world").className = "world " + cls; };
+      const vp = $("vp");
 
-      const TL = [
-        { at: 0,     fn: () => cam("cam-feed") },
-        { at: 2400,  fn: () => { $("sb").classList.add("on"); $("bd").classList.add("on"); cam("cam-sidebar"); }},
-        { at: 4200,  fn: () => { $("natte").classList.add("glow"); cam("cam-natte"); }},
-        { at: 5400,  fn: () => { $("sheet").classList.add("on"); $("sbg").classList.add("on"); }},
-        { at: 6600,  fn: () => cam("cam-slider") },
-        { at: 7200,  fn: () => $("rail").classList.add("go") },
-        { at: 9000,  fn: () => $("hero1").classList.add("on") },
-        { at: 10200, fn: () => $("hero1").classList.remove("on") },
-        { at: 10800, fn: () => { cam("cam-slider"); $("ty").classList.add("on"); }},
-        { at: 12000, fn: () => {
-          $("sheet").classList.remove("on"); $("sbg").classList.remove("on");
-          $("sb").classList.remove("on"); $("bd").classList.remove("on");
-          $("natte").classList.remove("glow");
-          cam("cam-feed");
-        }},
-        { at: 13200, fn: () => $("hero2").classList.add("on") },
-        { at: 14200, fn: () => $("hero2").classList.remove("on") },
-        { at: 14800, fn: () => { cam("cam-refresh"); $("feed").classList.add("pull"); $("pull").classList.add("on"); }},
-        { at: 16200, fn: () => {
-          $("feed").classList.remove("pull");
-          $("pull").classList.remove("on");
-          $("t2").classList.add("marked");
-          $("t4").classList.add("marked");
-          cam("cam-marked");
-        }},
-        { at: 18000, fn: () => { $("chip").classList.add("on"); cam("cam-chip"); }},
-        { at: 19600, fn: () => $("chip").classList.add("tap") },
-        { at: 20200, fn: () => {
-          $("t2").classList.add("hide");
-          $("t4").classList.add("hide");
-          $("chip-meta").textContent = "AI hidden";
-          cam("cam-feed");
-        }},
-        { at: 21800, fn: () => $("end").classList.add("on") },
-      ];
+      function ease(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2; }
+
+      function cam(to, dur = 900, origin = [640, 360]) {
+        const from = cam._s || { s: 1, x: 0, y: 0 };
+        const start = performance.now();
+        vp.style.transformOrigin = `${origin[0]}px ${origin[1]}px`;
+        return new Promise((resolve) => {
+          function step(now) {
+            const t = Math.min((now - start) / dur, 1);
+            const e = ease(t);
+            const s = from.s + (to.s - from.s) * e;
+            const x = from.x + (to.x - from.x) * e;
+            const y = from.y + (to.y - from.y) * e;
+            vp.style.transform = `translate(${x}px,${y}px) scale(${s})`;
+            if (t < 1) requestAnimationFrame(step);
+            else { cam._s = { ...to }; resolve(); }
+          }
+          requestAnimationFrame(step);
+        });
+      }
+      cam._s = { s: 1, x: 0, y: 0 };
+
+      function wait(ms) { return new Promise((r) => setTimeout(r, ms)); }
+      function hero(id, on) { $(id).classList.toggle("on", on); }
+
+      async function run() {
+        cam._s = { s: 1, x: 0, y: 0 };
+        vp.style.transform = "translate(0,0) scale(1)";
+
+        // ── FEED (0–20s) ──
+        await wait(2800);
+        $("sb").classList.add("on"); $("bd").classList.add("on");
+        await cam({ s: 1.28, x: 90, y: 20 }, 1000, [500, 360]);
+        await wait(1200);
+        $("natte").classList.add("glow");
+        await cam({ s: 1.65, x: 130, y: 55 }, 1100, [480, 380]);
+        await wait(800);
+        $("sheet").classList.add("on"); $("sbg").classList.add("on");
+        await wait(600);
+        await cam({ s: 2.05, x: 40, y: 180 }, 1200, [640, 520]);
+        await wait(400);
+        $("rail").classList.add("go");
+        await wait(2200);
+        hero("h1", true); await wait(1600); hero("h1", false);
+        await wait(400);
+        $("tb").classList.add("on");
+        await wait(900);
+        $("sheet").classList.remove("on"); $("sbg").classList.remove("on");
+        $("sb").classList.remove("on"); $("bd").classList.remove("on");
+        $("natte").classList.remove("glow");
+        await cam({ s: 1, x: 0, y: 0 }, 1100);
+        await wait(600);
+        hero("h2", true); await wait(1400); hero("h2", false);
+        await wait(300);
+        await cam({ s: 1.35, x: 0, y: 70 }, 900, [640, 200]);
+        $("scroll-feed").classList.add("pull"); $("spin-feed").classList.add("on");
+        await wait(1400);
+        $("scroll-feed").classList.remove("pull"); $("spin-feed").classList.remove("on");
+        $("f2").classList.add("marked"); $("f4").classList.add("marked");
+        await wait(400);
+        await cam({ s: 1.5, x: -20, y: 100 }, 1000, [640, 340]);
+        await wait(800);
+        $("chip-feed").classList.add("on");
+        await cam({ s: 1.42, x: 0, y: 60 }, 800, [640, 180]);
+        await wait(1200);
+        $("f2").classList.add("hide"); $("f4").classList.add("hide");
+        $("meta-feed").textContent = "AI hidden";
+        await cam({ s: 1, x: 0, y: 0 }, 1000);
+        await wait(1800);
+
+        // ── TRANSITION TO CHAT ──
+        hero("h3", true); await wait(1800); hero("h3", false);
+        $("panel-feed").classList.add("off");
+        $("panel-chat").classList.remove("off");
+        $("tog-label").textContent = "Activate on Chat";
+        $("tb").textContent = "All Chats";
+        $("ta").textContent = "This Chat";
+        cam._s = { s: 1, x: 0, y: 0 };
+        vp.style.transform = "translate(0,0) scale(1)";
+        await wait(1200);
+
+        // ── CHAT (20–37s) — same process ──
+        await cam({ s: 1.22, x: 0, y: 30 }, 900);
+        await wait(1000);
+        $("sb").classList.add("on"); $("bd").classList.add("on");
+        await cam({ s: 1.35, x: 95, y: 35 }, 1000, [500, 360]);
+        await wait(1000);
+        $("natte").classList.add("glow");
+        $("sheet").classList.add("on"); $("sbg").classList.add("on");
+        await wait(500);
+        await cam({ s: 2.0, x: 35, y: 175 }, 1100, [640, 510]);
+        $("rail").classList.remove("go");
+        await wait(100);
+        $("rail").classList.add("go");
+        await wait(2000);
+        $("ta").classList.add("on"); $("tb").classList.remove("on");
+        await wait(800);
+        $("sheet").classList.remove("on"); $("sbg").classList.remove("on");
+        $("sb").classList.remove("on"); $("bd").classList.remove("on");
+        $("natte").classList.remove("glow");
+        await cam({ s: 1, x: 0, y: 0 }, 1000);
+        await wait(600);
+        $("chat-list").style.display = "none";
+        $("convo").style.display = "flex";
+        $("cb-ai").classList.add("marked");
+        await cam({ s: 1.45, x: -10, y: 80 }, 1000, [640, 400]);
+        await wait(1000);
+        $("chip-chat").classList.add("on");
+        await wait(1200);
+        $("cb-ai").classList.add("hide");
+        $("meta-chat").textContent = "AI hidden";
+        await cam({ s: 1, x: 0, y: 0 }, 900);
+        await wait(800);
+        hero("h4", true); await wait(1600); hero("h4", false);
+        await wait(600);
+        $("end").classList.add("on");
+      }
 
       Promise.all([...document.images].map((img) =>
         img.complete ? Promise.resolve() : new Promise((r) => { img.onload = img.onerror = r; })
-      )).then(() => {
-        const t0 = performance.now();
-        const done = new Set();
-        (function loop(now) {
-          const e = now - t0;
-          TL.forEach((s, i) => { if (e >= s.at && !done.has(i)) { done.add(i); s.fn(); }});
-          if (e < 24000) requestAnimationFrame(loop);
-        })(performance.now());
-      });
+      )).then(() => setTimeout(run, 400));
     </script>
   </body>
 </html>

@@ -19,8 +19,6 @@ function startServer(root) {
         ".html": "text/html",
         ".jpg": "image/jpeg",
         ".png": "image/png",
-        ".css": "text/css",
-        ".js": "text/javascript",
       };
       res.writeHead(200, { "Content-Type": types[ext] || "application/octet-stream" });
       fs.createReadStream(filePath).pipe(res);
@@ -40,14 +38,15 @@ async function record() {
 
   const browser = await chromium.launch();
   const context = await browser.newContext({
-    viewport: { width: 1920, height: 1080 },
+    viewport: { width: 1280, height: 720 },
     deviceScaleFactor: 2,
-    recordVideo: { dir: outDir, size: { width: 1920, height: 1080 } },
+    recordVideo: { dir: outDir, size: { width: 1280, height: 720 } },
     colorScheme: "dark",
   });
   const page = await context.newPage();
   await page.goto(demoUrl, { waitUntil: "networkidle" });
-  await page.waitForTimeout(25000);
+  // ~41s to match X Design launch video pacing
+  await page.waitForTimeout(42000);
   const video = page.video();
   await context.close();
   await browser.close();
@@ -60,17 +59,10 @@ async function record() {
     fs.renameSync(tempPath, webmPath);
 
     execFileSync("ffmpeg", [
-      "-y",
-      "-i",
-      webmPath,
-      "-c:v",
-      "libx264",
-      "-crf",
-      "18",
-      "-pix_fmt",
-      "yuv420p",
-      "-movflags",
-      "+faststart",
+      "-y", "-i", webmPath,
+      "-c:v", "libx264", "-crf", "17",
+      "-pix_fmt", "yuv420p",
+      "-movflags", "+faststart",
       mp4Path,
     ], { stdio: "inherit" });
 
