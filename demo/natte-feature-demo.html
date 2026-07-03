@@ -8,18 +8,18 @@
       * { box-sizing: border-box; margin: 0; padding: 0; }
       body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        background: #ececec;
+        background: #d4d4d4;
         display: flex; align-items: center; justify-content: center; min-height: 100vh;
       }
       .stage {
         position: relative; width: 1280px; height: 720px;
-        background: linear-gradient(180deg, #fafafa, #efefef);
+        background: linear-gradient(165deg, #f8f8f8 0%, #ebebeb 100%);
         overflow: hidden;
       }
       .caption {
-        position: absolute; top: 28px; left: 50%; transform: translateX(-50%);
-        font-size: 0.85rem; font-weight: 600; color: #536471;
-        letter-spacing: 0.04em; text-transform: uppercase;
+        position: absolute; top: 24px; left: 50%; transform: translateX(-50%);
+        font-size: 0.8rem; font-weight: 600; color: #536471;
+        letter-spacing: 0.06em; text-transform: uppercase;
         opacity: 0; transition: opacity 0.4s; z-index: 100; white-space: nowrap;
       }
       .caption.show { opacity: 1; }
@@ -30,183 +30,295 @@
         transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
         transform-origin: center center;
       }
-      .camera.zoom-sidebar { transform: scale(1.55) translateX(18%); }
-      .camera.zoom-settings { transform: scale(1.85) translateX(22%) translateY(6%); }
+      .camera.zoom-sidebar { transform: scale(1.48) translateX(17%); }
+      .camera.zoom-settings { transform: scale(1.78) translateX(21%) translateY(5%); }
       .camera.zoom-feed { transform: scale(1); }
 
       .iphone {
-        width: 300px; height: 620px; background: #fff;
-        border-radius: 44px; position: relative;
-        box-shadow: 0 0 0 1px rgba(0,0,0,0.06), 0 30px 80px rgba(0,0,0,0.14);
+        width: 320px; height: 680px; background: #000;
+        border-radius: 48px; position: relative;
+        box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 40px 100px rgba(0,0,0,0.22);
       }
       .island {
-        position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
-        width: 96px; height: 28px; background: #111; border-radius: 18px; z-index: 20;
+        position: absolute; top: 11px; left: 50%; transform: translateX(-50%);
+        width: 108px; height: 32px; background: #000; border-radius: 20px; z-index: 30;
       }
       .screen {
-        position: absolute; inset: 6px; border-radius: 40px;
+        position: absolute; inset: 5px; border-radius: 44px;
         background: #fff; overflow: hidden;
       }
 
-      /* Feed */
+      /* Status bar */
+      .status {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 14px 22px 0; font-size: 0.68rem; font-weight: 600;
+        color: #000; position: relative; z-index: 5;
+      }
+      .status-icons { display: flex; gap: 4px; align-items: center; font-size: 0.6rem; }
+
+      /* X top bar */
       .topbar {
         display: flex; align-items: center; justify-content: space-between;
-        padding: 44px 14px 8px; border-bottom: 1px solid #eff3f4;
+        padding: 6px 14px 10px; position: relative; z-index: 5;
       }
-      .menu-btn { width: 20px; height: 14px; display: flex; flex-direction: column; justify-content: space-between; }
-      .menu-btn span { display: block; height: 2px; background: #000; border-radius: 1px; }
-      .x-logo { font-size: 1.1rem; font-weight: 800; }
-      .tabs { display: flex; border-bottom: 1px solid #eff3f4; }
-      .tab { flex: 1; text-align: center; padding: 10px 0; font-size: 0.72rem; font-weight: 600; color: #536471; position: relative; }
-      .tab.active { color: #000; }
+      .menu-btn { width: 22px; height: 16px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; }
+      .menu-btn span { display: block; height: 2px; background: #0f1419; border-radius: 1px; }
+      .x-logo { font-size: 1.15rem; font-weight: 800; color: #0f1419; letter-spacing: -0.02em; }
+      .top-avatar {
+        width: 28px; height: 28px; border-radius: 50%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.55rem; font-weight: 700; color: #fff;
+      }
+
+      .tabs {
+        display: flex; border-bottom: 1px solid #eff3f4;
+        position: relative; z-index: 5; background: #fff;
+      }
+      .tab {
+        flex: 1; text-align: center; padding: 12px 0 10px;
+        font-size: 0.78rem; font-weight: 500; color: #536471; position: relative;
+      }
+      .tab.active { color: #0f1419; font-weight: 700; }
       .tab.active::after {
-        content: ""; position: absolute; bottom: 0; left: 25%; right: 25%;
-        height: 3px; background: #1d9bf0; border-radius: 2px;
+        content: ""; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+        width: 56px; height: 4px; background: #1d9bf0; border-radius: 2px;
       }
+
       .natte-chip {
-        display: none; align-items: center; gap: 8px;
-        margin: 8px 12px 0; padding: 8px 12px;
+        display: none; align-items: center; gap: 6px;
+        margin: 8px 12px 4px; padding: 7px 10px;
         background: #f7f9f9; border: 1px solid #eff3f4; border-radius: 999px;
-        font-size: 0.68rem; font-weight: 600;
+        font-size: 0.64rem; font-weight: 700; color: #0f1419;
+        position: relative; z-index: 5;
       }
       .natte-chip.show { display: flex; }
+      .natte-chip .shield {
+        width: 18px; height: 18px; border-radius: 50%; background: #000;
+        color: #fff; font-size: 0.45rem; display: flex; align-items: center; justify-content: center;
+      }
+      .natte-chip .meta { color: #536471; font-weight: 500; flex: 1; }
       .natte-chip .hide-btn {
-        margin-left: auto; padding: 4px 10px; border-radius: 999px;
-        background: #000; color: #fff; font-size: 0.62rem; font-weight: 700;
+        padding: 4px 10px; border-radius: 999px;
+        background: #0f1419; color: #fff; font-size: 0.58rem; font-weight: 700;
       }
-      .natte-chip.pressed .hide-btn { transform: scale(0.95); background: #333; }
+      .natte-chip.pressed .hide-btn { transform: scale(0.94); opacity: 0.85; }
 
-      .post {
-        padding: 12px 14px; border-bottom: 1px solid #eff3f4;
-        position: relative; transition: opacity 0.4s, max-height 0.4s;
+      .feed-scroll {
+        height: calc(100% - 118px);
+        overflow: hidden;
+        position: relative;
+        transition: transform 0.5s ease;
       }
-      .post.hidden-ai { opacity: 0.25; }
-      .post .ai-mark {
+      .feed-scroll.pulling { transform: translateY(18px); }
+      .refresh-spinner {
+        position: absolute; top: -28px; left: 50%; transform: translateX(-50%);
+        width: 18px; height: 18px; border: 2px solid #eff3f4;
+        border-top-color: #1d9bf0; border-radius: 50%;
+        opacity: 0; transition: opacity 0.3s;
+      }
+      .feed-scroll.pulling .refresh-spinner { opacity: 1; animation: spin 0.7s linear infinite; }
+      @keyframes spin { to { transform: translateX(-50%) rotate(360deg); } }
+
+      /* Tweet */
+      .tweet {
+        display: flex; gap: 10px; padding: 10px 14px 12px;
+        border-bottom: 1px solid #eff3f4;
+        position: relative; transition: opacity 0.45s ease, filter 0.45s ease;
+      }
+      .tweet.hidden-ai { opacity: 0.22; filter: grayscale(0.6); }
+      .tweet.marked { background: linear-gradient(90deg, rgba(244,63,94,0.06) 0%, transparent 24%); }
+      .tweet.marked::before {
+        content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+        background: #f43f5e; opacity: 0; transition: opacity 0.4s;
+      }
+      .tweet.marked::before { opacity: 1; }
+      .ai-badge {
         display: none; position: absolute; top: 10px; right: 12px;
-        padding: 2px 8px; border-radius: 999px;
-        background: #fee2e2; color: #dc2626;
-        font-size: 0.58rem; font-weight: 700;
+        padding: 2px 7px; border-radius: 4px;
+        background: #fef2f2; color: #dc2626; border: 1px solid #fecaca;
+        font-size: 0.52rem; font-weight: 800; letter-spacing: 0.04em;
       }
-      .post.marked .ai-mark { display: block; }
-      .post-header { display: flex; gap: 8px; align-items: center; margin-bottom: 4px; }
-      .av { width: 32px; height: 32px; border-radius: 50%; background: #cfd9de; flex-shrink: 0; }
-      .av.dark { background: #000; }
-      .av.ai { background: linear-gradient(135deg, #f43f5e, #ef4444); }
-      .name { font-size: 0.72rem; font-weight: 700; }
-      .handle { font-size: 0.65rem; color: #536471; }
-      .body { font-size: 0.72rem; line-height: 1.4; padding-left: 40px; color: #000; }
+      .tweet.marked .ai-badge { display: block; }
+
+      .tweet-av {
+        width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.72rem; font-weight: 700; color: #fff;
+      }
+      .tweet-main { flex: 1; min-width: 0; }
+      .tweet-meta {
+        display: flex; align-items: center; gap: 3px; flex-wrap: wrap;
+        font-size: 0.72rem; line-height: 1.2; margin-bottom: 2px;
+      }
+      .tweet-name { font-weight: 700; color: #0f1419; }
+      .verified {
+        width: 14px; height: 14px; background: #1d9bf0; border-radius: 50%;
+        display: inline-flex; align-items: center; justify-content: center;
+        color: #fff; font-size: 0.45rem; font-weight: 900;
+      }
+      .tweet-handle, .tweet-dot, .tweet-time { color: #536471; font-weight: 400; }
+      .tweet-text {
+        font-size: 0.78rem; line-height: 1.35; color: #0f1419;
+        margin-bottom: 8px; word-wrap: break-word;
+      }
+      .tweet-text .link { color: #1d9bf0; }
+
+      .tweet-card {
+        border: 1px solid #eff3f4; border-radius: 14px; overflow: hidden; margin-bottom: 8px;
+      }
+      .tweet-card-img {
+        height: 72px; background: linear-gradient(135deg, #1a1a2e, #16213e);
+        display: flex; align-items: flex-end; padding: 8px;
+        font-size: 0.6rem; color: rgba(255,255,255,0.7);
+      }
+      .tweet-card-body { padding: 8px 10px; background: #f7f9f9; }
+      .tweet-card-title { font-size: 0.65rem; font-weight: 600; color: #0f1419; }
+      .tweet-card-url { font-size: 0.58rem; color: #536471; margin-top: 2px; }
+
+      .tweet-photo {
+        height: 100px; border-radius: 14px; margin-bottom: 8px;
+        background: linear-gradient(145deg, #fbbf24, #f59e0b, #d97706);
+        border: 1px solid #eff3f4;
+      }
+
+      .tweet-actions {
+        display: flex; justify-content: space-between; max-width: 220px;
+        margin-top: 2px;
+      }
+      .action {
+        display: flex; align-items: center; gap: 4px;
+        font-size: 0.62rem; color: #536471;
+      }
+      .action svg { width: 14px; height: 14px; }
 
       /* Sidebar */
       .sidebar {
-        position: absolute; top: 0; left: 0; bottom: 0; width: 72%;
+        position: absolute; top: 0; left: 0; bottom: 0; width: 78%;
         background: #fff; z-index: 15;
         transform: translateX(-100%);
         transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
         border-right: 1px solid #eff3f4;
-        padding: 48px 0 16px;
+        padding: 52px 12px 20px;
       }
       .sidebar.open { transform: translateX(0); }
+      .sidebar-profile {
+        display: flex; align-items: center; gap: 10px;
+        padding: 8px 10px 16px; margin-bottom: 8px;
+      }
+      .sidebar-profile .av {
+        width: 36px; height: 36px; border-radius: 50%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+      }
+      .sidebar-profile .name { font-size: 0.82rem; font-weight: 700; }
+      .sidebar-profile .handle { font-size: 0.68rem; color: #536471; }
       .sidebar-item {
-        display: flex; align-items: center; gap: 12px;
-        padding: 12px 18px; font-size: 0.78rem; font-weight: 500;
+        display: flex; align-items: center; gap: 14px;
+        padding: 13px 14px; font-size: 0.88rem; font-weight: 500; color: #0f1419;
+        border-radius: 999px;
       }
-      .sidebar-item .ico { width: 22px; text-align: center; font-size: 0.9rem; }
-      .sidebar-item.natte {
-        border-radius: 12px; margin: 4px 10px;
-        transition: background 0.3s;
-      }
-      .sidebar-item.natte.highlight { background: #f0f9ff; outline: 2px solid #1d9bf0; }
+      .sidebar-item svg { width: 22px; height: 22px; flex-shrink: 0; }
+      .sidebar-item.natte { margin: 6px 0; transition: background 0.3s; }
+      .sidebar-item.natte.highlight { background: #eff8ff; outline: 2px solid #1d9bf0; }
       .sidebar-item.natte .ico {
-        width: 28px; height: 28px; border-radius: 50%;
-        background: #000; color: #fff; font-size: 0.55rem;
+        width: 26px; height: 26px; border-radius: 50%;
+        background: #0f1419; color: #fff; font-size: 0.58rem;
         display: flex; align-items: center; justify-content: center; font-weight: 800;
       }
+
       .backdrop {
-        position: absolute; inset: 0; background: rgba(0,0,0,0.35);
+        position: absolute; inset: 0; background: rgba(0,0,0,0.4);
         opacity: 0; pointer-events: none; transition: opacity 0.4s; z-index: 14;
       }
       .backdrop.show { opacity: 1; }
 
       /* Settings sheet */
       .sheet {
-        position: absolute; inset: 0; background: rgba(0,0,0,0.4);
+        position: absolute; inset: 0; background: rgba(0,0,0,0.45);
         opacity: 0; pointer-events: none; z-index: 25;
         display: flex; align-items: flex-end; transition: opacity 0.4s;
       }
       .sheet.open { opacity: 1; pointer-events: auto; }
       .sheet-panel {
         width: 100%; background: #fff; border-radius: 20px 20px 0 0;
-        padding: 16px 16px 24px; transform: translateY(100%);
+        padding: 14px 16px 28px; transform: translateY(100%);
         transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
       }
       .sheet.open .sheet-panel { transform: translateY(0); }
-      .sheet h3 { font-size: 0.85rem; font-weight: 800; margin-bottom: 4px; }
-      .sheet .sub { font-size: 0.65rem; color: #536471; margin-bottom: 14px; }
+      .sheet-handle {
+        width: 36px; height: 4px; background: #cfd9de; border-radius: 2px;
+        margin: 0 auto 14px;
+      }
+      .sheet h3 { font-size: 0.92rem; font-weight: 800; margin-bottom: 2px; color: #0f1419; }
+      .sheet .sub { font-size: 0.68rem; color: #536471; margin-bottom: 14px; }
       .dropdown {
-        border: 1px solid #cfd9de; border-radius: 12px;
+        border: 1px solid #cfd9de; border-radius: 14px;
         overflow: hidden; margin-bottom: 14px;
       }
       .dropdown-item {
-        padding: 10px 12px; font-size: 0.72rem; font-weight: 600;
+        padding: 11px 13px; font-size: 0.76rem; font-weight: 600; color: #0f1419;
         border-bottom: 1px solid #eff3f4;
       }
       .dropdown-item:last-child { border-bottom: none; }
-      .dropdown-item.selected { background: #f0f9ff; color: #1d9bf0; }
-      .dropdown-item .child {
-        font-size: 0.65rem; font-weight: 500; color: #536471; margin-top: 2px;
-      }
-      .label { font-size: 0.65rem; font-weight: 600; color: #536471; margin-bottom: 8px; }
+      .dropdown-item.selected { background: #eff8ff; }
+      .dropdown-item.selected .title { color: #1d9bf0; }
+      .dropdown-item .child { font-size: 0.65rem; font-weight: 500; color: #536471; margin-top: 2px; }
+      .label { font-size: 0.68rem; font-weight: 600; color: #536471; margin-bottom: 8px; }
       .slider-track {
         position: relative; height: 4px; background: #f97316;
         border-radius: 999px; margin-bottom: 16px;
       }
       .slider-thumb {
-        position: absolute; top: 50%; width: 16px; height: 16px;
-        border: 2px solid #000; border-radius: 50%; background: #fff;
-        transform: translate(-50%, -50%); left: 40%;
+        position: absolute; top: 50%; width: 18px; height: 18px;
+        border: 2px solid #0f1419; border-radius: 50%; background: #fff;
+        transform: translate(-50%, -50%); left: 38%;
         transition: left 0.8s ease;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.15);
       }
-      .slider-thumb.dragged { left: 68%; }
-      .feed-toggles { display: flex; gap: 8px; margin-bottom: 8px; }
+      .slider-thumb.dragged { left: 70%; }
+      .feed-toggles { display: flex; gap: 8px; margin-bottom: 10px; }
       .feed-toggle {
-        flex: 1; padding: 10px; border-radius: 12px; text-align: center;
-        font-size: 0.68rem; font-weight: 600; border: 1px solid #cfd9de;
+        flex: 1; padding: 11px; border-radius: 999px; text-align: center;
+        font-size: 0.72rem; font-weight: 700; border: 1px solid #cfd9de;
         color: #536471; transition: all 0.3s;
       }
-      .feed-toggle.on {
-        background: #000; border-color: #000; color: #fff;
-      }
+      .feed-toggle.on { background: #0f1419; border-color: #0f1419; color: #fff; }
       .activate-btn {
-        width: 100%; padding: 12px; border-radius: 999px;
-        background: #000; color: #fff; font-size: 0.75rem; font-weight: 700;
-        text-align: center; margin-top: 8px;
+        width: 100%; padding: 13px; border-radius: 999px;
+        background: #0f1419; color: #fff; font-size: 0.78rem; font-weight: 700;
+        text-align: center;
       }
 
-      /* Tap cursor */
+      .fab {
+        position: absolute; bottom: 24px; right: 16px; z-index: 10;
+        width: 48px; height: 48px; border-radius: 50%;
+        background: #1d9bf0; display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 4px 14px rgba(29,155,240,0.4);
+      }
+      .fab svg { width: 22px; height: 22px; fill: #fff; }
+      .home-bar {
+        position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
+        width: 110px; height: 4px; background: #0f1419; border-radius: 2px; opacity: 0.18;
+        z-index: 20;
+      }
+
       .tap {
-        position: absolute; width: 28px; height: 28px;
-        border: 2px solid rgba(29,155,240,0.8); border-radius: 50%;
+        position: absolute; width: 32px; height: 32px;
+        border: 2.5px solid rgba(29,155,240,0.85); border-radius: 50%;
         z-index: 50; pointer-events: none; opacity: 0;
-        transform: translate(-50%, -50%) scale(1.4);
-        transition: opacity 0.2s, transform 0.2s;
+        transform: translate(-50%, -50%) scale(1.5);
+        transition: opacity 0.15s, transform 0.15s;
       }
       .tap.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
       .tap::after {
-        content: ""; position: absolute; inset: 6px;
-        background: rgba(29,155,240,0.25); border-radius: 50%;
+        content: ""; position: absolute; inset: 7px;
+        background: rgba(29,155,240,0.2); border-radius: 50%;
       }
-
-      /* Refresh indicator */
-      .refresh-bar {
-        height: 0; background: #1d9bf0; opacity: 0;
-        transition: height 0.4s, opacity 0.3s;
-      }
-      .refresh-bar.pull { height: 3px; opacity: 1; }
     </style>
   </head>
   <body>
     <div class="stage">
-      <p class="caption" id="caption"></p>
+      <p class="caption show" id="caption">X feed</p>
 
       <div class="camera zoom-feed" id="camera">
         <div class="iphone" id="phone">
@@ -215,85 +327,202 @@
             <div class="backdrop" id="backdrop"></div>
 
             <div class="sidebar" id="sidebar">
-              <div class="sidebar-item"><span class="ico">🏠</span> Home</div>
-              <div class="sidebar-item"><span class="ico">🔍</span> Explore</div>
-              <div class="sidebar-item"><span class="ico">🔔</span> Notifications</div>
-              <div class="sidebar-item natte" id="natte-nav"><span class="ico">n</span> n.a.t.t.e.</div>
-              <div class="sidebar-item"><span class="ico">👤</span> Profile</div>
+              <div class="sidebar-profile">
+                <div class="av"></div>
+                <div>
+                  <div class="name">You</div>
+                  <div class="handle">@yourhandle</div>
+                </div>
+              </div>
+              <div class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 9v13h7v-7h6v7h7V9L12 2z"/></svg>
+                Home
+              </div>
+              <div class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5"/></svg>
+                Explore
+              </div>
+              <div class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 106 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>
+                Notifications
+              </div>
+              <div class="sidebar-item natte" id="natte-nav">
+                <span class="ico">n</span> n.a.t.t.e.
+              </div>
+              <div class="sidebar-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Profile
+              </div>
             </div>
 
             <div class="sheet" id="sheet">
               <div class="sheet-panel">
+                <div class="sheet-handle"></div>
                 <h3>Proof of Human</h3>
                 <p class="sub">AI slop blocker · n.a.t.t.e.</p>
-                <div class="dropdown" id="dropdown">
-                  <div class="dropdown-item" id="dd-parent">Proof of Human</div>
-                  <div class="dropdown-item selected" id="dd-child">
-                    AI slop blocker
+                <div class="dropdown">
+                  <div class="dropdown-item"><div class="title">Proof of Human</div></div>
+                  <div class="dropdown-item selected">
+                    <div class="title">AI slop blocker</div>
                     <div class="child">Normative AI Turing Test</div>
                   </div>
                 </div>
                 <p class="label">Sensitivity</p>
-                <div class="slider-track">
-                  <div class="slider-thumb" id="slider"></div>
-                </div>
+                <div class="slider-track"><div class="slider-thumb" id="slider"></div></div>
                 <p class="label">Activate on feed</p>
                 <div class="feed-toggles">
                   <div class="feed-toggle" id="tog-following">Following</div>
                   <div class="feed-toggle" id="tog-foryou">For You</div>
                 </div>
-                <div class="activate-btn" id="activate">Activate</div>
+                <div class="activate-btn">Activate</div>
               </div>
+            </div>
+
+            <div class="status">
+              <span>9:41</span>
+              <span class="status-icons">●●●○ 📶 🔋</span>
             </div>
 
             <div class="topbar">
               <div class="menu-btn" id="menu"><span></span><span></span><span></span></div>
               <div class="x-logo">𝕏</div>
-              <div style="width:20px"></div>
-            </div>
-            <div class="refresh-bar" id="refresh"></div>
-            <div class="tabs">
-              <div class="tab" id="tab-following">Following</div>
-              <div class="tab active" id="tab-foryou">For You</div>
-            </div>
-            <div class="natte-chip" id="chip">
-              <span>n.a.t.t.e.</span>
-              <span style="color:#536471;font-weight:500">· 2 AI posts marked</span>
-              <span class="hide-btn" id="hide-btn">Hide AI</span>
+              <div class="top-avatar">Y</div>
             </div>
 
-            <div class="post" id="p1">
-              <span class="ai-mark">AI</span>
-              <div class="post-header">
-                <div class="av"></div>
-                <div><div class="name">sam</div><div class="handle">@sam</div></div>
-              </div>
-              <p class="body">Great coffee this morning ☕</p>
+            <div class="tabs">
+              <div class="tab">Following</div>
+              <div class="tab active">For You</div>
             </div>
-            <div class="post" id="p2">
-              <span class="ai-mark">AI</span>
-              <div class="post-header">
-                <div class="av ai"></div>
-                <div><div class="name">bot_feed</div><div class="handle">@bot_feed</div></div>
-              </div>
-              <p class="body">As an AI assistant, I can generate text that mimics human writing.</p>
+
+            <div class="natte-chip" id="chip">
+              <span class="shield">n</span>
+              <span>n.a.t.t.e.</span>
+              <span class="meta" id="chip-meta">2 AI posts marked</span>
+              <span class="hide-btn">Hide AI</span>
             </div>
-            <div class="post" id="p3">
-              <span class="ai-mark">AI</span>
-              <div class="post-header">
-                <div class="av dark"></div>
-                <div><div class="name">natte</div><div class="handle">@natte</div></div>
-              </div>
-              <p class="body">Weekend photos coming soon!</p>
+
+            <div class="feed-scroll" id="feed">
+              <div class="refresh-spinner"></div>
+
+              <!-- Human: news -->
+              <article class="tweet" id="p1">
+                <span class="ai-badge">AI</span>
+                <div class="tweet-av" style="background:linear-gradient(135deg,#1d4ed8,#3b82f6)">MK</div>
+                <div class="tweet-main">
+                  <div class="tweet-meta">
+                    <span class="tweet-name">Maya Kline</span>
+                    <span class="verified">✓</span>
+                    <span class="tweet-handle">@mayakline</span>
+                    <span class="tweet-dot">·</span>
+                    <span class="tweet-time">2h</span>
+                  </div>
+                  <p class="tweet-text">City council just approved the bike lane expansion. About time 🚲</p>
+                  <div class="tweet-card">
+                    <div class="tweet-card-img">localnews.com</div>
+                    <div class="tweet-card-body">
+                      <div class="tweet-card-title">Downtown bike lanes get green light</div>
+                      <div class="tweet-card-url">localnews.com/transport</div>
+                    </div>
+                  </div>
+                  <div class="tweet-actions">
+                    <span class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 11.5a8.4 8.4 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.4 8.4 0 01-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.4 8.4 0 013.8-.9h.5a8.5 8.5 0 018 8v.5z"/></svg>24</span>
+                    <span class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M17 1l4 4-4 4"/><path d="M3 5h18"/><path d="M7 23l-4-4 4-4"/><path d="M21 19H3"/></svg>89</span>
+                    <span class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg>412</span>
+                    <span class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></span>
+                  </div>
+                </div>
+              </article>
+
+              <!-- AI slop -->
+              <article class="tweet" id="p2">
+                <span class="ai-badge">AI</span>
+                <div class="tweet-av" style="background:linear-gradient(135deg,#6b7280,#374151)">AI</div>
+                <div class="tweet-main">
+                  <div class="tweet-meta">
+                    <span class="tweet-name">Growth Hacks Daily</span>
+                    <span class="tweet-handle">@growthhacks_ai</span>
+                    <span class="tweet-dot">·</span>
+                    <span class="tweet-time">3h</span>
+                  </div>
+                  <p class="tweet-text">As an AI language model, I'm excited to share 10 proven strategies to skyrocket your engagement. Thread 🧵👇</p>
+                  <div class="tweet-actions">
+                    <span class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 11.5a8.4 8.4 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.4 8.4 0 01-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.4 8.4 0 013.8-.9h.5a8.5 8.5 0 018 8v.5z"/></svg>3</span>
+                    <span class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M17 1l4 4-4 4"/><path d="M3 5h18"/><path d="M7 23l-4-4 4-4"/><path d="M21 19H3"/></svg>1</span>
+                    <span class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg>7</span>
+                    <span class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></span>
+                  </div>
+                </div>
+              </article>
+
+              <!-- Human: photo -->
+              <article class="tweet" id="p3">
+                <span class="ai-badge">AI</span>
+                <div class="tweet-av" style="background:linear-gradient(135deg,#0f1419,#333)">n</div>
+                <div class="tweet-main">
+                  <div class="tweet-meta">
+                    <span class="tweet-name">natte</span>
+                    <span class="tweet-handle">@natte</span>
+                    <span class="tweet-dot">·</span>
+                    <span class="tweet-time">4h</span>
+                  </div>
+                  <p class="tweet-text">finally shipped the pilot. the slop stops here.</p>
+                  <div class="tweet-photo"></div>
+                  <div class="tweet-actions">
+                    <span class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 11.5a8.4 8.4 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.4 8.4 0 01-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.4 8.4 0 013.8-.9h.5a8.5 8.5 0 018 8v.5z"/></svg>18</span>
+                    <span class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M17 1l4 4-4 4"/><path d="M3 5h18"/><path d="M7 23l-4-4 4-4"/><path d="M21 19H3"/></svg>42</span>
+                    <span class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg>156</span>
+                    <span class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></span>
+                  </div>
+                </div>
+              </article>
+
+              <!-- AI slop 2 -->
+              <article class="tweet" id="p4">
+                <span class="ai-badge">AI</span>
+                <div class="tweet-av" style="background:linear-gradient(135deg,#9333ea,#6b21a8)">SB</div>
+                <div class="tweet-main">
+                  <div class="tweet-meta">
+                    <span class="tweet-name">Startup Bro AI</span>
+                    <span class="tweet-handle">@startupbro_bot</span>
+                    <span class="tweet-dot">·</span>
+                    <span class="tweet-time">5h</span>
+                  </div>
+                  <p class="tweet-text">In today's fast-paced digital landscape, leveraging AI-generated content is essential for thought leadership. Here's why you should embrace it 🚀</p>
+                  <div class="tweet-actions">
+                    <span class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 11.5a8.4 8.4 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.4 8.4 0 01-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.4 8.4 0 013.8-.9h.5a8.5 8.5 0 018 8v.5z"/></svg>1</span>
+                    <span class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M17 1l4 4-4 4"/><path d="M3 5h18"/><path d="M7 23l-4-4 4-4"/><path d="M21 19H3"/></svg>0</span>
+                    <span class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg>2</span>
+                    <span class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></span>
+                  </div>
+                </div>
+              </article>
+
+              <!-- Human: short -->
+              <article class="tweet" id="p5">
+                <span class="ai-badge">AI</span>
+                <div class="tweet-av" style="background:linear-gradient(135deg,#059669,#10b981)">JR</div>
+                <div class="tweet-main">
+                  <div class="tweet-meta">
+                    <span class="tweet-name">jake runs</span>
+                    <span class="tweet-handle">@jakeruns</span>
+                    <span class="tweet-dot">·</span>
+                    <span class="tweet-time">6h</span>
+                  </div>
+                  <p class="tweet-text">5 miles before breakfast. legs are cooked</p>
+                  <div class="tweet-actions">
+                    <span class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 11.5a8.4 8.4 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.4 8.4 0 01-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.4 8.4 0 013.8-.9h.5a8.5 8.5 0 018 8v.5z"/></svg>6</span>
+                    <span class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M17 1l4 4-4 4"/><path d="M3 5h18"/><path d="M7 23l-4-4 4-4"/><path d="M21 19H3"/></svg>2</span>
+                    <span class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg>31</span>
+                    <span class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></span>
+                  </div>
+                </div>
+              </article>
             </div>
-            <div class="post" id="p4">
-              <span class="ai-mark">AI</span>
-              <div class="post-header">
-                <div class="av ai"></div>
-                <div><div class="name">slop_daily</div><div class="handle">@slop_daily</div></div>
-              </div>
-              <p class="body">This content was generated to maximize engagement metrics.</p>
+
+            <div class="fab">
+              <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>
             </div>
+            <div class="home-bar"></div>
           </div>
           <div class="tap" id="tap"></div>
         </div>
@@ -303,44 +532,34 @@
     <script>
       const $ = (id) => document.getElementById(id);
       const captions = [
-        "X feed",
-        "Open sidebar",
-        "Select n.a.t.t.e.",
-        "Proof of Human → AI slop blocker",
-        "Set sensitivity",
-        "Activate on For You",
-        "Back to feed",
-        "Refresh",
-        "AI posts marked",
-        "Tap n.a.t.t.e. chip",
-        "Hide AI slop",
+        "X feed", "Open sidebar", "Select n.a.t.t.e.",
+        "Proof of Human → AI slop blocker", "Set sensitivity",
+        "Activate on For You", "Back to feed", "Pull to refresh",
+        "AI posts marked", "n.a.t.t.e. chip", "Hide AI slop",
       ];
+      function cap(i) { $("caption").textContent = captions[i] || ""; $("caption").classList.add("show"); }
 
-      function cap(i) {
-        $("caption").textContent = captions[i] || "";
-        $("caption").classList.add("show");
-      }
-      function tap(x, y, phone) {
-        const rect = phone.getBoundingClientRect();
+      function tap(x, y, el) {
+        const rect = el.getBoundingClientRect();
         const stage = document.querySelector(".stage").getBoundingClientRect();
         const t = $("tap");
         t.style.left = (rect.left - stage.left + x) + "px";
         t.style.top = (rect.top - stage.top + y) + "px";
         t.classList.add("show");
-        setTimeout(() => t.classList.remove("show"), 400);
+        setTimeout(() => t.classList.remove("show"), 350);
       }
 
       const phone = $("phone");
       const TIMELINE = [
         { at: 0, fn: () => cap(0) },
-        { at: 1800, fn: () => { cap(1); tap(28, 58, phone); $("sidebar").classList.add("open"); $("backdrop").classList.add("show"); }},
-        { at: 3200, fn: () => { cap(2); $("camera").className = "camera zoom-sidebar"; }},
-        { at: 4200, fn: () => { tap(55, 230, phone); $("natte-nav").classList.add("highlight"); }},
-        { at: 5000, fn: () => { cap(3); tap(55, 230, phone); $("sheet").classList.add("open"); $("camera").className = "camera zoom-settings"; }},
-        { at: 6500, fn: () => { cap(4); $("slider").classList.add("dragged"); }},
-        { at: 7800, fn: () => { cap(5); tap(200, 520, phone); $("tog-foryou").classList.add("on"); }},
-        { at: 9000, fn: () => { tap(150, 560, phone); }},
-        { at: 9800, fn: () => {
+        { at: 2000, fn: () => { cap(1); tap(30, 72, phone); $("sidebar").classList.add("open"); $("backdrop").classList.add("show"); }},
+        { at: 3400, fn: () => { cap(2); $("camera").className = "camera zoom-sidebar"; }},
+        { at: 4400, fn: () => { tap(60, 268, phone); $("natte-nav").classList.add("highlight"); }},
+        { at: 5200, fn: () => { cap(3); tap(60, 268, phone); $("sheet").classList.add("open"); $("camera").className = "camera zoom-settings"; }},
+        { at: 6700, fn: () => { cap(4); $("slider").classList.add("dragged"); }},
+        { at: 8000, fn: () => { cap(5); tap(210, 540, phone); $("tog-foryou").classList.add("on"); }},
+        { at: 9200, fn: () => { tap(160, 580, phone); }},
+        { at: 10000, fn: () => {
           cap(6);
           $("sheet").classList.remove("open");
           $("sidebar").classList.remove("open");
@@ -348,19 +567,19 @@
           $("natte-nav").classList.remove("highlight");
           $("camera").className = "camera zoom-feed";
         }},
-        { at: 11200, fn: () => { cap(7); $("refresh").classList.add("pull"); }},
-        { at: 12200, fn: () => {
+        { at: 11400, fn: () => { cap(7); $("feed").classList.add("pulling"); }},
+        { at: 12400, fn: () => {
           cap(8);
-          $("refresh").classList.remove("pull");
+          $("feed").classList.remove("pulling");
           $("p2").classList.add("marked");
           $("p4").classList.add("marked");
         }},
-        { at: 14000, fn: () => { cap(9); $("chip").classList.add("show"); tap(150, 130, phone); }},
-        { at: 15500, fn: () => { cap(10); tap(250, 130, phone); $("chip").classList.add("pressed"); }},
-        { at: 16200, fn: () => {
+        { at: 14200, fn: () => { cap(9); $("chip").classList.add("show"); tap(160, 148, phone); }},
+        { at: 15700, fn: () => { cap(10); tap(270, 148, phone); $("chip").classList.add("pressed"); }},
+        { at: 16400, fn: () => {
           $("p2").classList.add("hidden-ai");
           $("p4").classList.add("hidden-ai");
-          $("chip").querySelector("span:nth-child(2)").textContent = "· AI hidden";
+          $("chip-meta").textContent = "AI hidden";
         }},
       ];
 
@@ -369,7 +588,7 @@
       function tick(now) {
         const e = now - start;
         TIMELINE.forEach((s, i) => { if (e >= s.at && !done.has(i)) { done.add(i); s.fn(); }});
-        if (e < 18000) requestAnimationFrame(tick);
+        if (e < 18500) requestAnimationFrame(tick);
       }
       requestAnimationFrame(tick);
     </script>
