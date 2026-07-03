@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NATTES Widget — Browser Demo</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        background: #0a0a0a;
+        color: #ededed;
+        min-height: 100vh;
+        padding: 40px 24px;
+      }
+      h1 { font-size: 1.5rem; margin-bottom: 8px; }
+      .subtitle { color: #888; margin-bottom: 32px; font-size: 0.9rem; }
+      .post {
+        border: 1px solid rgba(255,255,255,0.1);
+        background: rgba(255,255,255,0.03);
+        padding: 20px;
+        border-radius: 16px;
+        margin-bottom: 16px;
+        max-width: 600px;
+      }
+      .post p { line-height: 1.6; margin-bottom: 12px; }
+      code {
+        display: block;
+        background: #111;
+        border: 1px solid #333;
+        border-radius: 8px;
+        padding: 12px;
+        font-size: 0.8rem;
+        margin-top: 24px;
+        color: #7dd3fc;
+        word-break: break-all;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>NATTES Widget — Browser Demo</h1>
+    <p class="subtitle">Proof of Human detection running in your browser.</p>
+
+    <div class="post" data-natte-text="Hello everyone — excited to share my weekend photos from the coast!">
+      <p>Hello everyone — excited to share my weekend photos from the coast!</p>
+      <div data-natte-widget></div>
+    </div>
+
+    <div class="post" data-natte-text="As an AI language model, I can help you with a wide range of tasks including writing, analysis, and more.">
+      <p>As an AI language model, I can help you with a wide range of tasks including writing, analysis, and more.</p>
+      <div data-natte-widget></div>
+    </div>
+
+    <code>&lt;script src="https://your-domain.com/widget/natte-widget.js"&gt;&lt;/script&gt;</code>
+
+    <script src="/widget/natte-widget.js"></script>
+  </body>
+</html>

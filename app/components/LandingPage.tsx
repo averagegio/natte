@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import GlossyCard from "./GlossyCard";
 import IntroSection from "./IntroSection";
+import NattesSection from "./NattesSection";
 import SideDrawer from "./SideDrawer";
 import StarConstellation from "./StarConstellation";
 import XPostsSection from "./XPostsSection";
@@ -55,6 +56,8 @@ export default function LandingPage() {
         </div>
 
         <div className="relative z-10 mx-auto w-full max-w-5xl px-6 py-16 pb-8 sm:px-10">
+          <NattesSection />
+
           <section className="overflow-hidden rounded-[2rem] border border-white/10 bg-black/40 p-10 shadow-2xl backdrop-blur-md">
             <div className="flex flex-col gap-6 text-center sm:text-left">
               <span className="inline-flex w-fit rounded-full border border-sky-500/30 bg-sky-500/10 px-4 py-1 text-sm font-semibold text-sky-300">
