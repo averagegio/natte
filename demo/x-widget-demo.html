@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Proof of Human — Widget Demo</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background: #000;
+        color: #e7e9ea;
+        min-height: 100vh;
+        overflow: hidden;
+      }
+
+      .frame {
+        width: 1280px;
+        height: 720px;
+        margin: 0 auto;
+        padding: 32px 48px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .logo {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        font-size: 14px;
+        color: #fff;
+      }
+
+      .brand-text h1 {
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+
+      .brand-text p {
+        font-size: 13px;
+        color: #71767b;
+        margin-top: 2px;
+      }
+
+      .badge {
+        font-size: 12px;
+        font-weight: 600;
+        color: #38bdf8;
+        background: rgba(56, 189, 248, 0.12);
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        border-radius: 999px;
+        padding: 6px 12px;
+      }
+
+      .feed {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .post {
+        padding: 16px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        transition: background 0.3s ease;
+      }
+
+      .post:last-child {
+        border-bottom: none;
+      }
+
+      .post.active {
+        background: rgba(56, 189, 248, 0.04);
+      }
+
+      .post-row {
+        display: flex;
+        gap: 12px;
+      }
+
+      .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        font-size: 14px;
+        font-weight: 700;
+        color: #fff;
+      }
+
+      .avatar.human {
+        background: linear-gradient(135deg, #10b981, #059669);
+      }
+
+      .avatar.ai {
+        background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+      }
+
+      .avatar.demo {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+      }
+
+      .post-body {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .meta {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 15px;
+        line-height: 20px;
+        margin-bottom: 4px;
+      }
+
+      .name {
+        font-weight: 700;
+        color: #e7e9ea;
+      }
+
+      .handle,
+      .dot {
+        color: #71767b;
+      }
+
+      .text {
+        font-size: 15px;
+        line-height: 20px;
+        color: #e7e9ea;
+        margin-bottom: 12px;
+      }
+
+      .widget {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .toggle {
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.05);
+        color: rgba(255, 255, 255, 0.8);
+        border-radius: 999px;
+        padding: 6px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.25s ease;
+      }
+
+      .toggle.on {
+        background: #059669;
+        border-color: rgba(16, 185, 129, 0.5);
+        color: #fff;
+      }
+
+      .status {
+        font-size: 13px;
+        color: #71767b;
+        transition: color 0.25s ease;
+      }
+
+      .status.checking {
+        color: #38bdf8;
+      }
+
+      .status.human {
+        color: #34d399;
+        font-weight: 600;
+      }
+
+      .status.ai {
+        color: #f87171;
+        font-weight: 600;
+      }
+
+      .footer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding-top: 4px;
+        font-size: 13px;
+        color: #71767b;
+      }
+
+      .footer strong {
+        color: #e7e9ea;
+      }
+
+      .splash {
+        position: absolute;
+        inset: 0;
+        background: #000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        opacity: 1;
+        transition: opacity 0.6s ease;
+        z-index: 10;
+      }
+
+      .splash.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .splash h2 {
+        font-size: 42px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        text-align: center;
+        line-height: 1.1;
+      }
+
+      .splash p {
+        font-size: 18px;
+        color: #71767b;
+      }
+
+      .splash .logo-lg {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        font-size: 24px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="splash" id="splash">
+      <div class="logo-lg">PH</div>
+      <h2>Proof of Human</h2>
+      <p>Toggle AI detection on any post</p>
+    </div>
+
+    <div class="frame">
+      <header class="header">
+        <div class="brand">
+          <div class="logo">PH</div>
+          <div class="brand-text">
+            <h1>Proof of Human</h1>
+            <p>AI detection widget for X</p>
+          </div>
+        </div>
+        <span class="badge">X Pilot</span>
+      </header>
+
+      <div class="feed" id="feed">
+        <article class="post" id="post-0" data-text="Hello everyone — excited to share my weekend photos!">
+          <div class="post-row">
+            <div class="avatar human">S</div>
+            <div class="post-body">
+              <div class="meta">
+                <span class="name">Sarah Chen</span>
+                <span class="handle">@sarahchen</span>
+                <span class="dot">·</span>
+                <span class="handle">2h</span>
+              </div>
+              <p class="text">Hello everyone — excited to share my weekend photos!</p>
+              <div class="widget">
+                <button class="toggle" data-post="0">AI detection: OFF</button>
+                <span class="status" data-status="0">Idle</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="post" id="post-1" data-text="As an AI assistant, I can generate text that mimics human writing.">
+          <div class="post-row">
+            <div class="avatar ai">B</div>
+            <div class="post-body">
+              <div class="meta">
+                <span class="name">Bot Account</span>
+                <span class="handle">@botwriter</span>
+                <span class="dot">·</span>
+                <span class="handle">4h</span>
+              </div>
+              <p class="text">As an AI assistant, I can generate text that mimics human writing.</p>
+              <div class="widget">
+                <button class="toggle" data-post="1">AI detection: OFF</button>
+                <span class="status" data-status="1">Idle</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="post" id="post-2" data-text="Quick demo: this post was written by a human tester for the Proof of Human pilot.">
+          <div class="post-row">
+            <div class="avatar demo">N</div>
+            <div class="post-body">
+              <div class="meta">
+                <span class="name">natte</span>
+                <span class="handle">@natte</span>
+                <span class="dot">·</span>
+                <span class="handle">6h</span>
+              </div>
+              <p class="text">Quick demo: this post was written by a human tester for the Proof of Human pilot.</p>
+              <div class="widget">
+                <button class="toggle" data-post="2">AI detection: OFF</button>
+                <span class="status" data-status="2">Idle</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <footer class="footer">
+        <span>Toggle the widget on each post to see <strong>human</strong> vs <strong>AI</strong> results</span>
+      </footer>
+    </div>
+
+    <script>
+      function detect(text) {
+        return /As an AI/i.test(text) ? "ai" : "human";
+      }
+
+      function sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      }
+
+      async function togglePost(index) {
+        const post = document.getElementById(`post-${index}`);
+        const button = document.querySelector(`[data-post="${index}"]`);
+        const status = document.querySelector(`[data-status="${index}"]`);
+        const text = post.dataset.text;
+
+        post.classList.add("active");
+        button.classList.add("on");
+        button.textContent = "AI detection: ON";
+        status.textContent = "Checking...";
+        status.className = "status checking";
+
+        await sleep(1000);
+
+        const result = detect(text);
+        status.textContent = `Result: ${result}`;
+        status.className = `status ${result}`;
+
+        await sleep(1400);
+        post.classList.remove("active");
+      }
+
+      async function runDemo() {
+        await sleep(1800);
+        document.getElementById("splash").classList.add("hidden");
+        await sleep(1000);
+
+        await togglePost(0);
+        await sleep(400);
+        await togglePost(1);
+        await sleep(400);
+        await togglePost(2);
+        await sleep(1500);
+      }
+
+      document.querySelectorAll(".toggle").forEach((button) => {
+        button.addEventListener("click", () => {
+          const index = button.dataset.post;
+          if (!button.classList.contains("on")) {
+            togglePost(Number(index));
+          }
+        });
+      });
+
+      runDemo();
+    </script>
+  </body>
+</html>
