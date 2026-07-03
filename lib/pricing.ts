@@ -27,15 +27,14 @@ export const PRICING_TIERS: PricingTier[] = [
   {
     id: "pro",
     name: "Pro",
-    description: "For creators and small teams.",
+    description: "For individuals exploring AI detection.",
     monthlyPrice: 50,
     highlighted: true,
     features: [
-      "10,000 detections / month",
-      "Embeddable widget",
-      "Priority support",
-      "Full API access",
-      "Usage analytics",
+      "1,000 detections / month",
+      "Browser widget access",
+      "Email support",
+      "Basic API access",
     ],
   },
   {
