@@ -3,473 +3,373 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>n.a.t.t.e. — Feature Demo</title>
+    <title>n.a.t.t.e. on X — Feature Flow</title>
     <style>
       * { box-sizing: border-box; margin: 0; padding: 0; }
       body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        background: #f5f5f5;
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        background: #ececec;
+        display: flex; align-items: center; justify-content: center; min-height: 100vh;
       }
-
-      /* 16:9 stage — matches X product videos */
       .stage {
-        position: relative;
-        width: 1280px;
-        height: 720px;
-        background: linear-gradient(180deg, #fafafa 0%, #f0f0f0 100%);
+        position: relative; width: 1280px; height: 720px;
+        background: linear-gradient(180deg, #fafafa, #efefef);
         overflow: hidden;
       }
+      .caption {
+        position: absolute; top: 28px; left: 50%; transform: translateX(-50%);
+        font-size: 0.85rem; font-weight: 600; color: #536471;
+        letter-spacing: 0.04em; text-transform: uppercase;
+        opacity: 0; transition: opacity 0.4s; z-index: 100; white-space: nowrap;
+      }
+      .caption.show { opacity: 1; }
 
-      /* Intro scenes — full stage */
-      .intro-full {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        background: #fff;
-        opacity: 0;
-        pointer-events: none;
+      .camera {
+        position: absolute; inset: 0;
+        display: flex; align-items: center; justify-content: center;
+        transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+        transform-origin: center center;
       }
-      .intro-full.show { opacity: 1; }
-      .intro-full h1 {
-        font-size: 4.5rem;
-        font-weight: 700;
-        color: #000;
-        letter-spacing: -0.02em;
-      }
-      .waves {
-        position: absolute;
-        width: 420px;
-        height: 80px;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-      }
-      .brand-logo {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-      }
-      .brand-logo span {
-        font-size: 3rem;
-        font-weight: 600;
-        color: #000;
-        letter-spacing: -0.02em;
-      }
-      .brand-sub {
-        margin-top: 20px;
-        max-width: 480px;
-        text-align: center;
-        font-size: 0.8rem;
-        font-weight: 500;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: #536471;
-        line-height: 1.6;
-      }
+      .camera.zoom-sidebar { transform: scale(1.55) translateX(18%); }
+      .camera.zoom-settings { transform: scale(1.85) translateX(22%) translateY(6%); }
+      .camera.zoom-feed { transform: scale(1); }
 
-      /* iPhone mockup — X announcement style */
-      .phone-wrap {
-        position: absolute;
-        left: 50%;
-        top: 54%;
-        transform: translate(-50%, -50%) scale(0.92);
-        opacity: 0;
-        transition: opacity 0.6s ease, transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-      }
-      .phone-wrap.show {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-      }
       .iphone {
-        position: relative;
-        width: 320px;
-        height: 660px;
-        background: #fff;
-        border-radius: 48px;
-        box-shadow:
-          0 0 0 1px rgba(0,0,0,0.06),
-          0 24px 80px rgba(0,0,0,0.12);
-        overflow: visible;
+        width: 300px; height: 620px; background: #fff;
+        border-radius: 44px; position: relative;
+        box-shadow: 0 0 0 1px rgba(0,0,0,0.06), 0 30px 80px rgba(0,0,0,0.14);
       }
-      .dynamic-island {
-        position: absolute;
-        top: 14px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 110px;
-        height: 34px;
-        background: #1a1a1a;
-        border-radius: 20px;
-        z-index: 30;
+      .island {
+        position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+        width: 96px; height: 28px; background: #111; border-radius: 18px; z-index: 20;
       }
-      .iphone-screen {
-        position: absolute;
-        inset: 8px;
-        border-radius: 42px;
-        background: #fff;
-        overflow: hidden;
-        padding-top: 56px;
+      .screen {
+        position: absolute; inset: 6px; border-radius: 40px;
+        background: #fff; overflow: hidden;
       }
 
-      /* X-style toasts — morphing like Benji Taylor reference */
-      .toast {
-        position: absolute;
-        top: 58px;
-        left: 50%;
-        transform: translateX(-50%) translateY(-120%);
-        width: 290px;
-        padding: 12px 14px;
-        border-radius: 22px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        z-index: 40;
-        opacity: 0;
-        transition:
-          transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-          opacity 0.4s ease,
-          background 0.5s ease,
-          border-color 0.5s ease,
-          box-shadow 0.5s ease,
-          width 0.5s ease,
-          padding 0.5s ease;
+      /* Feed */
+      .topbar {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 44px 14px 8px; border-bottom: 1px solid #eff3f4;
       }
-      .toast.visible {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
+      .menu-btn { width: 20px; height: 14px; display: flex; flex-direction: column; justify-content: space-between; }
+      .menu-btn span { display: block; height: 2px; background: #000; border-radius: 1px; }
+      .x-logo { font-size: 1.1rem; font-weight: 800; }
+      .tabs { display: flex; border-bottom: 1px solid #eff3f4; }
+      .tab { flex: 1; text-align: center; padding: 10px 0; font-size: 0.72rem; font-weight: 600; color: #536471; position: relative; }
+      .tab.active { color: #000; }
+      .tab.active::after {
+        content: ""; position: absolute; bottom: 0; left: 25%; right: 25%;
+        height: 3px; background: #1d9bf0; border-radius: 2px;
       }
-      .toast.old-style {
-        background: #eef6fc;
-        border: 1.5px solid #b8daf0;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      .natte-chip {
+        display: none; align-items: center; gap: 8px;
+        margin: 8px 12px 0; padding: 8px 12px;
+        background: #f7f9f9; border: 1px solid #eff3f4; border-radius: 999px;
+        font-size: 0.68rem; font-weight: 600;
       }
-      .toast.new-style {
-        background: #3a3a3c;
-        border: 1.5px solid transparent;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-        width: 270px;
-        padding: 10px 14px;
-        border-radius: 28px;
+      .natte-chip.show { display: flex; }
+      .natte-chip .hide-btn {
+        margin-left: auto; padding: 4px 10px; border-radius: 999px;
+        background: #000; color: #fff; font-size: 0.62rem; font-weight: 700;
       }
-      .toast.slop {
-        background: #3a3a3c;
-        border: 1.5px solid transparent;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-      }
-      .toast.human {
-        background: #3a3a3c;
-        border: 1.5px solid transparent;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-      }
-      .toast-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1rem;
-        font-weight: 700;
-        color: #fff;
-      }
-      .toast-icon.warn { background: linear-gradient(135deg, #f43f5e, #ef4444); }
-      .toast-icon.ok { background: linear-gradient(135deg, #10b981, #059669); }
-      .toast-icon.shield { background: #000; font-size: 0.65rem; }
-      .toast-text { flex: 1; min-width: 0; }
-      .toast-title {
-        font-size: 0.8rem;
-        font-weight: 600;
-        line-height: 1.3;
-        color: #000;
-      }
-      .toast.new-style .toast-title,
-      .toast.slop .toast-title,
-      .toast.human .toast-title { color: #fff; }
-      .toast-sub {
-        font-size: 0.72rem;
-        color: #536471;
-        margin-top: 2px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-      .toast.new-style .toast-sub,
-      .toast.slop .toast-sub,
-      .toast.human .toast-sub { color: rgba(255,255,255,0.55); }
+      .natte-chip.pressed .hide-btn { transform: scale(0.95); background: #333; }
 
-      /* X post in phone */
-      .feed {
-        padding: 16px 18px;
-        opacity: 0;
-        transform: translateY(12px);
-        transition: opacity 0.5s ease, transform 0.5s ease;
-      }
-      .feed.show { opacity: 1; transform: translateY(0); }
       .post {
+        padding: 12px 14px; border-bottom: 1px solid #eff3f4;
+        position: relative; transition: opacity 0.4s, max-height 0.4s;
+      }
+      .post.hidden-ai { opacity: 0.25; }
+      .post .ai-mark {
+        display: none; position: absolute; top: 10px; right: 12px;
+        padding: 2px 8px; border-radius: 999px;
+        background: #fee2e2; color: #dc2626;
+        font-size: 0.58rem; font-weight: 700;
+      }
+      .post.marked .ai-mark { display: block; }
+      .post-header { display: flex; gap: 8px; align-items: center; margin-bottom: 4px; }
+      .av { width: 32px; height: 32px; border-radius: 50%; background: #cfd9de; flex-shrink: 0; }
+      .av.dark { background: #000; }
+      .av.ai { background: linear-gradient(135deg, #f43f5e, #ef4444); }
+      .name { font-size: 0.72rem; font-weight: 700; }
+      .handle { font-size: 0.65rem; color: #536471; }
+      .body { font-size: 0.72rem; line-height: 1.4; padding-left: 40px; color: #000; }
+
+      /* Sidebar */
+      .sidebar {
+        position: absolute; top: 0; left: 0; bottom: 0; width: 72%;
+        background: #fff; z-index: 15;
+        transform: translateX(-100%);
+        transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        border-right: 1px solid #eff3f4;
+        padding: 48px 0 16px;
+      }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-item {
+        display: flex; align-items: center; gap: 12px;
+        padding: 12px 18px; font-size: 0.78rem; font-weight: 500;
+      }
+      .sidebar-item .ico { width: 22px; text-align: center; font-size: 0.9rem; }
+      .sidebar-item.natte {
+        border-radius: 12px; margin: 4px 10px;
+        transition: background 0.3s;
+      }
+      .sidebar-item.natte.highlight { background: #f0f9ff; outline: 2px solid #1d9bf0; }
+      .sidebar-item.natte .ico {
+        width: 28px; height: 28px; border-radius: 50%;
+        background: #000; color: #fff; font-size: 0.55rem;
+        display: flex; align-items: center; justify-content: center; font-weight: 800;
+      }
+      .backdrop {
+        position: absolute; inset: 0; background: rgba(0,0,0,0.35);
+        opacity: 0; pointer-events: none; transition: opacity 0.4s; z-index: 14;
+      }
+      .backdrop.show { opacity: 1; }
+
+      /* Settings sheet */
+      .sheet {
+        position: absolute; inset: 0; background: rgba(0,0,0,0.4);
+        opacity: 0; pointer-events: none; z-index: 25;
+        display: flex; align-items: flex-end; transition: opacity 0.4s;
+      }
+      .sheet.open { opacity: 1; pointer-events: auto; }
+      .sheet-panel {
+        width: 100%; background: #fff; border-radius: 20px 20px 0 0;
+        padding: 16px 16px 24px; transform: translateY(100%);
+        transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .sheet.open .sheet-panel { transform: translateY(0); }
+      .sheet h3 { font-size: 0.85rem; font-weight: 800; margin-bottom: 4px; }
+      .sheet .sub { font-size: 0.65rem; color: #536471; margin-bottom: 14px; }
+      .dropdown {
+        border: 1px solid #cfd9de; border-radius: 12px;
+        overflow: hidden; margin-bottom: 14px;
+      }
+      .dropdown-item {
+        padding: 10px 12px; font-size: 0.72rem; font-weight: 600;
         border-bottom: 1px solid #eff3f4;
-        padding-bottom: 16px;
       }
-      .post-header {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 8px;
+      .dropdown-item:last-child { border-bottom: none; }
+      .dropdown-item.selected { background: #f0f9ff; color: #1d9bf0; }
+      .dropdown-item .child {
+        font-size: 0.65rem; font-weight: 500; color: #536471; margin-top: 2px;
       }
-      .avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: #000;
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.75rem;
-        font-weight: 700;
+      .label { font-size: 0.65rem; font-weight: 600; color: #536471; margin-bottom: 8px; }
+      .slider-track {
+        position: relative; height: 4px; background: #f97316;
+        border-radius: 999px; margin-bottom: 16px;
       }
-      .meta .name { font-size: 0.9rem; font-weight: 700; color: #000; }
-      .meta .handle { font-size: 0.8rem; color: #536471; }
-      .post-body {
-        font-size: 0.95rem;
-        line-height: 1.45;
-        color: #000;
-        padding-left: 50px;
+      .slider-thumb {
+        position: absolute; top: 50%; width: 16px; height: 16px;
+        border: 2px solid #000; border-radius: 50%; background: #fff;
+        transform: translate(-50%, -50%); left: 40%;
+        transition: left 0.8s ease;
       }
-      .detector {
-        margin-top: 12px;
-        padding-left: 50px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        opacity: 0;
-        transition: opacity 0.4s ease;
+      .slider-thumb.dragged { left: 68%; }
+      .feed-toggles { display: flex; gap: 8px; margin-bottom: 8px; }
+      .feed-toggle {
+        flex: 1; padding: 10px; border-radius: 12px; text-align: center;
+        font-size: 0.68rem; font-weight: 600; border: 1px solid #cfd9de;
+        color: #536471; transition: all 0.3s;
       }
-      .detector.show { opacity: 1; }
-      .detector-pill {
-        padding: 5px 12px;
-        border-radius: 999px;
-        font-size: 0.72rem;
-        font-weight: 600;
-        border: 1px solid #cfd9de;
-        background: #f7f9f9;
-        color: #536471;
-        transition: all 0.35s ease;
+      .feed-toggle.on {
+        background: #000; border-color: #000; color: #fff;
       }
-      .detector-pill.on {
-        background: #059669;
-        border-color: #059669;
-        color: #fff;
-      }
-      .result {
-        font-size: 0.72rem;
-        font-weight: 600;
-        color: #536471;
-      }
-      .result.ai { color: #f43f5e; }
-      .result.human { color: #10b981; }
-
-      /* CTA */
-      .cta-wrap {
-        position: absolute;
-        bottom: 48px;
-        left: 50%;
-        transform: translateX(-50%) translateY(20px);
-        opacity: 0;
-        transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-        text-align: center;
-      }
-      .cta-wrap.show {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-      }
-      .cta-btn {
-        padding: 14px 36px;
-        border-radius: 999px;
-        background: #000;
-        color: #fff;
-        font-size: 0.95rem;
-        font-weight: 700;
-        border: none;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-      }
-      .cta-sub {
-        margin-top: 12px;
-        font-size: 0.8rem;
-        color: #536471;
+      .activate-btn {
+        width: 100%; padding: 12px; border-radius: 999px;
+        background: #000; color: #fff; font-size: 0.75rem; font-weight: 700;
+        text-align: center; margin-top: 8px;
       }
 
-      /* Tagline overlay */
-      .tagline {
-        position: absolute;
-        top: 72px;
-        left: 50%;
-        transform: translateX(-50%);
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #000;
-        text-align: center;
-        opacity: 0;
-        transition: opacity 0.5s ease;
-        white-space: nowrap;
+      /* Tap cursor */
+      .tap {
+        position: absolute; width: 28px; height: 28px;
+        border: 2px solid rgba(29,155,240,0.8); border-radius: 50%;
+        z-index: 50; pointer-events: none; opacity: 0;
+        transform: translate(-50%, -50%) scale(1.4);
+        transition: opacity 0.2s, transform 0.2s;
       }
-      .tagline.show { opacity: 1; }
-      .tagline span { color: #536471; }
+      .tap.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      .tap::after {
+        content: ""; position: absolute; inset: 6px;
+        background: rgba(29,155,240,0.25); border-radius: 50%;
+      }
+
+      /* Refresh indicator */
+      .refresh-bar {
+        height: 0; background: #1d9bf0; opacity: 0;
+        transition: height 0.4s, opacity 0.3s;
+      }
+      .refresh-bar.pull { height: 3px; opacity: 1; }
     </style>
   </head>
   <body>
-    <div class="stage" id="stage">
-      <!-- Scene 1: Introducing -->
-      <div class="intro-full" id="scene-intro">
-        <div style="position:relative">
-          <svg class="waves" viewBox="0 0 300 60" fill="none">
-            <path d="M0 35 C40 10, 80 50, 120 30 S200 15, 300 35" stroke="#ef4444" stroke-width="1.5" opacity="0.7"/>
-            <path d="M0 28 C50 45, 100 5, 150 32 S220 48, 300 22" stroke="#ef4444" stroke-width="1.5" opacity="0.5"/>
-          </svg>
-          <h1>Introducing</h1>
-        </div>
-      </div>
+    <div class="stage">
+      <p class="caption" id="caption"></p>
 
-      <!-- Scene 2: Brand -->
-      <div class="intro-full" id="scene-brand">
-        <div class="brand-logo">
-          <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
-            <path d="M16 3l9 4v7c0 5-3.5 8.5-9 10.5C10.5 22.5 7 19 7 14V7l9-4z" stroke="#000" stroke-width="1.5"/>
-            <path d="M11.5 15.5l3 3 6.5-6.5" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
-          <span>n.a.t.t.e.</span>
-        </div>
-        <p class="brand-sub">Normative AI Turing Test that Eliminates slop</p>
-      </div>
+      <div class="camera zoom-feed" id="camera">
+        <div class="iphone" id="phone">
+          <div class="island"></div>
+          <div class="screen">
+            <div class="backdrop" id="backdrop"></div>
 
-      <!-- Scene 3+: iPhone demo -->
-      <p class="tagline" id="tagline">The slop <span>stops here.</span></p>
-
-      <div class="phone-wrap" id="phone">
-        <div class="iphone">
-          <div class="dynamic-island"></div>
-
-          <div class="toast old-style" id="toast-old">
-            <div class="toast-icon warn">!</div>
-            <div class="toast-text">
-              <div class="toast-title"><strong>Slop detected</strong> on your feed</div>
-              <div class="toast-sub">As an AI assistant, I can generate...</div>
+            <div class="sidebar" id="sidebar">
+              <div class="sidebar-item"><span class="ico">🏠</span> Home</div>
+              <div class="sidebar-item"><span class="ico">🔍</span> Explore</div>
+              <div class="sidebar-item"><span class="ico">🔔</span> Notifications</div>
+              <div class="sidebar-item natte" id="natte-nav"><span class="ico">n</span> n.a.t.t.e.</div>
+              <div class="sidebar-item"><span class="ico">👤</span> Profile</div>
             </div>
-          </div>
 
-          <div class="toast slop" id="toast-slop">
-            <div class="toast-icon warn">AI</div>
-            <div class="toast-text">
-              <div class="toast-title"><strong>n.a.t.t.e.</strong> · Result: ai</div>
-              <div class="toast-sub">Turing test failed — slop blocked</div>
-            </div>
-          </div>
-
-          <div class="toast human" id="toast-human">
-            <div class="toast-icon ok">✓</div>
-            <div class="toast-text">
-              <div class="toast-title"><strong>n.a.t.t.e.</strong> · Result: human</div>
-              <div class="toast-sub">Verified authentic writing</div>
-            </div>
-          </div>
-
-          <div class="iphone-screen">
-            <div class="feed" id="feed">
-              <div class="post">
-                <div class="post-header">
-                  <div class="avatar">X</div>
-                  <div class="meta">
-                    <div class="name">natte</div>
-                    <div class="handle">@natte</div>
+            <div class="sheet" id="sheet">
+              <div class="sheet-panel">
+                <h3>Proof of Human</h3>
+                <p class="sub">AI slop blocker · n.a.t.t.e.</p>
+                <div class="dropdown" id="dropdown">
+                  <div class="dropdown-item" id="dd-parent">Proof of Human</div>
+                  <div class="dropdown-item selected" id="dd-child">
+                    AI slop blocker
+                    <div class="child">Normative AI Turing Test</div>
                   </div>
                 </div>
-                <p class="post-body" id="post-text">As an AI assistant, I can generate text that mimics human writing.</p>
-                <div class="detector" id="detector">
-                  <span class="detector-pill" id="detector-pill">AI detection: OFF</span>
-                  <span class="result" id="result">Idle</span>
+                <p class="label">Sensitivity</p>
+                <div class="slider-track">
+                  <div class="slider-thumb" id="slider"></div>
                 </div>
+                <p class="label">Activate on feed</p>
+                <div class="feed-toggles">
+                  <div class="feed-toggle" id="tog-following">Following</div>
+                  <div class="feed-toggle" id="tog-foryou">For You</div>
+                </div>
+                <div class="activate-btn" id="activate">Activate</div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <div class="cta-wrap" id="cta">
-        <button class="cta-btn">Stop the Slop +</button>
-        <p class="cta-sub">n.a.t.t.e. for X</p>
+            <div class="topbar">
+              <div class="menu-btn" id="menu"><span></span><span></span><span></span></div>
+              <div class="x-logo">𝕏</div>
+              <div style="width:20px"></div>
+            </div>
+            <div class="refresh-bar" id="refresh"></div>
+            <div class="tabs">
+              <div class="tab" id="tab-following">Following</div>
+              <div class="tab active" id="tab-foryou">For You</div>
+            </div>
+            <div class="natte-chip" id="chip">
+              <span>n.a.t.t.e.</span>
+              <span style="color:#536471;font-weight:500">· 2 AI posts marked</span>
+              <span class="hide-btn" id="hide-btn">Hide AI</span>
+            </div>
+
+            <div class="post" id="p1">
+              <span class="ai-mark">AI</span>
+              <div class="post-header">
+                <div class="av"></div>
+                <div><div class="name">sam</div><div class="handle">@sam</div></div>
+              </div>
+              <p class="body">Great coffee this morning ☕</p>
+            </div>
+            <div class="post" id="p2">
+              <span class="ai-mark">AI</span>
+              <div class="post-header">
+                <div class="av ai"></div>
+                <div><div class="name">bot_feed</div><div class="handle">@bot_feed</div></div>
+              </div>
+              <p class="body">As an AI assistant, I can generate text that mimics human writing.</p>
+            </div>
+            <div class="post" id="p3">
+              <span class="ai-mark">AI</span>
+              <div class="post-header">
+                <div class="av dark"></div>
+                <div><div class="name">natte</div><div class="handle">@natte</div></div>
+              </div>
+              <p class="body">Weekend photos coming soon!</p>
+            </div>
+            <div class="post" id="p4">
+              <span class="ai-mark">AI</span>
+              <div class="post-header">
+                <div class="av ai"></div>
+                <div><div class="name">slop_daily</div><div class="handle">@slop_daily</div></div>
+              </div>
+              <p class="body">This content was generated to maximize engagement metrics.</p>
+            </div>
+          </div>
+          <div class="tap" id="tap"></div>
+        </div>
       </div>
     </div>
 
     <script>
       const $ = (id) => document.getElementById(id);
+      const captions = [
+        "X feed",
+        "Open sidebar",
+        "Select n.a.t.t.e.",
+        "Proof of Human → AI slop blocker",
+        "Set sensitivity",
+        "Activate on For You",
+        "Back to feed",
+        "Refresh",
+        "AI posts marked",
+        "Tap n.a.t.t.e. chip",
+        "Hide AI slop",
+      ];
 
+      function cap(i) {
+        $("caption").textContent = captions[i] || "";
+        $("caption").classList.add("show");
+      }
+      function tap(x, y, phone) {
+        const rect = phone.getBoundingClientRect();
+        const stage = document.querySelector(".stage").getBoundingClientRect();
+        const t = $("tap");
+        t.style.left = (rect.left - stage.left + x) + "px";
+        t.style.top = (rect.top - stage.top + y) + "px";
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 400);
+      }
+
+      const phone = $("phone");
       const TIMELINE = [
-        { at: 0, fn: () => { $("scene-intro").classList.add("show"); } },
-        { at: 1200, fn: () => {
-          $("scene-intro").classList.remove("show");
-          $("scene-brand").classList.add("show");
+        { at: 0, fn: () => cap(0) },
+        { at: 1800, fn: () => { cap(1); tap(28, 58, phone); $("sidebar").classList.add("open"); $("backdrop").classList.add("show"); }},
+        { at: 3200, fn: () => { cap(2); $("camera").className = "camera zoom-sidebar"; }},
+        { at: 4200, fn: () => { tap(55, 230, phone); $("natte-nav").classList.add("highlight"); }},
+        { at: 5000, fn: () => { cap(3); tap(55, 230, phone); $("sheet").classList.add("open"); $("camera").className = "camera zoom-settings"; }},
+        { at: 6500, fn: () => { cap(4); $("slider").classList.add("dragged"); }},
+        { at: 7800, fn: () => { cap(5); tap(200, 520, phone); $("tog-foryou").classList.add("on"); }},
+        { at: 9000, fn: () => { tap(150, 560, phone); }},
+        { at: 9800, fn: () => {
+          cap(6);
+          $("sheet").classList.remove("open");
+          $("sidebar").classList.remove("open");
+          $("backdrop").classList.remove("show");
+          $("natte-nav").classList.remove("highlight");
+          $("camera").className = "camera zoom-feed";
         }},
-        { at: 2600, fn: () => {
-          $("scene-brand").classList.remove("show");
-          $("tagline").classList.add("show");
-          $("phone").classList.add("show");
-          $("feed").classList.add("show");
+        { at: 11200, fn: () => { cap(7); $("refresh").classList.add("pull"); }},
+        { at: 12200, fn: () => {
+          cap(8);
+          $("refresh").classList.remove("pull");
+          $("p2").classList.add("marked");
+          $("p4").classList.add("marked");
         }},
-        { at: 3400, fn: () => {
-          $("toast-old").classList.add("visible");
-        }},
-        { at: 4200, fn: () => {
-          $("toast-old").classList.remove("visible");
-          setTimeout(() => $("toast-slop").classList.add("visible"), 200);
-        }},
-        { at: 5000, fn: () => {
-          $("detector").classList.add("show");
-          $("detector-pill").classList.add("on");
-          $("detector-pill").textContent = "AI detection: ON";
-          $("result").textContent = "Checking...";
-          $("result").className = "result";
-        }},
-        { at: 5600, fn: () => {
-          $("result").textContent = "Result: ai";
-          $("result").className = "result ai";
-        }},
-        { at: 6200, fn: () => {
-          $("toast-slop").classList.remove("visible");
-          $("post-text").textContent = "Hello everyone — excited to share my weekend photos!";
-          $("result").textContent = "Checking...";
-          $("result").className = "result";
-        }},
-        { at: 6800, fn: () => {
-          $("result").textContent = "Result: human";
-          $("result").className = "result human";
-          $("toast-human").classList.add("visible");
-        }},
-        { at: 7600, fn: () => {
-          $("tagline").classList.remove("show");
-          $("toast-human").classList.remove("visible");
-          $("cta").classList.add("show");
+        { at: 14000, fn: () => { cap(9); $("chip").classList.add("show"); tap(150, 130, phone); }},
+        { at: 15500, fn: () => { cap(10); tap(250, 130, phone); $("chip").classList.add("pressed"); }},
+        { at: 16200, fn: () => {
+          $("p2").classList.add("hidden-ai");
+          $("p4").classList.add("hidden-ai");
+          $("chip").querySelector("span:nth-child(2)").textContent = "· AI hidden";
         }},
       ];
 
       const start = performance.now();
-      let executed = new Set();
-
+      const done = new Set();
       function tick(now) {
-        const elapsed = now - start;
-        TIMELINE.forEach((step, i) => {
-          if (elapsed >= step.at && !executed.has(i)) {
-            executed.add(i);
-            step.fn();
-          }
-        });
-        if (elapsed < 9500) requestAnimationFrame(tick);
+        const e = now - start;
+        TIMELINE.forEach((s, i) => { if (e >= s.at && !done.has(i)) { done.add(i); s.fn(); }});
+        if (e < 18000) requestAnimationFrame(tick);
       }
       requestAnimationFrame(tick);
     </script>

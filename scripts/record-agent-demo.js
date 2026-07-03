@@ -16,7 +16,7 @@ async function record() {
   const page = await context.newPage();
   await page.goto(demoPath);
   // Full demo cycle: ~33s total
-  await page.waitForTimeout(10000);
+  await page.waitForTimeout(19000);
   const video = page.video();
   await context.close();
   await browser.close();

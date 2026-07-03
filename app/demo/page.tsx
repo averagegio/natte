@@ -15,7 +15,8 @@ export default function DemoPage() {
         </span>
         <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">n.a.t.t.e.</h1>
         <p className="mt-3 max-w-md text-sm text-white/50">
-          Normative AI Turing Test that Eliminates slop — real-time detection on X.
+          Sidebar → Proof of Human → sensitivity → activate on For You → refresh → mark
+          AI → hide slop.
         </p>
       </div>
 

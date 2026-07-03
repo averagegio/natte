@@ -98,8 +98,8 @@ export default function LandingPage() {
                   </span>
                   <h2 className="text-2xl font-semibold text-white sm:text-3xl">n.a.t.t.e.</h2>
                   <p className="mt-2 max-w-lg text-sm text-white/50">
-                    Normative AI Turing Test that Eliminates slop. Detect AI-generated posts on
-                    X in real time.
+                    Normative AI Turing Test that Eliminates slop. Open the sidebar, activate
+                    on your feed, refresh — AI posts get marked. Hide slop with one tap.
                   </p>
                 </div>
                 <NatteFeatureDemo />
