@@ -39,10 +39,11 @@
       .spin.on{opacity:1;animation:spin .6s linear infinite}
       @keyframes spin{to{transform:translateX(-50%) rotate(360deg)}}
 
-      .tweet{display:flex;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);position:relative;transition:opacity .45s,transform .45s,max-height .45s}
-      .tweet.hide{opacity:0;transform:scale(.98);max-height:0;padding:0;overflow:hidden;border:none}
-      .tweet.marked{background:linear-gradient(90deg,rgba(244,33,46,.1),transparent 38%)}
-      .tweet.marked::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--red)}
+      .tweet{display:flex;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);position:relative;transition:opacity .5s,transform .5s,max-height .5s,padding .5s}
+      .tweet.hide{opacity:0;transform:scale(.97) translateX(-8px);max-height:0;padding:0;overflow:hidden;border:none}
+      .tweet.marked{background:linear-gradient(90deg,rgba(244,33,46,.14),transparent 42%)}
+      .tweet.marked::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--red);animation:markPulse .6s ease}
+      @keyframes markPulse{0%{opacity:0;transform:scaleY(0)}100%{opacity:1;transform:scaleY(1)}}
       .ai-pill{display:none;margin-left:4px;padding:1px 5px;border-radius:4px;background:rgba(244,33,46,.15);color:var(--red);font-size:10px;font-weight:800}
       .tweet.marked .ai-pill{display:inline-block}
       .av{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0}
@@ -55,7 +56,6 @@
       .acts{display:flex;gap:28px;color:var(--muted);font-size:12px}
       .acts svg{width:16px;height:16px;fill:currentColor;vertical-align:-3px;margin-right:3px}
 
-      /* X Chat */
       .chat-head{display:flex;align-items:center;justify-content:space-between;padding:8px 16px 10px;border-bottom:1px solid var(--border)}
       .chat-head h1{font-size:20px;font-weight:800;color:var(--text)}
       .chat-head .filter{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center}
@@ -74,7 +74,7 @@
       .bubble.out{align-self:flex-end;background:var(--chat-out);color:#fff;border-bottom-right-radius:4px}
       .bubble.marked{outline:2px solid var(--red);position:relative}
       .bubble.marked::after{content:"AI";position:absolute;top:-8px;right:8px;background:var(--red);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px}
-      .bubble.hide{opacity:.12;transform:scale(.96);filter:blur(1px)}
+      .bubble.hide{opacity:.1;transform:scale(.94);filter:blur(2px)}
 
       .bd{position:absolute;inset:0;background:rgba(91,112,131,.4);opacity:0;pointer-events:none;transition:opacity .45s;z-index:40}
       .bd.on{opacity:1}
@@ -87,30 +87,44 @@
 
       .sbg{position:absolute;inset:0;background:rgba(0,0,0,.55);opacity:0;z-index:55;transition:opacity .4s}
       .sbg.on{opacity:1}
-      .sheet{position:absolute;left:0;right:0;bottom:0;z-index:56;background:var(--elevated);border-radius:18px 18px 0 0;border-top:1px solid var(--border);padding:10px 18px 32px;transform:translateY(105%);transition:transform .55s cubic-bezier(.33,1,.68,1)}
+      .sheet{position:absolute;left:0;right:0;bottom:0;z-index:56;background:var(--elevated);border-radius:18px 18px 0 0;border-top:1px solid var(--border);padding:10px 18px 24px;transform:translateY(105%);transition:transform .55s cubic-bezier(.33,1,.68,1);max-height:92%}
       .sheet.on{transform:none}
       .grab{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 14px}
       .sheet h2{font-size:18px;font-weight:800;color:var(--text)}
-      .sheet .sub{font-size:14px;color:var(--muted);margin:2px 0 16px}
-      .pick{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:18px}
+      .sheet .sub{font-size:14px;color:var(--muted);margin:2px 0 14px}
+      .pick{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px}
       .pick div{padding:12px 14px;font-size:14px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)}
       .pick div:last-child{border-bottom:none}
       .pick .sel{background:rgba(29,155,240,.08);color:var(--blue)}
       .fl{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
-      .rail{position:relative;height:3px;background:var(--orange);border-radius:99px;margin-bottom:22px}
+      .rail{position:relative;height:3px;background:var(--orange);border-radius:99px;margin-bottom:18px}
       .rail .dot,.rail .thumb{position:absolute;top:50%;transform:translate(-50%,-50%);left:30%;transition:left 1.4s cubic-bezier(.33,1,.68,1)}
       .rail .dot{width:7px;height:7px;background:#fff;border-radius:50%}
       .rail .thumb{width:20px;height:20px;border:2.5px solid #fff;border-radius:50%;background:var(--bg)}
       .rail.go .dot,.rail.go .thumb{left:72%}
-      .togs{display:flex;gap:8px;margin-bottom:16px}
+      .togs{display:flex;gap:8px;margin-bottom:14px}
       .tog{flex:1;padding:12px;text-align:center;border-radius:999px;font-size:14px;font-weight:700;border:1px solid var(--border);color:var(--text);transition:all .35s}
       .tog.on{background:#fff;color:#000;border-color:#fff}
+      .dur-wrap{margin-bottom:14px}
+      .dur-wheel{position:relative;height:108px;overflow:hidden}
+      .dur-wheel::before,.dur-wheel::after{content:"";position:absolute;left:0;right:0;height:36px;z-index:2;pointer-events:none}
+      .dur-wheel::before{top:0;background:linear-gradient(var(--elevated),transparent)}
+      .dur-wheel::after{bottom:0;background:linear-gradient(transparent,var(--elevated))}
+      .dur-lines{position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);height:36px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);z-index:1;pointer-events:none}
+      .dur-track{transition:transform .9s cubic-bezier(.33,1,.68,1)}
+      .dur-track div{height:36px;line-height:36px;text-align:center;font-size:15px;color:var(--muted);opacity:.45;transition:opacity .4s,font-size .4s,color .4s}
+      .dur-track .active{font-size:20px;font-weight:700;color:var(--text);opacity:1}
       .go-btn{padding:14px;border-radius:999px;background:#fff;color:#000;font-size:16px;font-weight:700;text-align:center}
 
-      .hero{position:absolute;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);opacity:0;pointer-events:none;transition:opacity .55s}
-      .hero.on{opacity:1}
-      .hero h1{font-size:56px;font-weight:800;color:#fff;text-align:center;line-height:1.02;letter-spacing:-.03em}
-      .hero p{margin-top:10px;font-size:18px;color:var(--muted);text-align:center}
+      /* Kinetic typography */
+      .ktype{position:absolute;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.78);opacity:0;pointer-events:none;transition:opacity .35s}
+      .ktype.on{opacity:1}
+      .ktype-inner{text-align:center;line-height:1.05}
+      .ktype .w{display:inline-block;font-size:54px;font-weight:800;color:#fff;letter-spacing:-.03em;opacity:0;transform:translateY(32px) scale(.92);margin-right:.18em}
+      .ktype.on .w{animation:wordIn .6s cubic-bezier(.22,1,.36,1) forwards}
+      .ktype .sub-w{display:block;font-size:17px;font-weight:500;color:var(--muted);margin-top:14px;opacity:0;transform:translateY(12px)}
+      .ktype.on .sub-w{animation:wordIn .5s cubic-bezier(.22,1,.36,1) .5s forwards}
+      @keyframes wordIn{to{opacity:1;transform:none}}
 
       .end{position:absolute;inset:0;z-index:100;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;transition:opacity .7s}
       .end.on{opacity:1}
@@ -126,7 +140,6 @@
     <div class="stage">
       <div class="viewport" id="vp">
         <div class="ui">
-          <!-- FEED -->
           <div class="panel" id="panel-feed">
             <div class="status"><span>9:41</span><span>5G 🔋</span></div>
             <header class="topbar">
@@ -135,7 +148,7 @@
               <img class="top-av" src="assets/avatars/sama.jpg" alt="" />
             </header>
             <div class="tabs"><div class="tab">Following</div><div class="tab on">For You</div></div>
-            <div class="chip" id="chip-feed"><span class="n">n</span><span class="lbl">n.a.t.t.e.</span><span class="meta" id="meta-feed">2 AI posts marked</span><span class="hide">Hide AI</span></div>
+            <div class="chip" id="chip-feed"><span class="n">n</span><span class="lbl">n.a.t.t.e.</span><span class="meta" id="meta-feed">4 AI posts marked</span><span class="hide">Hide AI</span></div>
             <div class="spin" id="spin-feed"></div>
             <div class="scroll" id="scroll-feed">
               <article class="tweet" id="f1">
@@ -154,10 +167,25 @@
                 <div class="av-bot">◆</div>
                 <div class="body"><div class="row1"><span class="name">Content Engine Pro</span><span class="ai-pill">AI</span><span class="handle">@contentengine_ai</span><span class="dot">·</span><span class="time">4h</span></div><p class="txt">In today's fast-paced digital landscape, leveraging AI-generated thought leadership is essential.</p></div>
               </article>
+              <article class="tweet" id="f5">
+                <img class="av" src="assets/avatars/paulg.jpg" alt="" />
+                <div class="body"><div class="row1"><span class="name">Paul Graham</span><svg class="verified" viewBox="0 0 22 22"><path fill="#1d9bf0" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.085-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.69-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.636.433 1.221.878 1.69.47.445 1.054.751 1.69.882.636.13 1.295.083 1.902-.14.27.586.702 1.087 1.24 1.44.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816z"/><path fill="#fff" d="M9.5 14.2l-2.8-2.8 1-1 1.8 1.8 4.2-4.2 1 1-5.2 5.2z"/></svg><span class="handle">@paulg</span><span class="dot">·</span><span class="time">5h</span></div><p class="txt">It's not cheating to use tools. It's cheating to let tools use you.</p></div>
+              </article>
+              <article class="tweet" id="f6">
+                <div class="av-bot">◇</div>
+                <div class="body"><div class="row1"><span class="name">Thought Leader Bot</span><span class="ai-pill">AI</span><span class="handle">@thoughtleader_ai</span><span class="dot">·</span><span class="time">5h</span></div><p class="txt">Unlock your potential with these 7 game-changing insights that will revolutionize your mindset.</p></div>
+              </article>
+              <article class="tweet" id="f7">
+                <img class="av" src="assets/avatars/sama.jpg" alt="" />
+                <div class="body"><div class="row1"><span class="name">Sam Altman</span><svg class="verified" viewBox="0 0 22 22"><path fill="#1d9bf0" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.085-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.69-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.636.433 1.221.878 1.69.47.445 1.054.751 1.69.882.636.13 1.295.083 1.902-.14.27.586.702 1.087 1.24 1.44.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816z"/><path fill="#fff" d="M9.5 14.2l-2.8-2.8 1-1 1.8 1.8 4.2-4.2 1 1-5.2 5.2z"/></svg><span class="handle">@sama</span><span class="dot">·</span><span class="time">6h</span></div><p class="txt">AGI is closer than most people think.</p></div>
+              </article>
+              <article class="tweet" id="f8">
+                <div class="av-bot">✦</div>
+                <div class="body"><div class="row1"><span class="name">Engagement Hacks AI</span><span class="ai-pill">AI</span><span class="handle">@engagement_ai</span><span class="dot">·</span><span class="time">7h</span></div><p class="txt">Here's a thread on why authenticity matters — crafted entirely by AI to sound authentic.</p></div>
+              </article>
             </div>
           </div>
 
-          <!-- CHAT -->
           <div class="panel off" id="panel-chat">
             <div class="status"><span>9:41</span><span>5G 🔋</span></div>
             <div class="chat-head"><h1>Chat</h1><div class="filter"><svg viewBox="0 0 24 24"><path d="M10 18h11M4 6h17M4 12h17" stroke="currentColor" stroke-width="2" fill="none"/></svg></div></div>
@@ -185,28 +213,41 @@
           <div class="sbg" id="sbg"></div>
           <div class="sheet" id="sheet">
             <div class="grab"></div>
-            <h2>Proof of Human</h2>
+            <h2 id="sec-title">Proof of Human</h2>
             <p class="sub">AI slop blocker</p>
-            <div class="pick"><div>Proof of Human</div><div class="sel">AI slop blocker</div></div>
-            <p class="fl">Sensitivity</p>
+            <div class="pick" id="sec-pick"><div>Proof of Human</div><div class="sel">AI slop blocker</div></div>
+            <p class="fl" id="sec-sens-label">Sensitivity</p>
             <div class="rail" id="rail"><div class="dot"></div><div class="thumb"></div></div>
             <p class="fl" id="tog-label">Activate on feed</p>
-            <div class="togs"><div class="tog" id="ta">Following</div><div class="tog on" id="tb">For You</div></div>
-            <div class="go-btn">Activate</div>
+            <div class="togs" id="sec-togs"><div class="tog" id="ta">Following</div><div class="tog on" id="tb">For You</div></div>
+            <div class="dur-wrap" id="sec-dur">
+              <p class="fl">Duration</p>
+              <div class="dur-wheel">
+                <div class="dur-lines"></div>
+                <div class="dur-track" id="dur-track">
+                  <div>5 minutes</div>
+                  <div class="active" id="dur-hr">1 hour</div>
+                  <div id="dur-day">1 day</div>
+                  <div>1 week</div>
+                </div>
+              </div>
+            </div>
+            <div class="go-btn" id="sec-go">Activate</div>
           </div>
         </div>
       </div>
 
-      <div class="hero" id="h1"><div><h1>Proof of<br>Human</h1><p>Normative AI Turing Test</p></div></div>
-      <div class="hero" id="h2"><div><h1>The slop<br>stops here</h1></div></div>
-      <div class="hero" id="h3"><div><h1>On X Chat<br>too</h1></div></div>
-      <div class="hero" id="h4"><div><h1>Human<br>verified</h1></div></div>
+      <div class="ktype" id="kt1"><div class="ktype-inner"><span class="w" style="animation-delay:.05s">Proof</span><span class="w" style="animation-delay:.15s">of</span><span class="w" style="animation-delay:.25s">Human</span><span class="sub-w">Normative AI Turing Test</span></div></div>
+      <div class="ktype" id="kt2"><div class="ktype-inner"><span class="w" style="animation-delay:.05s">Mark</span><span class="w" style="animation-delay:.18s">AI</span><span class="w" style="animation-delay:.31s">slop</span></div></div>
+      <div class="ktype" id="kt3"><div class="ktype-inner"><span class="w" style="animation-delay:.05s">On</span><span class="w" style="animation-delay:.15s">X</span><span class="w" style="animation-delay:.25s">Chat</span><span class="w" style="animation-delay:.35s">too</span></div></div>
+      <div class="ktype" id="kt4"><div class="ktype-inner"><span class="w" style="animation-delay:.05s">Human</span><span class="w" style="animation-delay:.2s">verified</span></div></div>
       <div class="end" id="end"><div class="logo">n</div><h2>n.a.t.t.e.</h2><p>Feed & Chat · Now on X</p></div>
     </div>
 
     <script>
       const $ = (id) => document.getElementById(id);
       const vp = $("vp");
+      const AI_FEED = ["f2", "f4", "f6", "f8"];
 
       function ease(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2; }
 
@@ -231,55 +272,106 @@
       cam._s = { s: 1, x: 0, y: 0 };
 
       function wait(ms) { return new Promise((r) => setTimeout(r, ms)); }
-      function hero(id, on) { $(id).classList.toggle("on", on); }
+
+      function ktype(id, on) {
+        const el = $(id);
+        el.classList.toggle("on", on);
+        if (!on) {
+          el.querySelectorAll(".w, .sub-w").forEach((w) => {
+            w.style.animation = "none";
+            void w.offsetWidth;
+            w.style.animation = "";
+          });
+        }
+      }
+
+      async function focusSection(el, scale = 1.42) {
+        const stage = document.querySelector(".stage");
+        const sr = stage.getBoundingClientRect();
+        const er = el.getBoundingClientRect();
+        const cx = er.left + er.width / 2 - sr.left;
+        const cy = er.top + er.height / 2 - sr.top;
+        const tx = (640 - cx) * 0.55;
+        const ty = (360 - cy) * 0.55;
+        await cam({ s: scale, x: tx, y: ty }, 850, [cx, cy]);
+      }
+
+      async function sheetFlow() {
+        await focusSection($("sec-title"), 1.38);
+        await wait(700);
+        await focusSection($("sec-pick"), 1.4);
+        await wait(600);
+        await focusSection($("sec-sens-label"), 1.42);
+        await wait(300);
+        await focusSection($("rail"), 1.44);
+        $("rail").classList.add("go");
+        await wait(1600);
+        await focusSection($("sec-togs"), 1.44);
+        await wait(500);
+        $("tb").classList.add("on");
+        await wait(600);
+        await focusSection($("sec-dur"), 1.46);
+        await wait(400);
+        $("dur-hr").classList.remove("active");
+        $("dur-day").classList.add("active");
+        $("dur-track").style.transform = "translateY(-36px)";
+        await wait(1400);
+        await focusSection($("sec-go"), 1.4);
+        await wait(500);
+      }
 
       async function run() {
         cam._s = { s: 1, x: 0, y: 0 };
         vp.style.transform = "translate(0,0) scale(1)";
+        $("dur-track").style.transform = "";
+        $("dur-hr").classList.add("active");
+        $("dur-day").classList.remove("active");
+        $("rail").classList.remove("go");
 
-        // ── FEED (0–20s) ──
-        await wait(2800);
+        // ── FEED ──
+        await wait(2400);
         $("sb").classList.add("on"); $("bd").classList.add("on");
-        await cam({ s: 1.28, x: 90, y: 20 }, 1000, [500, 360]);
-        await wait(1200);
-        $("natte").classList.add("glow");
-        await cam({ s: 1.65, x: 130, y: 55 }, 1100, [480, 380]);
-        await wait(800);
-        $("sheet").classList.add("on"); $("sbg").classList.add("on");
-        await wait(600);
-        await cam({ s: 2.05, x: 40, y: 180 }, 1200, [640, 520]);
-        await wait(400);
-        $("rail").classList.add("go");
-        await wait(2200);
-        hero("h1", true); await wait(1600); hero("h1", false);
-        await wait(400);
-        $("tb").classList.add("on");
+        await cam({ s: 1.25, x: 85, y: 15 }, 950, [500, 360]);
         await wait(900);
+        $("natte").classList.add("glow");
+        await cam({ s: 1.5, x: 115, y: 40 }, 1000, [470, 390]);
+        await wait(600);
+        $("sheet").classList.add("on"); $("sbg").classList.add("on");
+        await wait(500);
+        ktype("kt1", true); await wait(1500); ktype("kt1", false);
+        await wait(250);
+        await sheetFlow();
+        await wait(200);
         $("sheet").classList.remove("on"); $("sbg").classList.remove("on");
         $("sb").classList.remove("on"); $("bd").classList.remove("on");
         $("natte").classList.remove("glow");
-        await cam({ s: 1, x: 0, y: 0 }, 1100);
-        await wait(600);
-        hero("h2", true); await wait(1400); hero("h2", false);
-        await wait(300);
-        await cam({ s: 1.35, x: 0, y: 70 }, 900, [640, 200]);
-        $("scroll-feed").classList.add("pull"); $("spin-feed").classList.add("on");
-        await wait(1400);
-        $("scroll-feed").classList.remove("pull"); $("spin-feed").classList.remove("on");
-        $("f2").classList.add("marked"); $("f4").classList.add("marked");
-        await wait(400);
-        await cam({ s: 1.5, x: -20, y: 100 }, 1000, [640, 340]);
-        await wait(800);
-        $("chip-feed").classList.add("on");
-        await cam({ s: 1.42, x: 0, y: 60 }, 800, [640, 180]);
-        await wait(1200);
-        $("f2").classList.add("hide"); $("f4").classList.add("hide");
-        $("meta-feed").textContent = "AI hidden";
         await cam({ s: 1, x: 0, y: 0 }, 1000);
-        await wait(1800);
+        await wait(500);
+        ktype("kt2", true); await wait(1600); ktype("kt2", false);
+        await wait(300);
+        await cam({ s: 1.3, x: 0, y: 55 }, 850, [640, 220]);
+        $("scroll-feed").classList.add("pull"); $("spin-feed").classList.add("on");
+        await wait(1300);
+        $("scroll-feed").classList.remove("pull"); $("spin-feed").classList.remove("on");
+        for (let i = 0; i < AI_FEED.length; i++) {
+          await wait(180);
+          $(AI_FEED[i]).classList.add("marked");
+        }
+        await wait(500);
+        await cam({ s: 1.42, x: -10, y: 75 }, 900, [640, 280]);
+        await wait(600);
+        $("chip-feed").classList.add("on");
+        await wait(1000);
+        for (let i = 0; i < AI_FEED.length; i++) {
+          await wait(120);
+          $(AI_FEED[i]).classList.add("hide");
+        }
+        $("meta-feed").textContent = "AI hidden";
+        await cam({ s: 1, x: 0, y: 0 }, 900);
+        await wait(1400);
 
         // ── TRANSITION TO CHAT ──
-        hero("h3", true); await wait(1800); hero("h3", false);
+        ktype("kt3", true); await wait(1700); ktype("kt3", false);
         $("panel-feed").classList.add("off");
         $("panel-chat").classList.remove("off");
         $("tog-label").textContent = "Activate on Chat";
@@ -287,42 +379,43 @@
         $("ta").textContent = "This Chat";
         cam._s = { s: 1, x: 0, y: 0 };
         vp.style.transform = "translate(0,0) scale(1)";
-        await wait(1200);
+        await wait(1000);
 
-        // ── CHAT (20–37s) — same process ──
-        await cam({ s: 1.22, x: 0, y: 30 }, 900);
-        await wait(1000);
+        // ── CHAT ──
+        await cam({ s: 1.18, x: 0, y: 25 }, 850);
+        await wait(800);
         $("sb").classList.add("on"); $("bd").classList.add("on");
-        await cam({ s: 1.35, x: 95, y: 35 }, 1000, [500, 360]);
-        await wait(1000);
+        await cam({ s: 1.3, x: 90, y: 30 }, 950, [500, 360]);
+        await wait(800);
         $("natte").classList.add("glow");
         $("sheet").classList.add("on"); $("sbg").classList.add("on");
-        await wait(500);
-        await cam({ s: 2.0, x: 35, y: 175 }, 1100, [640, 510]);
+        await wait(400);
         $("rail").classList.remove("go");
-        await wait(100);
-        $("rail").classList.add("go");
-        await wait(2000);
+        $("dur-track").style.transform = "";
+        $("dur-hr").classList.add("active");
+        $("dur-day").classList.remove("active");
+        await wait(50);
+        await sheetFlow();
         $("ta").classList.add("on"); $("tb").classList.remove("on");
-        await wait(800);
+        await wait(400);
         $("sheet").classList.remove("on"); $("sbg").classList.remove("on");
         $("sb").classList.remove("on"); $("bd").classList.remove("on");
         $("natte").classList.remove("glow");
-        await cam({ s: 1, x: 0, y: 0 }, 1000);
-        await wait(600);
+        await cam({ s: 1, x: 0, y: 0 }, 950);
+        await wait(500);
         $("chat-list").style.display = "none";
         $("convo").style.display = "flex";
         $("cb-ai").classList.add("marked");
-        await cam({ s: 1.45, x: -10, y: 80 }, 1000, [640, 400]);
-        await wait(1000);
+        await cam({ s: 1.38, x: -8, y: 70 }, 900, [640, 380]);
+        await wait(800);
         $("chip-chat").classList.add("on");
-        await wait(1200);
+        await wait(900);
         $("cb-ai").classList.add("hide");
         $("meta-chat").textContent = "AI hidden";
-        await cam({ s: 1, x: 0, y: 0 }, 900);
-        await wait(800);
-        hero("h4", true); await wait(1600); hero("h4", false);
+        await cam({ s: 1, x: 0, y: 0 }, 850);
         await wait(600);
+        ktype("kt4", true); await wait(1500); ktype("kt4", false);
+        await wait(500);
         $("end").classList.add("on");
       }
 

@@ -45,8 +45,8 @@ async function record() {
   });
   const page = await context.newPage();
   await page.goto(demoUrl, { waitUntil: "networkidle" });
-  // ~41s to match X Design launch video pacing
-  await page.waitForTimeout(42000);
+  // ~50s — feed + chat segments with stepped settings flow
+  await page.waitForTimeout(50000);
   const video = page.video();
   await context.close();
   await browser.close();
