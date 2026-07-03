@@ -5,6 +5,7 @@ import GlossyCard from "./GlossyCard";
 import IntroSection from "./IntroSection";
 import SideDrawer from "./SideDrawer";
 import StarConstellation from "./StarConstellation";
+import AgentBuilderDemo from "./AgentBuilderDemo";
 import XPostsSection from "./XPostsSection";
 
 const features = [
@@ -86,6 +87,30 @@ export default function LandingPage() {
                 </GlossyCard>
               ))}
             </div>
+          </section>
+
+          <section id="agent-builder" className="mt-12 scroll-mt-8">
+            <GlossyCard>
+              <div className="flex flex-col items-center gap-8">
+                <div className="text-center">
+                  <span className="mb-4 inline-flex rounded-full border border-white/20 bg-white/5 px-5 py-1.5 text-xs font-semibold tracking-[0.2em] text-white/70 uppercase">
+                    Introducing
+                  </span>
+                  <h2 className="text-2xl font-semibold text-white sm:text-3xl">Agent Builder</h2>
+                  <p className="mt-2 max-w-lg text-sm text-white/50">
+                    Create voice agents for sales, dispatch, and support. X-style UI, built in
+                    minutes.
+                  </p>
+                </div>
+                <AgentBuilderDemo />
+                <a
+                  href="/agent-builder"
+                  className="rounded-full border border-white/20 bg-white/5 px-6 py-2.5 text-sm font-medium text-white/80 transition hover:bg-white/10 hover:text-white"
+                >
+                  Open full demo →
+                </a>
+              </div>
+            </GlossyCard>
           </section>
 
           <XPostsSection />

@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Agent Builder — Feature Demo</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background: #000;
+        color: #fff;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      .phone {
+        position: relative;
+        width: 320px;
+        aspect-ratio: 9/16;
+        border-radius: 40px;
+        border: 1px solid rgba(255,255,255,0.1);
+        overflow: hidden;
+        background: #000;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+      }
+      .notch {
+        position: absolute;
+        top: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 96px;
+        height: 4px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.2);
+        z-index: 20;
+      }
+      .scene {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transition: opacity 0.7s ease;
+        pointer-events: none;
+      }
+      .scene.active { opacity: 1; pointer-events: auto; }
+
+      /* Introducing */
+      .intro-scene {
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .intro-scene h2 {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: #000;
+        position: relative;
+        z-index: 1;
+      }
+      .waves {
+        position: absolute;
+        width: calc(100% + 48px);
+        height: 64px;
+        top: 50%;
+        left: -24px;
+        transform: translateY(-50%);
+      }
+
+      /* Branding */
+      .brand-scene {
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+      }
+      .brand-scene span {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #000;
+      }
+
+      /* Pills */
+      .pills-scene { background: #000; }
+      .orbital {
+        position: absolute;
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 50%;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .pills-wrap {
+        position: relative;
+        z-index: 1;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 0 24px;
+      }
+      .pill {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        max-width: 280px;
+        padding: 12px 16px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.1);
+        background: rgba(255,255,255,0.03);
+        opacity: 0.6;
+        transition: all 0.5s ease;
+      }
+      .pill.active {
+        opacity: 1;
+        border-color: rgba(255,255,255,0.25);
+        background: rgba(255,255,255,0.08);
+        box-shadow: 0 0 20px rgba(255,255,255,0.06);
+      }
+      .pill-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .pill span { flex: 1; font-size: 0.875rem; font-weight: 500; }
+      .pill-dots { color: rgba(255,255,255,0.4); font-size: 12px; letter-spacing: 2px; }
+
+      /* Form */
+      .form-scene {
+        background: #f7f9f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      .form-card {
+        width: 100%;
+        max-width: 300px;
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid rgba(0,0,0,0.08);
+        padding: 20px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      }
+      .form-card h3 { font-size: 1.125rem; font-weight: 700; color: #000; }
+      .field { margin-top: 20px; }
+      .field label { font-size: 0.75rem; font-weight: 500; color: #536471; }
+      .field .input {
+        margin-top: 6px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(0,0,0,0.1);
+        font-size: 0.875rem;
+        color: #000;
+        min-height: 20px;
+      }
+      .field .input.textarea { min-height: 80px; line-height: 1.5; }
+      .cursor { display: inline-block; width: 1px; height: 16px; background: #000; animation: blink 1s step-end infinite; vertical-align: text-bottom; }
+      @keyframes blink { 50% { opacity: 0; } }
+
+      /* Tabs */
+      .tabs-scene {
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .tabs-wrap {
+        position: relative;
+        display: flex;
+        gap: 32px;
+        padding: 0 16px;
+      }
+      .tab-icon { width: 24px; height: 24px; color: #000; }
+      .tab-icon.muted { color: rgba(0,0,0,0.25); }
+      .tab-underline {
+        position: absolute;
+        bottom: -4px;
+        left: 20%;
+        width: 60%;
+        height: 2px;
+        background: #f97316;
+        border-radius: 999px;
+      }
+
+      /* Progress */
+      .progress-scene {
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 40px;
+      }
+      .progress-track {
+        position: relative;
+        width: 100%;
+        max-width: 240px;
+        height: 2px;
+        background: #f97316;
+        border-radius: 999px;
+      }
+      .progress-dot {
+        position: absolute;
+        top: 50%;
+        width: 8px;
+        height: 8px;
+        background: #000;
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        transition: left 0.1s linear;
+      }
+      .progress-thumb {
+        position: absolute;
+        top: 50%;
+        width: 16px;
+        height: 16px;
+        border: 2px solid #000;
+        border-radius: 50%;
+        background: #fff;
+        transform: translate(-50%, -50%);
+        transition: left 0.1s linear;
+      }
+      .progress-thumb::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 8px;
+        height: 1px;
+        background: #000;
+        transform: translate(-50%, -50%);
+      }
+
+      /* CTA */
+      .cta-scene {
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .cta-btn {
+        padding: 12px 32px;
+        border-radius: 999px;
+        background: #000;
+        color: #fff;
+        font-size: 0.875rem;
+        font-weight: 700;
+        border: none;
+        transition: transform 0.2s ease;
+      }
+      .cta-btn.pressed { transform: scale(0.95); }
+
+      .dots {
+        position: absolute;
+        bottom: 12px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        z-index: 20;
+      }
+      .dot {
+        height: 4px;
+        width: 4px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.3);
+        transition: all 0.3s ease;
+      }
+      .dot.active { width: 16px; background: #fff; }
+    </style>
+  </head>
+  <body>
+    <div class="phone">
+      <div class="notch"></div>
+
+      <div class="scene intro-scene active" data-scene="0">
+        <div style="position:relative;padding:0 32px">
+          <svg class="waves" viewBox="0 0 300 60" fill="none">
+            <path d="M0 35 C40 10, 80 50, 120 30 S200 15, 300 35" stroke="#ef4444" stroke-width="1.5" opacity="0.7"/>
+            <path d="M0 28 C50 45, 100 5, 150 32 S220 48, 300 22" stroke="#ef4444" stroke-width="1.5" opacity="0.5"/>
+          </svg>
+          <h2>Introducing</h2>
+        </div>
+      </div>
+
+      <div class="scene brand-scene" data-scene="1">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="#000">
+          <rect x="4" y="12" width="3" height="8" rx="1.5"/>
+          <rect x="10" y="8" width="3" height="16" rx="1.5"/>
+          <rect x="16" y="5" width="3" height="22" rx="1.5"/>
+          <rect x="22" y="10" width="3" height="12" rx="1.5"/>
+          <rect x="28" y="14" width="3" height="4" rx="1.5"/>
+        </svg>
+        <span>Agent Builder</span>
+      </div>
+
+      <div class="scene pills-scene" data-scene="2">
+        <div class="orbital" style="width:200px;height:200px"></div>
+        <div class="orbital" style="width:320px;height:320px"></div>
+        <div class="orbital" style="width:440px;height:440px"></div>
+        <div class="pills-wrap">
+          <div class="pill" data-pill="0">
+            <div class="pill-icon" style="background:linear-gradient(135deg,#2dd4bf,#10b981,#0891b2)"></div>
+            <span>Sales Qualifier</span>
+            <span class="pill-dots">⋮</span>
+          </div>
+          <div class="pill active" data-pill="1">
+            <div class="pill-icon" style="background:linear-gradient(135deg,#d946ef,#a855f7,#7c3aed)"></div>
+            <span>Service Dispatch</span>
+            <span class="pill-dots">⋮</span>
+          </div>
+          <div class="pill" data-pill="2">
+            <div class="pill-icon" style="background:linear-gradient(135deg,#6d28d9,#581c87,#334155)"></div>
+            <span>Customer Support</span>
+            <span class="pill-dots">⋮</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="scene form-scene" data-scene="3">
+        <div class="form-card">
+          <h3>Create a Voice Agent</h3>
+          <div class="field">
+            <label>Agent name</label>
+            <div class="input" id="agentName"></div>
+          </div>
+          <div class="field">
+            <label>Goal (optional)</label>
+            <div class="input textarea" id="agentGoal"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="scene tabs-scene" data-scene="4">
+        <div class="tabs-wrap">
+          <svg class="tab-icon muted" viewBox="0 0 24 24" fill="none"><path d="M4 6a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2H9l-4 4v-4H6a2 2 0 01-2-2V6z" stroke="currentColor" stroke-width="1.5"/></svg>
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none"><path d="M14.7 6.3a4 4 0 00-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 005.4-5.4l-2 2-3.4-3.4 2-2z" stroke="currentColor" stroke-width="1.5"/></svg>
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none"><path d="M4 8h16M4 16h16" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="16" cy="16" r="2" stroke="currentColor" stroke-width="1.5"/></svg>
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none"><path d="M5 4h6a2 2 0 012 2v14a2 2 0 00-2-2H5a2 2 0 00-2 2V6a2 2 0 012-2zm8 0h6a2 2 0 012 2v14a2 2 0 01-2-2h-6a2 2 0 01-2-2V6a2 2 0 012-2z" stroke="currentColor" stroke-width="1.5"/></svg>
+          <svg class="tab-icon muted" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6l7-3z" stroke="currentColor" stroke-width="1.5"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <div class="tab-underline"></div>
+        </div>
+      </div>
+
+      <div class="scene progress-scene" data-scene="5">
+        <div class="progress-track">
+          <div class="progress-dot" id="progressDot" style="left:35%"></div>
+          <div class="progress-thumb" id="progressThumb" style="left:50%"></div>
+        </div>
+      </div>
+
+      <div class="scene cta-scene" data-scene="6">
+        <button class="cta-btn" id="ctaBtn">Create Agent +</button>
+      </div>
+
+      <div class="dots" id="dots"></div>
+    </div>
+
+    <script>
+      const DURATIONS = [3500, 3000, 4500, 5500, 3000, 2500, 3000];
+      const scenes = document.querySelectorAll(".scene");
+      const dotsContainer = document.getElementById("dots");
+      let current = 0;
+
+      DURATIONS.forEach((_, i) => {
+        const d = document.createElement("div");
+        d.className = "dot" + (i === 0 ? " active" : "");
+        dotsContainer.appendChild(d);
+      });
+      const dots = dotsContainer.querySelectorAll(".dot");
+
+      function showScene(n) {
+        scenes.forEach((s, i) => s.classList.toggle("active", i === n));
+        dots.forEach((d, i) => d.classList.toggle("active", i === n));
+        current = n;
+
+        if (n === 2) animatePills();
+        if (n === 3) animateForm();
+        if (n === 5) animateProgress();
+        if (n === 6) animateCta();
+      }
+
+      function nextScene() {
+        showScene((current + 1) % DURATIONS.length);
+        scheduleNext();
+      }
+
+      let timer;
+      function scheduleNext() {
+        clearTimeout(timer);
+        timer = setTimeout(nextScene, DURATIONS[current]);
+      }
+
+      function animatePills() {
+        const pills = document.querySelectorAll(".pill");
+        pills.forEach(p => p.classList.remove("active"));
+        pills[0].classList.add("active");
+        setTimeout(() => { pills[0].classList.remove("active"); pills[1].classList.add("active"); }, 1200);
+        setTimeout(() => { pills[1].classList.remove("active"); pills[2].classList.add("active"); }, 2800);
+      }
+
+      function animateForm() {
+        const nameEl = document.getElementById("agentName");
+        const goalEl = document.getElementById("agentGoal");
+        const fullName = "Customer Support";
+        const fullGoal = "You are a friendly customer support agent.";
+        nameEl.textContent = "";
+        goalEl.textContent = "";
+        let ni = 0, gi = 0, phase = "name";
+
+        const iv = setInterval(() => {
+          if (phase === "name") {
+            ni++;
+            nameEl.innerHTML = fullName.slice(0, ni) + '<span class="cursor"></span>';
+            if (ni >= fullName.length) { phase = "goal"; nameEl.textContent = fullName; }
+          } else if (phase === "goal") {
+            gi++;
+            goalEl.innerHTML = fullGoal.slice(0, gi) + '<span class="cursor"></span>';
+            if (gi >= fullGoal.length) { goalEl.textContent = fullGoal; clearInterval(iv); }
+          }
+        }, 60);
+      }
+
+      function animateProgress() {
+        const dot = document.getElementById("progressDot");
+        const thumb = document.getElementById("progressThumb");
+        const start = Date.now();
+        function tick() {
+          const t = Math.min((Date.now() - start) / 2000, 1);
+          const p = 35 + t * 30;
+          dot.style.left = p + "%";
+          thumb.style.left = Math.min(p + 15, 95) + "%";
+          if (t < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      }
+
+      function animateCta() {
+        const btn = document.getElementById("ctaBtn");
+        btn.classList.remove("pressed");
+        setTimeout(() => btn.classList.add("pressed"), 1800);
+        setTimeout(() => btn.classList.remove("pressed"), 2200);
+      }
+
+      scheduleNext();
+    </script>
+  </body>
+</html>
