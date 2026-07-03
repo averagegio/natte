@@ -6,11 +6,11 @@
     <style>
       :root {
         --bg:#000; --elevated:#16181c; --border:#2f3336;
-        --text:#e7e9ea; --muted:#71767b; --blue:#1d9bf0; --red:#f4212e; --orange:#ff7a00;
-        --chat-in:#2f3336; --chat-out:#1d9bf0;
+        --text:#e7e9ea; --muted:#71767b; --blue:#1d9bf0; --red:#f4212e;
+        --chat-in:#2f3336; --chat-out:#1d9bf0; --hover:#181818;
       }
       *{box-sizing:border-box;margin:0;padding:0}
-      body{background:#000;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+      body{background:#000;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
       .stage{width:1280px;height:720px;background:#000;position:relative;overflow:hidden}
       .viewport{position:absolute;inset:0;will-change:transform;transform-origin:640px 360px}
       .ui{position:absolute;inset:0;background:var(--bg);width:393px;left:50%;margin-left:-196.5px}
@@ -22,51 +22,47 @@
       .top-av{width:32px;height:32px;border-radius:50%;object-fit:cover}
 
       .tabs{display:flex;border-bottom:1px solid var(--border)}
-      .tab{flex:1;text-align:center;padding:12px 0 10px;font-size:15px;color:var(--muted);position:relative}
+      .tab{flex:1;text-align:center;padding:12px 0 10px;font-size:15px;color:var(--muted);position:relative;transition:color .2s}
       .tab.on{color:var(--text);font-weight:700}
       .tab.on::after{content:"";position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:56px;height:4px;background:var(--blue);border-radius:2px}
 
-      .chip{display:flex;align-items:center;gap:8px;margin:8px 14px 4px;padding:9px 12px;background:var(--elevated);border:1px solid var(--border);border-radius:999px;opacity:0;transform:translateY(-10px);transition:opacity .5s,transform .5s cubic-bezier(.34,1.3,.64,1)}
+      .chip{display:flex;align-items:center;gap:8px;margin:8px 14px 4px;padding:9px 12px;background:var(--elevated);border:1px solid var(--border);border-radius:999px;opacity:0;transform:translateY(-10px);transition:opacity .45s,transform .45s cubic-bezier(.34,1.3,.64,1)}
       .chip.on{opacity:1;transform:none}
       .chip .n{width:20px;height:20px;border-radius:50%;background:#fff;color:#000;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center}
       .chip .lbl{font-size:13px;font-weight:700;color:var(--text)}
       .chip .meta{flex:1;font-size:12px;color:var(--muted)}
-      .chip .hide{padding:5px 12px;border-radius:999px;background:#fff;color:#000;font-size:12px;font-weight:700}
+      .chip .hide{padding:5px 12px;border-radius:999px;background:var(--text);color:var(--bg);font-size:12px;font-weight:700}
 
-      .scroll{height:calc(100% - 120px);overflow:hidden;transition:transform .55s cubic-bezier(.33,1,.68,1)}
+      .scroll{height:calc(100% - 120px);overflow:hidden;transition:transform .5s cubic-bezier(.33,1,.68,1)}
       .scroll.pull{transform:translateY(48px)}
       .spin{position:absolute;top:108px;left:50%;transform:translateX(-50%);width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--blue);border-radius:50%;opacity:0;z-index:5}
       .spin.on{opacity:1;animation:spin .6s linear infinite}
       @keyframes spin{to{transform:translateX(-50%) rotate(360deg)}}
 
-      .tweet{display:flex;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);position:relative;transition:opacity .5s,transform .5s,max-height .5s,padding .5s}
+      .tweet{display:flex;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);position:relative;transition:opacity .45s,transform .45s,max-height .45s,padding .45s}
       .tweet.hide{opacity:0;transform:scale(.97) translateX(-8px);max-height:0;padding:0;overflow:hidden;border:none}
-      .tweet.marked{background:linear-gradient(90deg,rgba(244,33,46,.14),transparent 42%)}
-      .tweet.marked::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--red);animation:markPulse .6s ease}
-      @keyframes markPulse{0%{opacity:0;transform:scaleY(0)}100%{opacity:1;transform:scaleY(1)}}
+      .tweet.marked{background:linear-gradient(90deg,rgba(244,33,46,.12),transparent 42%)}
+      .tweet.marked::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--red)}
       .ai-pill{display:none;margin-left:4px;padding:1px 5px;border-radius:4px;background:rgba(244,33,46,.15);color:var(--red);font-size:10px;font-weight:800}
       .tweet.marked .ai-pill{display:inline-block}
       .av{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0}
-      .av-bot{width:40px;height:40px;border-radius:50%;background:#262626;display:flex;align-items:center;justify-content:center;color:#525252;font-size:13px;flex-shrink:0}
+      .av-bot{width:40px;height:40px;border-radius:50%;background:#333639;display:flex;align-items:center;justify-content:center;color:#71767b;font-size:13px;flex-shrink:0}
       .body{flex:1;min-width:0}
       .row1{display:flex;flex-wrap:wrap;align-items:center;gap:2px;font-size:15px;margin-bottom:2px}
       .name{font-weight:700;color:var(--text)} .handle,.dot,.time{color:var(--muted)}
       .verified{width:17px;height:17px}
       .txt{font-size:15px;line-height:20px;color:var(--text);margin-bottom:10px}
-      .acts{display:flex;gap:28px;color:var(--muted);font-size:12px}
-      .acts svg{width:16px;height:16px;fill:currentColor;vertical-align:-3px;margin-right:3px}
 
       .chat-head{display:flex;align-items:center;justify-content:space-between;padding:8px 16px 10px;border-bottom:1px solid var(--border);gap:8px}
       .chat-head h1{font-size:20px;font-weight:800;color:var(--text);flex:1;text-align:center}
       .chat-head .filter{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center}
       .chat-head .filter svg{width:18px;height:18px;fill:var(--text)}
-      .dm{display:flex;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);align-items:center}
+      .dm{display:flex;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);align-items:center;transition:background .2s}
       .dm .preview{flex:1;min-width:0}
       .dm .top{display:flex;justify-content:space-between;align-items:center}
       .dm .nm{font-size:15px;font-weight:700;color:var(--text)}
       .dm .tm{font-size:13px;color:var(--muted)}
       .dm .msg{font-size:15px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
-      .dm.glow{background:rgba(29,155,240,.08);box-shadow:inset 0 0 0 1px rgba(29,155,240,.3)}
 
       .convo{padding:16px;display:flex;flex-direction:column;gap:10px;height:calc(100% - 56px);overflow:hidden}
       .bubble{max-width:78%;padding:10px 14px;border-radius:20px;font-size:15px;line-height:20px}
@@ -76,38 +72,35 @@
       .bubble.marked::after{content:"AI";position:absolute;top:-8px;right:8px;background:var(--red);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px}
       .bubble.hide{opacity:.1;transform:scale(.94);filter:blur(2px)}
 
-      .bd{position:absolute;inset:0;background:rgba(91,112,131,.4);opacity:0;pointer-events:none;transition:opacity .45s;z-index:40}
+      .bd{position:absolute;inset:0;background:rgba(91,112,131,.4);opacity:0;pointer-events:none;transition:opacity .35s;z-index:40}
       .bd.on{opacity:1}
       .sb{position:absolute;top:0;left:0;bottom:0;width:82%;background:var(--bg);z-index:50;transform:translateX(-105%);transition:transform .38s cubic-bezier(.34,1.45,.64,1);padding:54px 8px 20px}
       .sb.on{transform:none}
-      .sb-item{display:flex;align-items:center;gap:18px;padding:12px 18px;font-size:19px;color:var(--text);border-radius:999px;transition:transform .15s cubic-bezier(.34,1.45,.64,1),background .15s}
-      .sb-item.flash{transform:scale(.96);background:rgba(255,255,255,.08)}
+      .sb-item{display:flex;align-items:center;gap:18px;padding:12px 18px;font-size:19px;color:var(--text);border-radius:999px;transition:background .2s,box-shadow .2s}
       .sb-item svg{width:24px;height:24px;fill:currentColor}
       .sb-item.natte .ni{width:28px;height:28px;border-radius:50%;background:#fff;color:#000;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center}
-      .sb-item.natte.glow{background:rgba(29,155,240,.12);box-shadow:0 0 0 2px var(--blue)}
+      .sb-item.natte.glow{background:rgba(29,155,240,.1);box-shadow:0 0 0 2px var(--blue)}
 
-      .sbg{position:absolute;inset:0;background:rgba(0,0,0,.55);opacity:0;z-index:55;transition:opacity .4s}
+      .sbg{position:absolute;inset:0;background:rgba(0,0,0,.6);opacity:0;z-index:55;transition:opacity .35s}
       .sbg.on{opacity:1}
-      .sheet{position:absolute;left:0;right:0;bottom:0;z-index:56;background:var(--elevated);border-radius:18px 18px 0 0;border-top:1px solid var(--border);padding:10px 18px 24px;transform:translateY(105%);transition:transform .42s cubic-bezier(.34,1.45,.64,1);max-height:92%}
+      .sheet{position:absolute;left:0;right:0;bottom:0;z-index:56;background:var(--elevated);border-radius:16px 16px 0 0;border-top:1px solid var(--border);padding:10px 18px 24px;transform:translateY(105%);transition:transform .42s cubic-bezier(.34,1.45,.64,1);max-height:92%}
       .sheet.on{transform:none}
-      .grab{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 14px}
-      .sheet h2{font-size:18px;font-weight:800;color:var(--text)}
-      .sheet .sub{font-size:14px;color:var(--muted);margin:2px 0 14px}
-      .pick{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px}
-      .pick div{padding:12px 14px;font-size:14px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border);transition:transform .12s cubic-bezier(.34,1.45,.64,1),background .12s}
-      .pick div.flash{transform:scale(.98);background:rgba(255,255,255,.06)}
+      .grab{width:36px;height:4px;background:#536471;border-radius:2px;margin:0 auto 14px}
+      .sheet h2{font-size:20px;font-weight:800;color:var(--text)}
+      .sheet .sub{font-size:15px;color:var(--muted);margin:2px 0 14px}
+      .pick{border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:16px}
+      .pick div{padding:14px 16px;font-size:15px;font-weight:500;color:var(--text);border-bottom:1px solid var(--border);transition:background .2s,color .2s}
       .pick div:last-child{border-bottom:none}
-      .pick .sel{background:rgba(29,155,240,.08);color:var(--blue)}
-      .fl{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
-      .rail{position:relative;height:3px;background:var(--orange);border-radius:99px;margin-bottom:18px}
-      .rail .dot,.rail .thumb{position:absolute;top:50%;transform:translate(-50%,-50%);left:30%;transition:left .65s cubic-bezier(.34,1.45,.64,1)}
-      .rail .dot{width:7px;height:7px;background:#fff;border-radius:50%}
-      .rail .thumb{width:20px;height:20px;border:2.5px solid #fff;border-radius:50%;background:var(--bg)}
-      .rail.go .dot,.rail.go .thumb{left:72%}
+      .pick .sel{background:transparent;color:var(--blue);font-weight:700}
+      .fl{font-size:13px;font-weight:500;color:var(--muted);margin-bottom:10px}
+      .rail{position:relative;height:4px;background:var(--border);border-radius:99px;margin-bottom:18px}
+      .rail::before{content:"";position:absolute;inset:0;border-radius:99px;background:var(--blue);width:30%;transition:width .6s cubic-bezier(.34,1.45,.64,1)}
+      .rail.go::before{width:72%}
+      .rail .thumb{position:absolute;top:50%;transform:translate(-50%,-50%);left:30%;width:22px;height:22px;border:2px solid var(--blue);border-radius:50%;background:var(--bg);transition:left .6s cubic-bezier(.34,1.45,.64,1)}
+      .rail.go .thumb{left:72%}
       .togs{display:flex;gap:8px;margin-bottom:14px}
-      .tog{flex:1;padding:12px;text-align:center;border-radius:999px;font-size:14px;font-weight:700;border:1px solid var(--border);color:var(--text);transition:all .2s cubic-bezier(.34,1.45,.64,1)}
-      .tog.on{background:#fff;color:#000;border-color:#fff}
-      .tog.flash{transform:scale(.94)}
+      .tog{flex:1;padding:12px;text-align:center;border-radius:999px;font-size:15px;font-weight:700;border:1px solid var(--border);color:var(--text);background:transparent;transition:all .2s cubic-bezier(.34,1.45,.64,1)}
+      .tog.on{background:var(--text);color:var(--bg);border-color:var(--text)}
       .dur-wrap{margin-bottom:14px}
       .dur-wheel{position:relative;height:108px;overflow:hidden}
       .dur-wheel::before,.dur-wheel::after{content:"";position:absolute;left:0;right:0;height:36px;z-index:2;pointer-events:none}
@@ -115,33 +108,25 @@
       .dur-wheel::after{bottom:0;background:linear-gradient(transparent,var(--elevated))}
       .dur-lines{position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);height:36px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);z-index:1;pointer-events:none}
       .dur-track{transition:transform .55s cubic-bezier(.34,1.45,.64,1)}
-      .dur-track div{height:36px;line-height:36px;text-align:center;font-size:15px;color:var(--muted);opacity:.45;transition:opacity .4s,font-size .4s,color .4s}
-      .dur-track .active{font-size:20px;font-weight:700;color:var(--text);opacity:1}
-      .go-btn{padding:14px;border-radius:999px;background:#fff;color:#000;font-size:16px;font-weight:700;text-align:center;transition:transform .12s cubic-bezier(.34,1.45,.64,1)}
-      .go-btn.flash{transform:scale(.95)}
-      .chip .hide{transition:transform .12s cubic-bezier(.34,1.45,.64,1)}
-      .chip .hide.flash{transform:scale(.9)}
-      .dm{transition:transform .12s cubic-bezier(.34,1.45,.64,1),background .2s}
-      .dm.flash{transform:scale(.98);background:rgba(255,255,255,.04)}
-      .menu-btn{transition:transform .12s cubic-bezier(.34,1.45,.64,1)}
-      .menu-btn.flash{transform:scale(.88)}
+      .dur-track div{height:36px;line-height:36px;text-align:center;font-size:15px;color:var(--muted);opacity:.4;transition:opacity .35s,font-size .35s,color .35s}
+      .dur-track .active{font-size:20px;font-weight:800;color:var(--text);opacity:1}
+      .go-btn{padding:14px;border-radius:999px;background:var(--text);color:var(--bg);font-size:17px;font-weight:700;text-align:center;transition:opacity .2s}
 
-      /* Tap finger */
-      .finger{position:absolute;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.28);border:2.5px solid rgba(255,255,255,.75);z-index:200;opacity:0;pointer-events:none;transform:translate(-50%,-50%) scale(.4);box-shadow:0 2px 12px rgba(0,0,0,.4)}
-      .finger.show{opacity:1;transform:translate(-50%,-50%) scale(1);transition:opacity .12s,transform .28s cubic-bezier(.34,1.55,.64,1),left .32s cubic-bezier(.34,1.45,.64,1),top .32s cubic-bezier(.34,1.45,.64,1)}
-      .finger.down{transform:translate(-50%,-50%) scale(.82);transition:transform .08s}
-      .finger .ripple{position:absolute;inset:-8px;border-radius:50%;border:2px solid rgba(255,255,255,.5);opacity:0}
-      .finger.pop .ripple{animation:ripplePop .4s ease-out forwards}
-      @keyframes ripplePop{0%{transform:scale(.6);opacity:.9}100%{transform:scale(2.2);opacity:0}}
+      /* Selection highlight — no cursor */
+      .hl{position:relative;z-index:1}
+      .hl::after{content:"";position:absolute;inset:-3px;border-radius:inherit;border:2px solid var(--blue);box-shadow:0 0 0 4px rgba(29,155,240,.2);animation:hlPop .45s cubic-bezier(.34,1.45,.64,1);pointer-events:none}
+      .pick div.hl::after{border-radius:14px}
+      .rail.hl::after{border-radius:99px;inset:-8px -4px}
+      .dur-wheel.hl::after{border-radius:12px;inset:-4px}
+      @keyframes hlPop{0%{opacity:0;transform:scale(.96)}40%{opacity:1}100%{opacity:1;transform:scale(1)}}
 
-      /* Kinetic typography */
-      .ktype{position:absolute;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.78);opacity:0;pointer-events:none;transition:opacity .22s}
+      .ktype{position:absolute;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.82);opacity:0;pointer-events:none;transition:opacity .22s}
       .ktype.on{opacity:1}
       .ktype-inner{text-align:center;line-height:1.05}
       .ktype .w{display:inline-block;font-size:54px;font-weight:800;color:#fff;letter-spacing:-.03em;opacity:0;transform:translateY(32px) scale(.92);margin-right:.18em}
-      .ktype.on .w{animation:wordIn .6s cubic-bezier(.22,1,.36,1) forwards}
+      .ktype.on .w{animation:wordIn .55s cubic-bezier(.22,1,.36,1) forwards}
       .ktype .sub-w{display:block;font-size:17px;font-weight:500;color:var(--muted);margin-top:14px;opacity:0;transform:translateY(12px)}
-      .ktype.on .sub-w{animation:wordIn .5s cubic-bezier(.22,1,.36,1) .5s forwards}
+      .ktype.on .sub-w{animation:wordIn .5s cubic-bezier(.22,1,.36,1) .45s forwards}
       @keyframes wordIn{to{opacity:1;transform:none}}
 
       .end{position:absolute;inset:0;z-index:100;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;transition:opacity .7s}
@@ -150,8 +135,10 @@
       .end h2{margin-top:20px;font-size:28px;font-weight:800;color:#fff}
       .end p{margin-top:6px;font-size:14px;color:var(--muted)}
 
-      .panel{position:absolute;inset:0;opacity:1;transition:opacity .6s}
+      .panel{position:absolute;inset:0;opacity:1;transition:opacity .5s}
       .panel.off{opacity:0;pointer-events:none}
+      .feed-label{position:absolute;top:52px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.08em;opacity:0;transition:opacity .3s;z-index:10;pointer-events:none}
+      .feed-label.on{opacity:1}
     </style>
   </head>
   <body>
@@ -165,8 +152,12 @@
               <span class="x-mark">𝕏</span>
               <img class="top-av" src="assets/avatars/sama.jpg" alt="" />
             </header>
-            <div class="tabs"><div class="tab">Following</div><div class="tab on">For You</div></div>
-            <div class="chip" id="chip-feed"><span class="n">n</span><span class="lbl">n.a.t.t.e.</span><span class="meta" id="meta-feed">4 AI posts marked</span><span class="hide" id="hide-feed">Hide AI</span></div>
+            <div class="tabs">
+              <div class="tab" id="tab-following">Following</div>
+              <div class="tab" id="tab-foryou">For You</div>
+            </div>
+            <div class="feed-label" id="feed-label"></div>
+            <div class="chip" id="chip-feed"><span class="n">n</span><span class="lbl">n.a.t.t.e.</span><span class="meta" id="meta-feed">0 AI posts marked</span><span class="hide" id="hide-feed">Hide AI</span></div>
             <div class="spin" id="spin-feed"></div>
             <div class="scroll" id="scroll-feed">
               <article class="tweet" id="f1">
@@ -213,16 +204,16 @@
             </div>
             <div id="chat-list">
               <div class="dm" id="dm1"><img class="av" src="assets/avatars/paulg.jpg" alt="" /><div class="preview"><div class="top"><span class="nm">Paul Graham</span><span class="tm">1h</span></div><div class="msg">It's not cheating to use tools.</div></div></div>
-              <div class="dm glow" id="dm2"><img class="av" src="assets/avatars/elonmusk.jpg" alt="" /><div class="preview"><div class="top"><span class="nm">Elon Musk</span><span class="tm">2h</span></div><div class="msg">As an AI, I can generate...</div></div></div>
+              <div class="dm" id="dm2"><img class="av" src="assets/avatars/elonmusk.jpg" alt="" /><div class="preview"><div class="top"><span class="nm">Elon Musk</span><span class="tm">2h</span></div><div class="msg">As an AI, I can generate...</div></div></div>
               <div class="dm"><img class="av" src="assets/avatars/naval.jpg" alt="" /><div class="preview"><div class="top"><span class="nm">Naval</span><span class="tm">3h</span></div><div class="msg">Read the docs.</div></div></div>
             </div>
             <div class="convo off" id="convo" style="display:none">
               <div class="bubble in">Hey — saw your post about slop detection.</div>
               <div class="bubble out">Yeah, we shipped n.a.t.t.e.</div>
-              <div class="bubble in marked" id="cb-ai">As an AI language model, I can help you draft engaging replies for your audience.</div>
+              <div class="bubble in" id="cb-ai">As an AI language model, I can help you draft engaging replies for your audience.</div>
               <div class="bubble in" id="cb-real">Nice. Does it work in Chat too?</div>
             </div>
-            <div class="chip" id="chip-chat" style="margin-top:8px"><span class="n">n</span><span class="lbl">n.a.t.t.e.</span><span class="meta" id="meta-chat">1 AI message marked</span><span class="hide" id="hide-chat">Hide AI</span></div>
+            <div class="chip" id="chip-chat"><span class="n">n</span><span class="lbl">n.a.t.t.e.</span><span class="meta" id="meta-chat">0 AI messages marked</span><span class="hide" id="hide-chat">Hide AI</span></div>
           </div>
 
           <div class="bd" id="bd"></div>
@@ -237,18 +228,21 @@
             <div class="grab"></div>
             <h2 id="sec-title">Proof of Human</h2>
             <p class="sub">AI slop blocker</p>
-            <div class="pick" id="sec-pick"><div>Proof of Human</div><div class="sel" id="pick-slop">AI slop blocker</div></div>
+            <div class="pick" id="sec-pick">
+              <div class="sel" id="pick-poh">Proof of Human</div>
+              <div id="pick-slop">AI slop blocker</div>
+            </div>
             <p class="fl" id="sec-sens-label">Sensitivity</p>
-            <div class="rail" id="rail"><div class="dot"></div><div class="thumb"></div></div>
+            <div class="rail" id="rail"><div class="thumb"></div></div>
             <p class="fl" id="tog-label">Activate on feed</p>
-            <div class="togs" id="sec-togs"><div class="tog" id="ta">Following</div><div class="tog on" id="tb">For You</div></div>
+            <div class="togs" id="sec-togs"><div class="tog" id="ta">Following</div><div class="tog" id="tb">For You</div></div>
             <div class="dur-wrap" id="sec-dur">
               <p class="fl">Duration</p>
               <div class="dur-wheel" id="dur-wheel">
                 <div class="dur-lines"></div>
                 <div class="dur-track" id="dur-track">
-                  <div>5 minutes</div>
-                  <div class="active" id="dur-hr">1 hour</div>
+                  <div id="dur-5">5 minutes</div>
+                  <div id="dur-hr">1 hour</div>
                   <div id="dur-day">1 day</div>
                   <div>1 week</div>
                 </div>
@@ -259,26 +253,25 @@
         </div>
       </div>
 
-      <div class="finger" id="finger"><div class="ripple"></div></div>
-      <div class="ktype" id="kt1"><div class="ktype-inner"><span class="w" style="animation-delay:.05s">Proof</span><span class="w" style="animation-delay:.15s">of</span><span class="w" style="animation-delay:.25s">Human</span><span class="sub-w">Normative AI Turing Test</span></div></div>
+      <div class="ktype" id="kt1"><div class="ktype-inner"><span class="w" style="animation-delay:.05s">Proof</span><span class="w" style="animation-delay:.15s">of</span><span class="w" style="animation-delay:.25s">Human</span></div></div>
       <div class="ktype" id="kt2"><div class="ktype-inner"><span class="w" style="animation-delay:.05s">Mark</span><span class="w" style="animation-delay:.18s">AI</span><span class="w" style="animation-delay:.31s">slop</span></div></div>
       <div class="ktype" id="kt3"><div class="ktype-inner"><span class="w" style="animation-delay:.05s">On</span><span class="w" style="animation-delay:.15s">X</span><span class="w" style="animation-delay:.25s">Chat</span><span class="w" style="animation-delay:.35s">too</span></div></div>
       <div class="ktype" id="kt4"><div class="ktype-inner"><span class="w" style="animation-delay:.05s">Human</span><span class="w" style="animation-delay:.2s">verified</span></div></div>
-      <div class="end" id="end"><div class="logo">n</div><h2>n.a.t.t.e.</h2><p>Feed & Chat · Now on X</p></div>
+      <div class="end" id="end"><div class="logo">n</div><h2>n.a.t.t.e.</h2><p>Following · For You · Chat</p></div>
     </div>
 
     <script>
       const $ = (id) => document.getElementById(id);
       const vp = $("vp");
-      const finger = $("finger");
-      const AI_FEED = ["f2", "f4", "f6", "f8"];
+      const AI_FOLLOWING = ["f2", "f4"];
+      const AI_FORYOU = ["f6", "f8"];
 
       function easeOutBack(t) {
         const c = 1.70158;
         return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2);
       }
 
-      function cam(to, dur = 520, origin = [640, 360]) {
+      function cam(to, dur = 480, origin = [640, 360]) {
         const from = cam._s || { s: 1, x: 0, y: 0 };
         const start = performance.now();
         vp.style.transformOrigin = `${origin[0]}px ${origin[1]}px`;
@@ -286,10 +279,7 @@
           function step(now) {
             const t = Math.min((now - start) / dur, 1);
             const e = easeOutBack(t);
-            const s = from.s + (to.s - from.s) * e;
-            const x = from.x + (to.x - from.x) * e;
-            const y = from.y + (to.y - from.y) * e;
-            vp.style.transform = `translate(${x}px,${y}px) scale(${s})`;
+            vp.style.transform = `translate(${from.x + (to.x - from.x) * e}px,${from.y + (to.y - from.y) * e}px) scale(${from.s + (to.s - from.s) * e})`;
             if (t < 1) requestAnimationFrame(step);
             else { cam._s = { ...to }; resolve(); }
           }
@@ -298,187 +288,195 @@
       }
       cam._s = { s: 1, x: 0, y: 0 };
 
-      function wait(ms) { return new Promise((r) => setTimeout(r, ms)); }
+      const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
-      function center(el) {
-        const stage = document.querySelector(".stage");
-        const sr = stage.getBoundingClientRect();
-        const er = el.getBoundingClientRect();
-        return {
-          x: er.left + er.width / 2 - sr.left,
-          y: er.top + er.height / 2 - sr.top,
-        };
-      }
-
-      async function moveFinger(el) {
-        const { x, y } = center(el);
-        finger.style.left = `${x}px`;
-        finger.style.top = `${y}px`;
-        if (!finger.classList.contains("show")) finger.classList.add("show");
-        await wait(220);
-      }
-
-      async function tap(el, action) {
-        await moveFinger(el);
-        finger.classList.add("down");
-        el.classList.add("flash");
-        await wait(90);
-        finger.classList.add("pop");
-        finger.classList.remove("down");
+      async function pick(el, action) {
+        el.classList.add("hl");
+        await wait(260);
         if (action) action();
-        await wait(160);
-        el.classList.remove("flash");
-        finger.classList.remove("pop");
-        await wait(40);
+        await wait(180);
+        el.classList.remove("hl");
       }
 
-      function hideFinger() {
-        finger.classList.remove("show", "down", "pop");
-      }
-
-      async function camSheet(y, scale = 1.3, dur = 480) {
+      async function camSheet(y, scale = 1.28, dur = 420) {
         return cam({ s: scale, x: 0, y }, dur, [640, 500]);
       }
 
-      function ktype(id, on) {
-        const el = $(id);
-        el.classList.toggle("on", on);
-        if (!on) {
-          el.querySelectorAll(".w, .sub-w").forEach((w) => {
-            w.style.animation = "none";
-            void w.offsetWidth;
-            w.style.animation = "";
-          });
-        }
+      function resetSheet() {
+        $("pick-poh").classList.add("sel");
+        $("pick-slop").classList.remove("sel");
+        $("rail").classList.remove("go");
+        $("ta").classList.remove("on");
+        $("tb").classList.remove("on");
+        $("dur-track").style.transform = "";
+        $("dur-5").classList.remove("active");
+        $("dur-hr").classList.remove("active");
+        $("dur-day").classList.remove("active");
+        $("tog-label").textContent = "Activate on feed";
+        $("ta").textContent = "Following";
+        $("tb").textContent = "For You";
       }
 
-      async function ktypeBeat(id, ms = 750) {
-        ktype(id, true);
-        await wait(ms);
-        ktype(id, false);
+      function resetChatSheet() {
+        resetSheet();
+        $("tog-label").textContent = "Activate on Chat";
+        $("ta").textContent = "This Chat";
+        $("tb").textContent = "All Chats";
       }
 
-      async function sheetFlow(isChat = false) {
-        await camSheet(-35, 1.28, 420);
-        await tap($("pick-slop"));
-        await Promise.all([
-          camSheet(-58, 1.3, 380),
-          (async () => {
-            await tap($("rail"), () => $("rail").classList.add("go"));
-            await wait(420);
-          })(),
-        ]);
-        await camSheet(-82, 1.32, 360);
-        if (isChat) {
-          await tap($("ta"), () => { $("ta").classList.add("on"); $("tb").classList.remove("on"); });
-        } else {
-          await tap($("tb"), () => $("tb").classList.add("on"));
+      async function sheetFlow(mode) {
+        await camSheet(-30, 1.26, 400);
+        await pick($("pick-slop"), () => {
+          $("pick-poh").classList.remove("sel");
+          $("pick-slop").classList.add("sel");
+        });
+        await camSheet(-52, 1.28, 360);
+        await pick($("rail"), () => $("rail").classList.add("go"));
+        await wait(380);
+        await camSheet(-78, 1.3, 360);
+        if (mode === "following") {
+          await pick($("ta"), () => $("ta").classList.add("on"));
+        } else if (mode === "foryou") {
+          await pick($("tb"), () => $("tb").classList.add("on"));
+        } else if (mode === "thischat") {
+          await pick($("ta"), () => $("ta").classList.add("on"));
+        } else if (mode === "allchats") {
+          await pick($("tb"), () => $("tb").classList.add("on"));
         }
-        await camSheet(-108, 1.34, 360);
-        await tap($("dur-wheel"), () => {
-          $("dur-hr").classList.remove("active");
+        await camSheet(-102, 1.32, 340);
+        await pick($("dur-wheel"), () => {
           $("dur-day").classList.add("active");
           $("dur-track").style.transform = "translateY(-36px)";
         });
-        await wait(380);
-        await camSheet(-118, 1.32, 340);
-        await tap($("sec-go"), () => {
+        await wait(320);
+        await camSheet(-112, 1.3, 320);
+        await pick($("sec-go"), () => {
           $("sheet").classList.remove("on");
           $("sbg").classList.remove("on");
+        });
+      }
+
+      function setFeedTab(which) {
+        $("tab-following").classList.toggle("on", which === "following");
+        $("tab-foryou").classList.toggle("on", which === "foryou");
+        $("feed-label").textContent = which === "following" ? "Following" : "For You";
+        $("feed-label").classList.add("on");
+      }
+
+      async function feedBlock(tab, aiIds) {
+        setFeedTab(tab);
+        await cam({ s: 1.2, x: 0, y: 40 }, 400, [640, 220]);
+        $("scroll-feed").classList.add("pull"); $("spin-feed").classList.add("on");
+        await wait(600);
+        $("scroll-feed").classList.remove("pull"); $("spin-feed").classList.remove("on");
+        for (const id of aiIds) {
+          $(id).classList.add("marked");
+          await wait(60);
+        }
+        $("meta-feed").textContent = `${aiIds.length} AI posts marked`;
+        $("chip-feed").classList.add("on");
+        await wait(220);
+        await pick($("hide-feed"), () => {
+          aiIds.forEach((id) => $(id).classList.add("hide"));
+          $("meta-feed").textContent = "AI hidden";
+        });
+        await cam({ s: 1, x: 0, y: 0 }, 420);
+        await wait(400);
+      }
+
+      function clearFeedMarks() {
+        [...AI_FOLLOWING, ...AI_FORYOU].forEach((id) => {
+          $(id).classList.remove("marked", "hide");
+        });
+        $("chip-feed").classList.remove("on");
+        $("meta-feed").textContent = "0 AI posts marked";
+      }
+
+      async function openNatte(menuBtn) {
+        await pick($(menuBtn), () => { $("sb").classList.add("on"); $("bd").classList.add("on"); });
+        await cam({ s: 1.2, x: 72, y: 8 }, 440, [480, 360]);
+        await pick($("natte"), () => {
+          $("natte").classList.add("glow");
+          $("sheet").classList.add("on");
+          $("sbg").classList.add("on");
+        });
+      }
+
+      function closeNatte() {
+        $("sb").classList.remove("on"); $("bd").classList.remove("on");
+        $("natte").classList.remove("glow");
+      }
+
+      async function ktypeBeat(id, ms = 620) {
+        $(id).classList.add("on");
+        await wait(ms);
+        $(id).classList.remove("on");
+        $(id).querySelectorAll(".w").forEach((w) => {
+          w.style.animation = "none"; void w.offsetWidth; w.style.animation = "";
         });
       }
 
       async function run() {
         cam._s = { s: 1, x: 0, y: 0 };
         vp.style.transform = "translate(0,0) scale(1)";
-        $("dur-track").style.transform = "";
-        $("dur-hr").classList.add("active");
-        $("dur-day").classList.remove("active");
-        $("rail").classList.remove("go");
-        $("ta").classList.remove("on");
-        $("tb").classList.add("on");
+        resetSheet();
+        clearFeedMarks();
+        $("feed-label").classList.remove("on");
+        $("cb-ai").classList.remove("marked", "hide");
+        $("chip-chat").classList.remove("on");
+        $("meta-chat").textContent = "0 AI messages marked";
+        $("chat-list").style.display = "";
+        $("convo").style.display = "none";
 
-        // ── FEED ──
-        await wait(900);
-        await tap($("menu-btn"), () => { $("sb").classList.add("on"); $("bd").classList.add("on"); });
-        await cam({ s: 1.22, x: 75, y: 10 }, 480, [480, 360]);
-        await tap($("natte"), () => {
-          $("natte").classList.add("glow");
-          $("sheet").classList.add("on");
-          $("sbg").classList.add("on");
-        });
-        hideFinger();
-        await ktypeBeat("kt1", 680);
-        await sheetFlow(false);
-        hideFinger();
-        $("sb").classList.remove("on"); $("bd").classList.remove("on");
-        $("natte").classList.remove("glow");
-        await cam({ s: 1, x: 0, y: 0 }, 520);
-        await ktypeBeat("kt2", 650);
-        $("scroll-feed").classList.add("pull"); $("spin-feed").classList.add("on");
-        await cam({ s: 1.22, x: 0, y: 45 }, 420, [640, 200]);
+        // ── FOLLOWING FEED ──
         await wait(700);
-        $("scroll-feed").classList.remove("pull"); $("spin-feed").classList.remove("on");
-        for (const id of AI_FEED) {
-          $(id).classList.add("marked");
-          await wait(70);
-        }
-        await cam({ s: 1.28, x: 0, y: 52 }, 380, [640, 200]);
-        $("chip-feed").classList.add("on");
-        await wait(280);
-        await tap($("hide-feed"), () => {
-          AI_FEED.forEach((id) => $(id).classList.add("hide"));
-          $("meta-feed").textContent = "AI hidden";
-        });
-        hideFinger();
-        await cam({ s: 1, x: 0, y: 0 }, 480);
-        await wait(600);
+        await openNatte("menu-btn");
+        await ktypeBeat("kt1", 580);
+        await sheetFlow("following");
+        closeNatte();
+        await cam({ s: 1, x: 0, y: 0 }, 420);
+        await ktypeBeat("kt2", 580);
+        await feedBlock("following", AI_FOLLOWING);
+
+        // ── FOR YOU FEED ──
+        clearFeedMarks();
+        await openNatte("menu-btn");
+        resetSheet();
+        await sheetFlow("foryou");
+        closeNatte();
+        await cam({ s: 1, x: 0, y: 0 }, 420);
+        await feedBlock("foryou", AI_FORYOU);
 
         // ── CHAT ──
-        await ktypeBeat("kt3", 700);
+        await ktypeBeat("kt3", 620);
         $("panel-feed").classList.add("off");
         $("panel-chat").classList.remove("off");
-        $("tog-label").textContent = "Activate on Chat";
-        $("tb").textContent = "All Chats";
-        $("ta").textContent = "This Chat";
+        $("feed-label").classList.remove("on");
         cam._s = { s: 1, x: 0, y: 0 };
         vp.style.transform = "translate(0,0) scale(1)";
-        await wait(500);
-        await tap($("menu-btn-chat"), () => { $("sb").classList.add("on"); $("bd").classList.add("on"); });
-        await cam({ s: 1.18, x: 72, y: 8 }, 460, [480, 360]);
-        await tap($("natte"), () => {
-          $("natte").classList.add("glow");
-          $("sheet").classList.add("on");
-          $("sbg").classList.add("on");
-        });
-        $("rail").classList.remove("go");
-        $("dur-track").style.transform = "";
-        $("dur-hr").classList.add("active");
-        $("dur-day").classList.remove("active");
-        $("ta").classList.remove("on");
-        $("tb").classList.add("on");
-        hideFinger();
-        await sheetFlow(true);
-        hideFinger();
-        $("sb").classList.remove("on"); $("bd").classList.remove("on");
-        $("natte").classList.remove("glow");
-        await cam({ s: 1, x: 0, y: 0 }, 480);
-        await tap($("dm2"), () => {
+        await wait(400);
+        resetChatSheet();
+        await openNatte("menu-btn-chat");
+        await sheetFlow("thischat");
+        closeNatte();
+        await cam({ s: 1, x: 0, y: 0 }, 420);
+        await pick($("dm2"), () => {
           $("chat-list").style.display = "none";
           $("convo").style.display = "flex";
         });
+        await wait(200);
         $("cb-ai").classList.add("marked");
-        await cam({ s: 1.26, x: 0, y: 55 }, 420, [640, 380]);
+        $("meta-chat").textContent = "1 AI message marked";
         $("chip-chat").classList.add("on");
-        await wait(240);
-        await tap($("hide-chat"), () => {
+        await cam({ s: 1.22, x: 0, y: 50 }, 400, [640, 380]);
+        await wait(200);
+        await pick($("hide-chat"), () => {
           $("cb-ai").classList.add("hide");
           $("meta-chat").textContent = "AI hidden";
         });
-        hideFinger();
-        await cam({ s: 1, x: 0, y: 0 }, 460);
-        await ktypeBeat("kt4", 650);
-        await wait(300);
+        await cam({ s: 1, x: 0, y: 0 }, 400);
+        await ktypeBeat("kt4", 580);
+        await wait(280);
         $("end").classList.add("on");
       }
 
