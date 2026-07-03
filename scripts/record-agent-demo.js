@@ -46,7 +46,7 @@ async function record() {
   const page = await context.newPage();
   await page.goto(demoUrl, { waitUntil: "networkidle" });
   // ~50s — feed + chat segments with stepped settings flow
-  await page.waitForTimeout(82000);
+  await page.waitForTimeout(90000);
   const video = page.video();
   await context.close();
   await browser.close();
