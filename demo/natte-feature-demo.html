@@ -8,481 +8,470 @@
       * { box-sizing: border-box; margin: 0; padding: 0; }
       body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        background: #000;
-        color: #fff;
+        background: #f5f5f5;
         min-height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 24px;
       }
-      .phone {
+
+      /* 16:9 stage — matches X product videos */
+      .stage {
         position: relative;
-        width: 320px;
-        aspect-ratio: 9/16;
-        border-radius: 40px;
-        border: 1px solid rgba(255,255,255,0.1);
+        width: 1280px;
+        height: 720px;
+        background: linear-gradient(180deg, #fafafa 0%, #f0f0f0 100%);
         overflow: hidden;
-        background: #000;
-        box-shadow: 0 25px 50px rgba(0,0,0,0.5);
       }
-      .notch {
-        position: absolute;
-        top: 12px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 96px;
-        height: 4px;
-        border-radius: 999px;
-        background: rgba(255,255,255,0.2);
-        z-index: 20;
-      }
-      .scene {
+
+      /* Intro scenes — full stage */
+      .intro-full {
         position: absolute;
         inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
         opacity: 0;
-        transition: opacity 0.7s ease;
         pointer-events: none;
       }
-      .scene.active { opacity: 1; pointer-events: auto; }
-
-      .intro-scene, .brand-scene {
-        background: #fff;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
+      .intro-full.show { opacity: 1; }
+      .intro-full h1 {
+        font-size: 4.5rem;
+        font-weight: 700;
+        color: #000;
+        letter-spacing: -0.02em;
       }
-      .intro-scene h2 { font-size: 2.25rem; font-weight: 700; color: #000; position: relative; z-index: 1; }
-      .waves { position: absolute; width: calc(100% + 48px); height: 64px; top: 50%; left: -24px; transform: translateY(-50%); }
-      .brand-scene .logo-row { display: flex; align-items: center; gap: 12px; }
-      .brand-scene .logo-text { font-size: 1.75rem; font-weight: 600; color: #000; }
-      .brand-scene .tagline {
-        margin-top: 16px;
-        max-width: 260px;
-        text-align: center;
-        font-size: 0.7rem;
-        line-height: 1.5;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-        color: #536471;
-      }
-
-      .tagline-scene {
-        background: #000;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 0 32px;
-      }
-      .tagline-scene h2 { font-size: 1.875rem; font-weight: 700; text-align: center; line-height: 1.2; }
-      .tagline-scene .dim { color: rgba(255,255,255,0.5); }
-      .tagline-scene p { margin-top: 16px; font-size: 0.875rem; color: rgba(255,255,255,0.4); }
-
-      .pills-scene { background: #000; }
-      .orbital {
+      .waves {
         position: absolute;
-        border: 1px solid rgba(255,255,255,0.06);
-        border-radius: 50%;
-        left: 50%;
+        width: 420px;
+        height: 80px;
         top: 50%;
+        left: 50%;
         transform: translate(-50%, -50%);
       }
-      .pills-wrap {
-        position: relative;
-        z-index: 1;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        padding: 0 24px;
-      }
-      .pill {
+      .brand-logo {
         display: flex;
         align-items: center;
-        gap: 12px;
-        width: 100%;
-        max-width: 280px;
-        padding: 12px 16px;
-        border-radius: 999px;
-        border: 1px solid rgba(255,255,255,0.1);
-        background: rgba(255,255,255,0.03);
-        opacity: 0.6;
-        transition: all 0.5s ease;
+        gap: 14px;
       }
-      .pill.active {
-        opacity: 1;
-        border-color: rgba(255,255,255,0.25);
-        background: rgba(255,255,255,0.08);
-        box-shadow: 0 0 20px rgba(255,255,255,0.06);
+      .brand-logo span {
+        font-size: 3rem;
+        font-weight: 600;
+        color: #000;
+        letter-spacing: -0.02em;
       }
-      .pill-icon { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; }
-      .pill span { flex: 1; font-size: 0.875rem; font-weight: 500; }
-      .pill-dots { color: rgba(255,255,255,0.4); font-size: 12px; letter-spacing: 2px; }
+      .brand-sub {
+        margin-top: 20px;
+        max-width: 480px;
+        text-align: center;
+        font-size: 0.8rem;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #536471;
+        line-height: 1.6;
+      }
 
-      .post-scene {
-        background: #f7f9f9;
+      /* iPhone mockup — X announcement style */
+      .phone-wrap {
+        position: absolute;
+        left: 50%;
+        top: 54%;
+        transform: translate(-50%, -50%) scale(0.92);
+        opacity: 0;
+        transition: opacity 0.6s ease, transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .phone-wrap.show {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+      .iphone {
+        position: relative;
+        width: 320px;
+        height: 660px;
+        background: #fff;
+        border-radius: 48px;
+        box-shadow:
+          0 0 0 1px rgba(0,0,0,0.06),
+          0 24px 80px rgba(0,0,0,0.12);
+        overflow: visible;
+      }
+      .dynamic-island {
+        position: absolute;
+        top: 14px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 110px;
+        height: 34px;
+        background: #1a1a1a;
+        border-radius: 20px;
+        z-index: 30;
+      }
+      .iphone-screen {
+        position: absolute;
+        inset: 8px;
+        border-radius: 42px;
+        background: #fff;
+        overflow: hidden;
+        padding-top: 56px;
+      }
+
+      /* X-style toasts — morphing like Benji Taylor reference */
+      .toast {
+        position: absolute;
+        top: 58px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-120%);
+        width: 290px;
+        padding: 12px 14px;
+        border-radius: 22px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 40;
+        opacity: 0;
+        transition:
+          transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.4s ease,
+          background 0.5s ease,
+          border-color 0.5s ease,
+          box-shadow 0.5s ease,
+          width 0.5s ease,
+          padding 0.5s ease;
+      }
+      .toast.visible {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+      .toast.old-style {
+        background: #eef6fc;
+        border: 1.5px solid #b8daf0;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      }
+      .toast.new-style {
+        background: #3a3a3c;
+        border: 1.5px solid transparent;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+        width: 270px;
+        padding: 10px 14px;
+        border-radius: 28px;
+      }
+      .toast.slop {
+        background: #3a3a3c;
+        border: 1.5px solid transparent;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      }
+      .toast.human {
+        background: #3a3a3c;
+        border: 1.5px solid transparent;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      }
+      .toast-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        flex-shrink: 0;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 20px;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #fff;
       }
-      .post-card {
-        width: 100%;
-        max-width: 300px;
-        background: #fff;
-        border-radius: 16px;
-        border: 1px solid rgba(0,0,0,0.08);
-        padding: 16px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      .toast-icon.warn { background: linear-gradient(135deg, #f43f5e, #ef4444); }
+      .toast-icon.ok { background: linear-gradient(135deg, #10b981, #059669); }
+      .toast-icon.shield { background: #000; font-size: 0.65rem; }
+      .toast-text { flex: 1; min-width: 0; }
+      .toast-title {
+        font-size: 0.8rem;
+        font-weight: 600;
+        line-height: 1.3;
+        color: #000;
       }
-      .post-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+      .toast.new-style .toast-title,
+      .toast.slop .toast-title,
+      .toast.human .toast-title { color: #fff; }
+      .toast-sub {
+        font-size: 0.72rem;
+        color: #536471;
+        margin-top: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .toast.new-style .toast-sub,
+      .toast.slop .toast-sub,
+      .toast.human .toast-sub { color: rgba(255,255,255,0.55); }
+
+      /* X post in phone */
+      .feed {
+        padding: 16px 18px;
+        opacity: 0;
+        transform: translateY(12px);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+      }
+      .feed.show { opacity: 1; transform: translateY(0); }
+      .post {
+        border-bottom: 1px solid #eff3f4;
+        padding-bottom: 16px;
+      }
+      .post-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
       .avatar {
-        width: 32px;
-        height: 32px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
         background: #000;
         color: #fff;
-        font-size: 0.75rem;
-        font-weight: 700;
         display: flex;
         align-items: center;
         justify-content: center;
-      }
-      .handle { font-size: 0.875rem; font-weight: 600; color: #000; }
-      .post-text { font-size: 0.875rem; line-height: 1.5; color: #000; }
-      .post-controls { margin-top: 16px; display: flex; align-items: center; gap: 12px; }
-      .toggle {
-        padding: 4px 12px;
-        border-radius: 999px;
         font-size: 0.75rem;
-        font-weight: 500;
-        border: 1px solid rgba(0,0,0,0.1);
-        background: rgba(0,0,0,0.04);
-        color: rgba(0,0,0,0.7);
-        transition: all 0.3s ease;
+        font-weight: 700;
       }
-      .toggle.on {
-        border-color: rgba(16,185,129,0.5);
+      .meta .name { font-size: 0.9rem; font-weight: 700; color: #000; }
+      .meta .handle { font-size: 0.8rem; color: #536471; }
+      .post-body {
+        font-size: 0.95rem;
+        line-height: 1.45;
+        color: #000;
+        padding-left: 50px;
+      }
+      .detector {
+        margin-top: 12px;
+        padding-left: 50px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+      }
+      .detector.show { opacity: 1; }
+      .detector-pill {
+        padding: 5px 12px;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        border: 1px solid #cfd9de;
+        background: #f7f9f9;
+        color: #536471;
+        transition: all 0.35s ease;
+      }
+      .detector-pill.on {
         background: #059669;
+        border-color: #059669;
         color: #fff;
       }
-      .result { font-size: 0.75rem; font-weight: 500; color: #536471; }
+      .result {
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: #536471;
+      }
       .result.ai { color: #f43f5e; }
       .result.human { color: #10b981; }
 
-      .tabs-scene {
-        background: #fff;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-      }
-      .tabs-label { margin-bottom: 32px; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: #536471; }
-      .tabs-wrap { position: relative; display: flex; gap: 32px; padding: 0 16px; }
-      .tab-icon { width: 24px; height: 24px; color: #000; }
-      .tab-icon.muted { color: rgba(0,0,0,0.25); }
-      .tab-underline {
+      /* CTA */
+      .cta-wrap {
         position: absolute;
-        bottom: -4px;
-        left: 12%;
-        width: 76%;
-        height: 2px;
-        background: #f97316;
-        border-radius: 999px;
-      }
-
-      .progress-scene {
-        background: #fff;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 0 40px;
-      }
-      .progress-label { margin-bottom: 24px; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: #536471; }
-      .progress-track {
-        position: relative;
-        width: 100%;
-        max-width: 240px;
-        height: 2px;
-        background: #f97316;
-        border-radius: 999px;
-      }
-      .progress-dot {
-        position: absolute;
-        top: 50%;
-        width: 8px;
-        height: 8px;
-        background: #000;
-        border-radius: 50%;
-        transform: translate(-50%, -50%);
-        transition: left 0.1s linear;
-      }
-      .progress-thumb {
-        position: absolute;
-        top: 50%;
-        width: 16px;
-        height: 16px;
-        border: 2px solid #000;
-        border-radius: 50%;
-        background: #fff;
-        transform: translate(-50%, -50%);
-        transition: left 0.1s linear;
-      }
-      .progress-thumb::after {
-        content: "";
-        position: absolute;
-        top: 50%;
+        bottom: 48px;
         left: 50%;
-        width: 8px;
-        height: 1px;
-        background: #000;
-        transform: translate(-50%, -50%);
+        transform: translateX(-50%) translateY(20px);
+        opacity: 0;
+        transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        text-align: center;
       }
-
-      .cta-scene {
-        background: #fff;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
+      .cta-wrap.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
       }
       .cta-btn {
-        padding: 12px 32px;
+        padding: 14px 36px;
         border-radius: 999px;
         background: #000;
         color: #fff;
-        font-size: 0.875rem;
+        font-size: 0.95rem;
         font-weight: 700;
         border: none;
-        transition: transform 0.2s ease;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
       }
-      .cta-btn.pressed { transform: scale(0.95); }
-      .cta-sub { margin-top: 16px; font-size: 0.75rem; color: #536471; }
+      .cta-sub {
+        margin-top: 12px;
+        font-size: 0.8rem;
+        color: #536471;
+      }
 
-      .dots {
+      /* Tagline overlay */
+      .tagline {
         position: absolute;
-        bottom: 12px;
-        left: 0;
-        right: 0;
-        display: flex;
-        justify-content: center;
-        gap: 6px;
-        z-index: 20;
+        top: 72px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #000;
+        text-align: center;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        white-space: nowrap;
       }
-      .dot {
-        height: 4px;
-        width: 4px;
-        border-radius: 999px;
-        background: rgba(255,255,255,0.3);
-        transition: all 0.3s ease;
-      }
-      .dot.active { width: 16px; background: #fff; }
+      .tagline.show { opacity: 1; }
+      .tagline span { color: #536471; }
     </style>
   </head>
   <body>
-    <div class="phone">
-      <div class="notch"></div>
-
-      <div class="scene intro-scene active" data-scene="0">
-        <div style="position:relative;padding:0 32px">
+    <div class="stage" id="stage">
+      <!-- Scene 1: Introducing -->
+      <div class="intro-full" id="scene-intro">
+        <div style="position:relative">
           <svg class="waves" viewBox="0 0 300 60" fill="none">
             <path d="M0 35 C40 10, 80 50, 120 30 S200 15, 300 35" stroke="#ef4444" stroke-width="1.5" opacity="0.7"/>
             <path d="M0 28 C50 45, 100 5, 150 32 S220 48, 300 22" stroke="#ef4444" stroke-width="1.5" opacity="0.5"/>
           </svg>
-          <h2>Introducing</h2>
+          <h1>Introducing</h1>
         </div>
       </div>
 
-      <div class="scene brand-scene" data-scene="1">
-        <div class="logo-row">
-          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+      <!-- Scene 2: Brand -->
+      <div class="intro-full" id="scene-brand">
+        <div class="brand-logo">
+          <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
             <path d="M16 3l9 4v7c0 5-3.5 8.5-9 10.5C10.5 22.5 7 19 7 14V7l9-4z" stroke="#000" stroke-width="1.5"/>
             <path d="M11.5 15.5l3 3 6.5-6.5" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
-          <span class="logo-text">n.a.t.t.e.</span>
+          <span>n.a.t.t.e.</span>
         </div>
-        <p class="tagline">Normative AI Turing Test that Eliminates slop</p>
+        <p class="brand-sub">Normative AI Turing Test that Eliminates slop</p>
       </div>
 
-      <div class="scene tagline-scene" data-scene="2">
-        <h2>The slop<br><span class="dim">stops here.</span></h2>
-        <p>Real-time AI detection on X</p>
-      </div>
+      <!-- Scene 3+: iPhone demo -->
+      <p class="tagline" id="tagline">The slop <span>stops here.</span></p>
 
-      <div class="scene pills-scene" data-scene="3">
-        <div class="orbital" style="width:200px;height:200px"></div>
-        <div class="orbital" style="width:320px;height:320px"></div>
-        <div class="orbital" style="width:440px;height:440px"></div>
-        <div class="pills-wrap">
-          <div class="pill" data-pill="0">
-            <div class="pill-icon" style="background:linear-gradient(135deg,#f43f5e,#ef4444,#ea580c)"></div>
-            <span>Slop Detection</span>
-            <span class="pill-dots">⋮</span>
-          </div>
-          <div class="pill active" data-pill="1">
-            <div class="pill-icon" style="background:linear-gradient(135deg,#d946ef,#a855f7,#7c3aed)"></div>
-            <span>Turing Test</span>
-            <span class="pill-dots">⋮</span>
-          </div>
-          <div class="pill" data-pill="2">
-            <div class="pill-icon" style="background:linear-gradient(135deg,#34d399,#14b8a6,#06b6d4)"></div>
-            <span>Human Proof</span>
-            <span class="pill-dots">⋮</span>
-          </div>
-        </div>
-      </div>
+      <div class="phone-wrap" id="phone">
+        <div class="iphone">
+          <div class="dynamic-island"></div>
 
-      <div class="scene post-scene" data-scene="4">
-        <div class="post-card">
-          <div class="post-header">
-            <div class="avatar">X</div>
-            <span class="handle">@natte</span>
+          <div class="toast old-style" id="toast-old">
+            <div class="toast-icon warn">!</div>
+            <div class="toast-text">
+              <div class="toast-title"><strong>Slop detected</strong> on your feed</div>
+              <div class="toast-sub">As an AI assistant, I can generate...</div>
+            </div>
           </div>
-          <p class="post-text">As an AI assistant, I can generate text that mimics human writing.</p>
-          <div class="post-controls">
-            <span class="toggle" id="slopToggle">AI detection: OFF</span>
-            <span class="result" id="slopResult">Idle</span>
-          </div>
-        </div>
-      </div>
 
-      <div class="scene post-scene" data-scene="5">
-        <div class="post-card">
-          <div class="post-header">
-            <div class="avatar">X</div>
-            <span class="handle">@natte</span>
+          <div class="toast slop" id="toast-slop">
+            <div class="toast-icon warn">AI</div>
+            <div class="toast-text">
+              <div class="toast-title"><strong>n.a.t.t.e.</strong> · Result: ai</div>
+              <div class="toast-sub">Turing test failed — slop blocked</div>
+            </div>
           </div>
-          <p class="post-text">Hello everyone — excited to share my weekend photos!</p>
-          <div class="post-controls">
-            <span class="toggle" id="humanToggle">AI detection: OFF</span>
-            <span class="result" id="humanResult">Idle</span>
+
+          <div class="toast human" id="toast-human">
+            <div class="toast-icon ok">✓</div>
+            <div class="toast-text">
+              <div class="toast-title"><strong>n.a.t.t.e.</strong> · Result: human</div>
+              <div class="toast-sub">Verified authentic writing</div>
+            </div>
+          </div>
+
+          <div class="iphone-screen">
+            <div class="feed" id="feed">
+              <div class="post">
+                <div class="post-header">
+                  <div class="avatar">X</div>
+                  <div class="meta">
+                    <div class="name">natte</div>
+                    <div class="handle">@natte</div>
+                  </div>
+                </div>
+                <p class="post-body" id="post-text">As an AI assistant, I can generate text that mimics human writing.</p>
+                <div class="detector" id="detector">
+                  <span class="detector-pill" id="detector-pill">AI detection: OFF</span>
+                  <span class="result" id="result">Idle</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="scene tabs-scene" data-scene="6">
-        <p class="tabs-label">Built for X</p>
-        <div class="tabs-wrap">
-          <svg class="tab-icon" viewBox="0 0 24 24" fill="none"><path d="M4 6a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2H9l-4 4v-4H6a2 2 0 01-2-2V6z" stroke="currentColor" stroke-width="1.5"/></svg>
-          <svg class="tab-icon" viewBox="0 0 24 24" fill="none"><path d="M14.7 6.3a4 4 0 00-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 005.4-5.4l-2 2-3.4-3.4 2-2z" stroke="currentColor" stroke-width="1.5"/></svg>
-          <svg class="tab-icon" viewBox="0 0 24 24" fill="none"><path d="M4 8h16M4 16h16" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="16" cy="16" r="2" stroke="currentColor" stroke-width="1.5"/></svg>
-          <svg class="tab-icon muted" viewBox="0 0 24 24" fill="none"><path d="M5 4h6a2 2 0 012 2v14a2 2 0 00-2-2H5a2 2 0 00-2 2V6a2 2 0 012-2zm8 0h6a2 2 0 012 2v14a2 2 0 01-2-2h-6a2 2 0 01-2-2V6a2 2 0 012-2z" stroke="currentColor" stroke-width="1.5"/></svg>
-          <svg class="tab-icon" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6l7-3z" stroke="currentColor" stroke-width="1.5"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          <div class="tab-underline"></div>
-        </div>
-      </div>
-
-      <div class="scene progress-scene" data-scene="7">
-        <p class="progress-label">Detection sensitivity</p>
-        <div class="progress-track">
-          <div class="progress-dot" id="progressDot" style="left:35%"></div>
-          <div class="progress-thumb" id="progressThumb" style="left:50%"></div>
-        </div>
-      </div>
-
-      <div class="scene cta-scene" data-scene="8">
-        <button class="cta-btn" id="ctaBtn">Stop the Slop +</button>
+      <div class="cta-wrap" id="cta">
+        <button class="cta-btn">Stop the Slop +</button>
         <p class="cta-sub">n.a.t.t.e. for X</p>
       </div>
-
-      <div class="dots" id="dots"></div>
     </div>
 
     <script>
-      const DURATIONS = [3500, 4000, 3500, 4500, 5000, 4500, 3000, 2500, 3000];
-      const scenes = document.querySelectorAll(".scene");
-      const dotsContainer = document.getElementById("dots");
-      let current = 0;
+      const $ = (id) => document.getElementById(id);
 
-      DURATIONS.forEach((_, i) => {
-        const d = document.createElement("div");
-        d.className = "dot" + (i === 0 ? " active" : "");
-        dotsContainer.appendChild(d);
-      });
-      const dots = dotsContainer.querySelectorAll(".dot");
+      const TIMELINE = [
+        { at: 0, fn: () => { $("scene-intro").classList.add("show"); } },
+        { at: 1200, fn: () => {
+          $("scene-intro").classList.remove("show");
+          $("scene-brand").classList.add("show");
+        }},
+        { at: 2600, fn: () => {
+          $("scene-brand").classList.remove("show");
+          $("tagline").classList.add("show");
+          $("phone").classList.add("show");
+          $("feed").classList.add("show");
+        }},
+        { at: 3400, fn: () => {
+          $("toast-old").classList.add("visible");
+        }},
+        { at: 4200, fn: () => {
+          $("toast-old").classList.remove("visible");
+          setTimeout(() => $("toast-slop").classList.add("visible"), 200);
+        }},
+        { at: 5000, fn: () => {
+          $("detector").classList.add("show");
+          $("detector-pill").classList.add("on");
+          $("detector-pill").textContent = "AI detection: ON";
+          $("result").textContent = "Checking...";
+          $("result").className = "result";
+        }},
+        { at: 5600, fn: () => {
+          $("result").textContent = "Result: ai";
+          $("result").className = "result ai";
+        }},
+        { at: 6200, fn: () => {
+          $("toast-slop").classList.remove("visible");
+          $("post-text").textContent = "Hello everyone — excited to share my weekend photos!";
+          $("result").textContent = "Checking...";
+          $("result").className = "result";
+        }},
+        { at: 6800, fn: () => {
+          $("result").textContent = "Result: human";
+          $("result").className = "result human";
+          $("toast-human").classList.add("visible");
+        }},
+        { at: 7600, fn: () => {
+          $("tagline").classList.remove("show");
+          $("toast-human").classList.remove("visible");
+          $("cta").classList.add("show");
+        }},
+      ];
 
-      function showScene(n) {
-        scenes.forEach((s, i) => s.classList.toggle("active", i === n));
-        dots.forEach((d, i) => d.classList.toggle("active", i === n));
-        current = n;
+      const start = performance.now();
+      let executed = new Set();
 
-        if (n === 3) animatePills();
-        if (n === 4) animateSlopPost();
-        if (n === 5) animateHumanPost();
-        if (n === 7) animateProgress();
-        if (n === 8) animateCta();
+      function tick(now) {
+        const elapsed = now - start;
+        TIMELINE.forEach((step, i) => {
+          if (elapsed >= step.at && !executed.has(i)) {
+            executed.add(i);
+            step.fn();
+          }
+        });
+        if (elapsed < 9500) requestAnimationFrame(tick);
       }
-
-      function nextScene() {
-        showScene((current + 1) % DURATIONS.length);
-        scheduleNext();
-      }
-
-      let timer;
-      function scheduleNext() {
-        clearTimeout(timer);
-        timer = setTimeout(nextScene, DURATIONS[current]);
-      }
-
-      function animatePills() {
-        const pills = document.querySelectorAll(".pill");
-        pills.forEach(p => p.classList.remove("active"));
-        pills[0].classList.add("active");
-        setTimeout(() => { pills[0].classList.remove("active"); pills[1].classList.add("active"); }, 1200);
-        setTimeout(() => { pills[1].classList.remove("active"); pills[2].classList.add("active"); }, 2800);
-      }
-
-      function animateSlopPost() {
-        const toggle = document.getElementById("slopToggle");
-        const result = document.getElementById("slopResult");
-        toggle.className = "toggle";
-        toggle.textContent = "AI detection: OFF";
-        result.className = "result";
-        result.textContent = "Idle";
-        setTimeout(() => { toggle.className = "toggle on"; toggle.textContent = "AI detection: ON"; }, 800);
-        setTimeout(() => { result.textContent = "Checking..."; }, 1200);
-        setTimeout(() => { result.className = "result ai"; result.textContent = "Result: ai"; }, 2200);
-      }
-
-      function animateHumanPost() {
-        const toggle = document.getElementById("humanToggle");
-        const result = document.getElementById("humanResult");
-        toggle.className = "toggle";
-        toggle.textContent = "AI detection: OFF";
-        result.className = "result";
-        result.textContent = "Idle";
-        setTimeout(() => { toggle.className = "toggle on"; toggle.textContent = "AI detection: ON"; }, 800);
-        setTimeout(() => { result.textContent = "Checking..."; }, 1200);
-        setTimeout(() => { result.className = "result human"; result.textContent = "Result: human"; }, 2200);
-      }
-
-      function animateProgress() {
-        const dot = document.getElementById("progressDot");
-        const thumb = document.getElementById("progressThumb");
-        const start = Date.now();
-        function tick() {
-          const t = Math.min((Date.now() - start) / 2000, 1);
-          const p = 35 + t * 30;
-          dot.style.left = p + "%";
-          thumb.style.left = Math.min(p + 15, 95) + "%";
-          if (t < 1) requestAnimationFrame(tick);
-        }
-        requestAnimationFrame(tick);
-      }
-
-      function animateCta() {
-        const btn = document.getElementById("ctaBtn");
-        btn.classList.remove("pressed");
-        setTimeout(() => btn.classList.add("pressed"), 1800);
-        setTimeout(() => btn.classList.remove("pressed"), 2200);
-      }
-
-      scheduleNext();
+      requestAnimationFrame(tick);
     </script>
   </body>
 </html>
