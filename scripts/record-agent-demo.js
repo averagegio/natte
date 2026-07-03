@@ -47,7 +47,7 @@ async function record() {
   });
   const page = await context.newPage();
   await page.goto(demoUrl, { waitUntil: "networkidle" });
-  await page.waitForTimeout(20000);
+  await page.waitForTimeout(25000);
   const video = page.video();
   await context.close();
   await browser.close();
