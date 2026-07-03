@@ -7,13 +7,18 @@
       :root {
         --bg:#000; --elevated:#16181c; --border:#2f3336;
         --text:#e7e9ea; --muted:#71767b; --blue:#1d9bf0; --red:#f4212e;
-        --chat-in:#2f3336; --chat-out:#1d9bf0; --hover:#181818;
+        --chat-in:#2f3336; --chat-out:#1d9bf0;
       }
       *{box-sizing:border-box;margin:0;padding:0}
       body{background:#000;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
       .stage{width:1280px;height:720px;background:#000;position:relative;overflow:hidden}
       .viewport{position:absolute;inset:0;will-change:transform;transform-origin:640px 360px}
       .ui{position:absolute;inset:0;background:var(--bg);width:393px;left:50%;margin-left:-196.5px}
+
+      /* n.a.t.t.e. icon */
+      .natte-icon{width:28px;height:28px;flex-shrink:0}
+      .natte-icon.lg{width:88px;height:88px}
+      .natte-icon.sm{width:20px;height:20px}
 
       .status{display:flex;justify-content:space-between;padding:14px 22px 0;font-size:15px;font-weight:600;color:var(--text)}
       .topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 16px 4px}
@@ -22,24 +27,24 @@
       .top-av{width:32px;height:32px;border-radius:50%;object-fit:cover}
 
       .tabs{display:flex;border-bottom:1px solid var(--border)}
-      .tab{flex:1;text-align:center;padding:12px 0 10px;font-size:15px;color:var(--muted);position:relative;transition:color .2s}
+      .tab{flex:1;text-align:center;padding:12px 0 10px;font-size:15px;color:var(--muted);position:relative;transition:color .35s}
       .tab.on{color:var(--text);font-weight:700}
-      .tab.on::after{content:"";position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:56px;height:4px;background:var(--blue);border-radius:2px}
+      .tab.on::after{content:"";position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:56px;height:4px;background:var(--blue);border-radius:2px;animation:tabLine .4s cubic-bezier(.34,1.45,.64,1)}
+      @keyframes tabLine{from{width:0;opacity:0}to{width:56px;opacity:1}}
 
-      .chip{display:flex;align-items:center;gap:8px;margin:8px 14px 4px;padding:9px 12px;background:var(--elevated);border:1px solid var(--border);border-radius:999px;opacity:0;transform:translateY(-10px);transition:opacity .45s,transform .45s cubic-bezier(.34,1.3,.64,1)}
+      .chip{display:flex;align-items:center;gap:8px;margin:8px 14px 4px;padding:9px 12px;background:var(--elevated);border:1px solid var(--border);border-radius:999px;opacity:0;transform:translateY(-10px);transition:opacity .55s,transform .55s cubic-bezier(.34,1.3,.64,1)}
       .chip.on{opacity:1;transform:none}
-      .chip .n{width:20px;height:20px;border-radius:50%;background:#fff;color:#000;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center}
       .chip .lbl{font-size:13px;font-weight:700;color:var(--text)}
       .chip .meta{flex:1;font-size:12px;color:var(--muted)}
       .chip .hide{padding:5px 12px;border-radius:999px;background:var(--text);color:var(--bg);font-size:12px;font-weight:700}
 
-      .scroll{height:calc(100% - 120px);overflow:hidden;transition:transform .5s cubic-bezier(.33,1,.68,1)}
+      .scroll{height:calc(100% - 120px);overflow:hidden;transition:transform .65s cubic-bezier(.33,1,.68,1)}
       .scroll.pull{transform:translateY(48px)}
       .spin{position:absolute;top:108px;left:50%;transform:translateX(-50%);width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--blue);border-radius:50%;opacity:0;z-index:5}
-      .spin.on{opacity:1;animation:spin .6s linear infinite}
+      .spin.on{opacity:1;animation:spin .7s linear infinite}
       @keyframes spin{to{transform:translateX(-50%) rotate(360deg)}}
 
-      .tweet{display:flex;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);position:relative;transition:opacity .45s,transform .45s,max-height .45s,padding .45s}
+      .tweet{display:flex;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);position:relative;transition:opacity .55s,transform .55s,max-height .55s,padding .55s}
       .tweet.hide{opacity:0;transform:scale(.97) translateX(-8px);max-height:0;padding:0;overflow:hidden;border:none}
       .tweet.marked{background:linear-gradient(90deg,rgba(244,33,46,.12),transparent 42%)}
       .tweet.marked::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--red)}
@@ -57,88 +62,104 @@
       .chat-head h1{font-size:20px;font-weight:800;color:var(--text);flex:1;text-align:center}
       .chat-head .filter{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center}
       .chat-head .filter svg{width:18px;height:18px;fill:var(--text)}
-      .dm{display:flex;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);align-items:center;transition:background .2s}
+      .dm{display:flex;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);align-items:center;transition:transform .45s cubic-bezier(.34,1.45,.64,1),background .35s,box-shadow .35s}
       .dm .preview{flex:1;min-width:0}
       .dm .top{display:flex;justify-content:space-between;align-items:center}
       .dm .nm{font-size:15px;font-weight:700;color:var(--text)}
       .dm .tm{font-size:13px;color:var(--muted)}
       .dm .msg{font-size:15px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+      .dm.lift{transform:scale(1.02);background:rgba(255,255,255,.04);box-shadow:0 8px 32px rgba(0,0,0,.5),inset 0 0 0 1px rgba(255,255,255,.08);border-radius:16px;margin:0 8px;border-bottom-color:transparent;z-index:2;position:relative}
 
-      .convo{padding:16px;display:flex;flex-direction:column;gap:10px;height:calc(100% - 56px);overflow:hidden}
-      .bubble{max-width:78%;padding:10px 14px;border-radius:20px;font-size:15px;line-height:20px}
+      .convo-head{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border)}
+      .convo-head .back svg{width:20px;height:20px;fill:var(--text)}
+      .convo-head .nm{font-size:16px;font-weight:700;color:var(--text)}
+      .convo-head .handle{font-size:13px;color:var(--muted)}
+      .convo{padding:16px;display:flex;flex-direction:column;gap:10px;flex:1;overflow:hidden}
+      .bubble{max-width:78%;padding:10px 14px;border-radius:20px;font-size:15px;line-height:20px;opacity:0;transform:translateY(8px);transition:opacity .5s,transform .5s cubic-bezier(.34,1.3,.64,1)}
+      .bubble.show{opacity:1;transform:none}
       .bubble.in{align-self:flex-start;background:var(--chat-in);color:var(--text);border-bottom-left-radius:4px}
       .bubble.out{align-self:flex-end;background:var(--chat-out);color:#fff;border-bottom-right-radius:4px}
       .bubble.marked{outline:2px solid var(--red);position:relative}
       .bubble.marked::after{content:"AI";position:absolute;top:-8px;right:8px;background:var(--red);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px}
-      .bubble.hide{opacity:.1;transform:scale(.94);filter:blur(2px)}
+      .bubble.hide{opacity:.08;transform:scale(.94);filter:blur(2px)}
+      .typing{align-self:flex-start;display:flex;gap:4px;padding:12px 16px;background:var(--chat-in);border-radius:20px;border-bottom-left-radius:4px;opacity:0;transition:opacity .4s}
+      .typing.show{opacity:1}
+      .typing span{width:6px;height:6px;background:var(--muted);border-radius:50%;animation:typBounce 1.2s infinite}
+      .typing span:nth-child(2){animation-delay:.15s}
+      .typing span:nth-child(3){animation-delay:.3s}
+      @keyframes typBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)}}
 
-      .bd{position:absolute;inset:0;background:rgba(91,112,131,.4);opacity:0;pointer-events:none;transition:opacity .35s;z-index:40}
+      .bd{position:absolute;inset:0;background:rgba(91,112,131,.4);opacity:0;pointer-events:none;transition:opacity .45s;z-index:40}
       .bd.on{opacity:1}
-      .sb{position:absolute;top:0;left:0;bottom:0;width:82%;background:var(--bg);z-index:50;transform:translateX(-105%);transition:transform .38s cubic-bezier(.34,1.45,.64,1);padding:54px 8px 20px}
+      .sb{position:absolute;top:0;left:0;bottom:0;width:82%;background:var(--bg);z-index:50;transform:translateX(-105%);transition:transform .5s cubic-bezier(.25,.9,.35,1);padding:54px 8px 20px}
       .sb.on{transform:none}
-      .sb-item{display:flex;align-items:center;gap:18px;padding:12px 18px;font-size:19px;color:var(--text);border-radius:999px;transition:background .2s,box-shadow .2s}
+      .sb-item{display:flex;align-items:center;gap:18px;padding:12px 18px;font-size:19px;color:var(--text);border-radius:999px;transition:background .25s,box-shadow .25s}
       .sb-item svg{width:24px;height:24px;fill:currentColor}
-      .sb-item.natte .ni{width:28px;height:28px;border-radius:50%;background:#fff;color:#000;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center}
       .sb-item.natte.glow{background:rgba(29,155,240,.1);box-shadow:0 0 0 2px var(--blue)}
 
-      .sbg{position:absolute;inset:0;background:rgba(0,0,0,.6);opacity:0;z-index:55;transition:opacity .35s}
+      .sbg{position:absolute;inset:0;background:rgba(0,0,0,.65);opacity:0;z-index:55;transition:opacity .45s}
       .sbg.on{opacity:1}
-      .sheet{position:absolute;left:0;right:0;bottom:0;z-index:56;background:var(--elevated);border-radius:16px 16px 0 0;border-top:1px solid var(--border);padding:10px 18px 24px;transform:translateY(105%);transition:transform .42s cubic-bezier(.34,1.45,.64,1);max-height:92%}
+      .sheet{position:absolute;left:0;right:0;bottom:0;z-index:56;background:var(--elevated);border-radius:16px 16px 0 0;border-top:1px solid var(--border);padding:10px 18px 24px;transform:translateY(105%);transition:transform .5s cubic-bezier(.25,.9,.35,1);max-height:92%}
       .sheet.on{transform:none}
       .grab{width:36px;height:4px;background:#536471;border-radius:2px;margin:0 auto 14px}
       .sheet h2{font-size:20px;font-weight:800;color:var(--text)}
       .sheet .sub{font-size:15px;color:var(--muted);margin:2px 0 14px}
       .pick{border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:16px}
-      .pick div{padding:14px 16px;font-size:15px;font-weight:500;color:var(--text);border-bottom:1px solid var(--border);transition:background .2s,color .2s}
+      .pick div{padding:14px 16px;font-size:15px;font-weight:500;color:var(--text);border-bottom:1px solid var(--border);transition:color .3s,background .3s}
       .pick div:last-child{border-bottom:none}
-      .pick .sel{background:transparent;color:var(--blue);font-weight:700}
+      .pick .sel{color:var(--blue);font-weight:700}
       .fl{font-size:13px;font-weight:500;color:var(--muted);margin-bottom:10px}
       .rail{position:relative;height:4px;background:var(--border);border-radius:99px;margin-bottom:18px}
-      .rail::before{content:"";position:absolute;inset:0;border-radius:99px;background:var(--blue);width:30%;transition:width .6s cubic-bezier(.34,1.45,.64,1)}
+      .rail::before{content:"";position:absolute;inset:0;border-radius:99px;background:var(--blue);width:28%;transition:width .9s cubic-bezier(.25,.9,.35,1)}
       .rail.go::before{width:72%}
-      .rail .thumb{position:absolute;top:50%;transform:translate(-50%,-50%);left:30%;width:22px;height:22px;border:2px solid var(--blue);border-radius:50%;background:var(--bg);transition:left .6s cubic-bezier(.34,1.45,.64,1)}
+      .rail .thumb{position:absolute;top:50%;transform:translate(-50%,-50%);left:28%;width:22px;height:22px;border:2px solid var(--blue);border-radius:50%;background:var(--bg);transition:left .9s cubic-bezier(.25,.9,.35,1)}
       .rail.go .thumb{left:72%}
       .togs{display:flex;gap:8px;margin-bottom:14px}
-      .tog{flex:1;padding:12px;text-align:center;border-radius:999px;font-size:15px;font-weight:700;border:1px solid var(--border);color:var(--text);background:transparent;transition:all .2s cubic-bezier(.34,1.45,.64,1)}
+      .tog{flex:1;padding:12px;text-align:center;border-radius:999px;font-size:15px;font-weight:700;border:1px solid var(--border);color:var(--text);background:transparent;transition:all .35s cubic-bezier(.34,1.45,.64,1)}
       .tog.on{background:var(--text);color:var(--bg);border-color:var(--text)}
       .dur-wrap{margin-bottom:14px}
-      .dur-wheel{position:relative;height:108px;overflow:hidden}
-      .dur-wheel::before,.dur-wheel::after{content:"";position:absolute;left:0;right:0;height:36px;z-index:2;pointer-events:none}
-      .dur-wheel::before{top:0;background:linear-gradient(var(--elevated),transparent)}
-      .dur-wheel::after{bottom:0;background:linear-gradient(transparent,var(--elevated))}
-      .dur-lines{position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);height:36px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);z-index:1;pointer-events:none}
-      .dur-track{transition:transform .55s cubic-bezier(.34,1.45,.64,1)}
-      .dur-track div{height:36px;line-height:36px;text-align:center;font-size:15px;color:var(--muted);opacity:.4;transition:opacity .35s,font-size .35s,color .35s}
-      .dur-track .active{font-size:20px;font-weight:800;color:var(--text);opacity:1}
-      .go-btn{padding:14px;border-radius:999px;background:var(--text);color:var(--bg);font-size:17px;font-weight:700;text-align:center;transition:opacity .2s}
+      .dur-wheel{position:relative;height:180px;overflow:hidden}
+      .dur-wheel::before,.dur-wheel::after{content:"";position:absolute;left:0;right:0;height:70px;z-index:2;pointer-events:none}
+      .dur-wheel::before{top:0;background:linear-gradient(var(--elevated) 20%,transparent)}
+      .dur-wheel::after{bottom:0;background:linear-gradient(transparent,var(--elevated) 80%)}
+      .dur-lines{position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);height:40px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);z-index:1;pointer-events:none}
+      .dur-track{transition:transform 1.1s cubic-bezier(.25,.9,.35,1)}
+      .dur-track div{height:40px;line-height:40px;text-align:center;font-size:15px;color:var(--muted);opacity:.35;transition:opacity .5s,font-size .5s,color .5s,transform .5s}
+      .dur-track .active{font-size:22px;font-weight:800;color:var(--text);opacity:1}
+      .dur-track .near{font-size:17px;opacity:.55}
+      .go-btn{padding:14px;border-radius:999px;background:var(--text);color:var(--bg);font-size:17px;font-weight:700;text-align:center}
 
-      /* Selection highlight — no cursor */
       .hl{position:relative;z-index:1}
-      .hl::after{content:"";position:absolute;inset:-3px;border-radius:inherit;border:2px solid var(--blue);box-shadow:0 0 0 4px rgba(29,155,240,.2);animation:hlPop .45s cubic-bezier(.34,1.45,.64,1);pointer-events:none}
+      .hl::after{content:"";position:absolute;inset:-3px;border-radius:inherit;border:2px solid var(--blue);box-shadow:0 0 0 5px rgba(29,155,240,.18);animation:hlPop .55s cubic-bezier(.34,1.45,.64,1);pointer-events:none}
       .pick div.hl::after{border-radius:14px}
       .rail.hl::after{border-radius:99px;inset:-8px -4px}
       .dur-wheel.hl::after{border-radius:12px;inset:-4px}
-      @keyframes hlPop{0%{opacity:0;transform:scale(.96)}40%{opacity:1}100%{opacity:1;transform:scale(1)}}
+      @keyframes hlPop{0%{opacity:0;transform:scale(.95)}50%{opacity:1}100%{opacity:1;transform:scale(1)}}
 
-      .ktype{position:absolute;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.82);opacity:0;pointer-events:none;transition:opacity .22s}
-      .ktype.on{opacity:1}
-      .ktype-inner{text-align:center;line-height:1.05}
-      .ktype .w{display:inline-block;font-size:54px;font-weight:800;color:#fff;letter-spacing:-.03em;opacity:0;transform:translateY(32px) scale(.92);margin-right:.18em}
-      .ktype.on .w{animation:wordIn .55s cubic-bezier(.22,1,.36,1) forwards}
-      .ktype .sub-w{display:block;font-size:17px;font-weight:500;color:var(--muted);margin-top:14px;opacity:0;transform:translateY(12px)}
-      .ktype.on .sub-w{animation:wordIn .5s cubic-bezier(.22,1,.36,1) .45s forwards}
-      @keyframes wordIn{to{opacity:1;transform:none}}
+      /* Keynote hero typography */
+      .hero{position:absolute;inset:0;z-index:90;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#000;opacity:0;pointer-events:none;transition:opacity .65s ease}
+      .hero.show{opacity:1}
+      .hero-line{font-size:58px;font-weight:800;color:#fff;letter-spacing:-.04em;text-align:center;opacity:0;transform:translateY(28px) scale(.96);filter:blur(12px);transition:opacity .85s cubic-bezier(.25,.46,.45,.94),transform .85s cubic-bezier(.25,.46,.45,.94),filter .85s ease}
+      .hero-line.sub{font-size:24px;font-weight:500;color:var(--muted);margin-top:14px;letter-spacing:-.01em}
+      .hero-line.small{font-size:20px;font-weight:500;color:var(--muted);margin-top:10px}
+      .hero-line.in{opacity:1;transform:none;filter:blur(0)}
+      .hero-line.out{opacity:0;transform:translateY(-16px) scale(.98);filter:blur(8px)}
 
-      .end{position:absolute;inset:0;z-index:100;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;transition:opacity .7s}
-      .end.on{opacity:1}
-      .end .logo{width:80px;height:80px;border-radius:20px;background:#fff;color:#000;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:800}
-      .end h2{margin-top:20px;font-size:28px;font-weight:800;color:#fff}
-      .end p{margin-top:6px;font-size:14px;color:var(--muted)}
+      /* Finale */
+      .finale{position:absolute;inset:0;z-index:100;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;transition:opacity .8s ease;padding:0 48px}
+      .finale.on{opacity:1}
+      .finale h1{font-size:36px;font-weight:800;color:#fff;margin-top:24px;letter-spacing:-.02em}
+      .finale .acronym{font-size:15px;color:var(--muted);margin-top:10px;text-align:center;line-height:1.45;max-width:340px}
+      .finale ul{list-style:none;margin-top:28px;width:100%;max-width:320px}
+      .finale li{font-size:16px;color:var(--text);padding:10px 0;border-bottom:1px solid var(--border);opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s cubic-bezier(.25,.9,.35,1)}
+      .finale li::before{content:"";display:inline-block;width:6px;height:6px;background:var(--blue);border-radius:50%;margin-right:12px;vertical-align:middle}
+      .finale li.show{opacity:1;transform:none}
 
-      .panel{position:absolute;inset:0;opacity:1;transition:opacity .5s}
+      .panel{position:absolute;inset:0;opacity:1;transition:opacity .65s}
       .panel.off{opacity:0;pointer-events:none}
-      .feed-label{position:absolute;top:52px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.08em;opacity:0;transition:opacity .3s;z-index:10;pointer-events:none}
-      .feed-label.on{opacity:1}
+      .convo-wrap{display:none;flex-direction:column;height:calc(100% - 56px)}
+      .convo-wrap.open{display:flex}
+      .resolve-hold{/* marker for pacing */}
     </style>
   </head>
   <body>
@@ -156,42 +177,20 @@
               <div class="tab" id="tab-following">Following</div>
               <div class="tab" id="tab-foryou">For You</div>
             </div>
-            <div class="feed-label" id="feed-label"></div>
-            <div class="chip" id="chip-feed"><span class="n">n</span><span class="lbl">n.a.t.t.e.</span><span class="meta" id="meta-feed">0 AI posts marked</span><span class="hide" id="hide-feed">Hide AI</span></div>
+            <div class="chip" id="chip-feed">
+              <svg class="natte-icon sm" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#fff"/><text x="16" y="22" text-anchor="middle" font-size="18" font-weight="800" fill="#000" font-family="system-ui">n</text><circle cx="26" cy="6" r="5" fill="#1d9bf0"/></svg>
+              <span class="lbl">n.a.t.t.e.</span><span class="meta" id="meta-feed">0 AI posts marked</span><span class="hide" id="hide-feed">Hide AI</span>
+            </div>
             <div class="spin" id="spin-feed"></div>
             <div class="scroll" id="scroll-feed">
-              <article class="tweet" id="f1">
-                <img class="av" src="assets/avatars/BenedictEvans.jpg" alt="" />
-                <div class="body"><div class="row1"><span class="name">Benedict Evans</span><svg class="verified" viewBox="0 0 22 22"><path fill="#1d9bf0" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.085-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.69-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.636.433 1.221.878 1.69.47.445 1.054.751 1.69.882.636.13 1.295.083 1.902-.14.27.586.702 1.087 1.24 1.44.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816z"/><path fill="#fff" d="M9.5 14.2l-2.8-2.8 1-1 1.8 1.8 4.2-4.2 1 1-5.2 5.2z"/></svg><span class="handle">@BenedictEvans</span><span class="dot">·</span><span class="time">1h</span></div><p class="txt">Every wave of technology looks like a toy, and then it's infrastructure.</p></div>
-              </article>
-              <article class="tweet" id="f2">
-                <div class="av-bot">⌘</div>
-                <div class="body"><div class="row1"><span class="name">Viral Growth AI</span><span class="ai-pill">AI</span><span class="handle">@viralgrowth_ai</span><span class="dot">·</span><span class="time">2h</span></div><p class="txt">As an AI language model, I'm thrilled to share 10 proven frameworks for maximizing engagement.</p></div>
-              </article>
-              <article class="tweet" id="f3">
-                <img class="av" src="assets/avatars/naval.jpg" alt="" />
-                <div class="body"><div class="row1"><span class="name">Naval</span><svg class="verified" viewBox="0 0 22 22"><path fill="#1d9bf0" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.085-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.69-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.636.433 1.221.878 1.69.47.445 1.054.751 1.69.882.636.13 1.295.083 1.902-.14.27.586.702 1.087 1.24 1.44.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816z"/><path fill="#fff" d="M9.5 14.2l-2.8-2.8 1-1 1.8 1.8 4.2-4.2 1 1-5.2 5.2z"/></svg><span class="handle">@naval</span><span class="dot">·</span><span class="time">3h</span></div><p class="txt">The internet means you can learn anything.</p></div>
-              </article>
-              <article class="tweet" id="f4">
-                <div class="av-bot">◆</div>
-                <div class="body"><div class="row1"><span class="name">Content Engine Pro</span><span class="ai-pill">AI</span><span class="handle">@contentengine_ai</span><span class="dot">·</span><span class="time">4h</span></div><p class="txt">In today's fast-paced digital landscape, leveraging AI-generated thought leadership is essential.</p></div>
-              </article>
-              <article class="tweet" id="f5">
-                <img class="av" src="assets/avatars/paulg.jpg" alt="" />
-                <div class="body"><div class="row1"><span class="name">Paul Graham</span><svg class="verified" viewBox="0 0 22 22"><path fill="#1d9bf0" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.085-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.69-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.636.433 1.221.878 1.69.47.445 1.054.751 1.69.882.636.13 1.295.083 1.902-.14.27.586.702 1.087 1.24 1.44.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816z"/><path fill="#fff" d="M9.5 14.2l-2.8-2.8 1-1 1.8 1.8 4.2-4.2 1 1-5.2 5.2z"/></svg><span class="handle">@paulg</span><span class="dot">·</span><span class="time">5h</span></div><p class="txt">It's not cheating to use tools. It's cheating to let tools use you.</p></div>
-              </article>
-              <article class="tweet" id="f6">
-                <div class="av-bot">◇</div>
-                <div class="body"><div class="row1"><span class="name">Thought Leader Bot</span><span class="ai-pill">AI</span><span class="handle">@thoughtleader_ai</span><span class="dot">·</span><span class="time">5h</span></div><p class="txt">Unlock your potential with these 7 game-changing insights that will revolutionize your mindset.</p></div>
-              </article>
-              <article class="tweet" id="f7">
-                <img class="av" src="assets/avatars/sama.jpg" alt="" />
-                <div class="body"><div class="row1"><span class="name">Sam Altman</span><svg class="verified" viewBox="0 0 22 22"><path fill="#1d9bf0" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.085-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.69-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.636.433 1.221.878 1.69.47.445 1.054.751 1.69.882.636.13 1.295.083 1.902-.14.27.586.702 1.087 1.24 1.44.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816z"/><path fill="#fff" d="M9.5 14.2l-2.8-2.8 1-1 1.8 1.8 4.2-4.2 1 1-5.2 5.2z"/></svg><span class="handle">@sama</span><span class="dot">·</span><span class="time">6h</span></div><p class="txt">AGI is closer than most people think.</p></div>
-              </article>
-              <article class="tweet" id="f8">
-                <div class="av-bot">✦</div>
-                <div class="body"><div class="row1"><span class="name">Engagement Hacks AI</span><span class="ai-pill">AI</span><span class="handle">@engagement_ai</span><span class="dot">·</span><span class="time">7h</span></div><p class="txt">Here's a thread on why authenticity matters — crafted entirely by AI to sound authentic.</p></div>
-              </article>
+              <article class="tweet" id="f1"><img class="av" src="assets/avatars/BenedictEvans.jpg" alt="" /><div class="body"><div class="row1"><span class="name">Benedict Evans</span><svg class="verified" viewBox="0 0 22 22"><path fill="#1d9bf0" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.085-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.69-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.636.433 1.221.878 1.69.47.445 1.054.751 1.69.882.636.13 1.295.083 1.902-.14.27.586.702 1.087 1.24 1.44.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816z"/><path fill="#fff" d="M9.5 14.2l-2.8-2.8 1-1 1.8 1.8 4.2-4.2 1 1-5.2 5.2z"/></svg><span class="handle">@BenedictEvans</span><span class="dot">·</span><span class="time">1h</span></div><p class="txt">Every wave of technology looks like a toy, and then it's infrastructure.</p></div></article>
+              <article class="tweet" id="f2"><div class="av-bot">⌘</div><div class="body"><div class="row1"><span class="name">Viral Growth AI</span><span class="ai-pill">AI</span><span class="handle">@viralgrowth_ai</span><span class="dot">·</span><span class="time">2h</span></div><p class="txt">As an AI language model, I'm thrilled to share 10 proven frameworks for maximizing engagement.</p></div></article>
+              <article class="tweet" id="f3"><img class="av" src="assets/avatars/naval.jpg" alt="" /><div class="body"><div class="row1"><span class="name">Naval</span><svg class="verified" viewBox="0 0 22 22"><path fill="#1d9bf0" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.085-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.69-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.636.433 1.221.878 1.69.47.445 1.054.751 1.69.882.636.13 1.295.083 1.902-.14.27.586.702 1.087 1.24 1.44.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816z"/><path fill="#fff" d="M9.5 14.2l-2.8-2.8 1-1 1.8 1.8 4.2-4.2 1 1-5.2 5.2z"/></svg><span class="handle">@naval</span><span class="dot">·</span><span class="time">3h</span></div><p class="txt">The internet means you can learn anything.</p></div></article>
+              <article class="tweet" id="f4"><div class="av-bot">◆</div><div class="body"><div class="row1"><span class="name">Content Engine Pro</span><span class="ai-pill">AI</span><span class="handle">@contentengine_ai</span><span class="dot">·</span><span class="time">4h</span></div><p class="txt">In today's fast-paced digital landscape, leveraging AI-generated thought leadership is essential.</p></div></article>
+              <article class="tweet" id="f5"><img class="av" src="assets/avatars/paulg.jpg" alt="" /><div class="body"><div class="row1"><span class="name">Paul Graham</span><svg class="verified" viewBox="0 0 22 22"><path fill="#1d9bf0" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.085-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.69-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.636.433 1.221.878 1.69.47.445 1.054.751 1.69.882.636.13 1.295.083 1.902-.14.27.586.702 1.087 1.24 1.44.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816z"/><path fill="#fff" d="M9.5 14.2l-2.8-2.8 1-1 1.8 1.8 4.2-4.2 1 1-5.2 5.2z"/></svg><span class="handle">@paulg</span><span class="dot">·</span><span class="time">5h</span></div><p class="txt">It's not cheating to use tools. It's cheating to let tools use you.</p></div></article>
+              <article class="tweet" id="f6"><div class="av-bot">◇</div><div class="body"><div class="row1"><span class="name">Thought Leader Bot</span><span class="ai-pill">AI</span><span class="handle">@thoughtleader_ai</span><span class="dot">·</span><span class="time">5h</span></div><p class="txt">Unlock your potential with these 7 game-changing insights that will revolutionize your mindset.</p></div></article>
+              <article class="tweet" id="f7"><img class="av" src="assets/avatars/sama.jpg" alt="" /><div class="body"><div class="row1"><span class="name">Sam Altman</span><svg class="verified" viewBox="0 0 22 22"><path fill="#1d9bf0" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.085-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.69-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.636.433 1.221.878 1.69.47.445 1.054.751 1.69.882.636.13 1.295.083 1.902-.14.27.586.702 1.087 1.24 1.44.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816z"/><path fill="#fff" d="M9.5 14.2l-2.8-2.8 1-1 1.8 1.8 4.2-4.2 1 1-5.2 5.2z"/></svg><span class="handle">@sama</span><span class="dot">·</span><span class="time">6h</span></div><p class="txt">AGI is closer than most people think.</p></div></article>
+              <article class="tweet" id="f8"><div class="av-bot">✦</div><div class="body"><div class="row1"><span class="name">Engagement Hacks AI</span><span class="ai-pill">AI</span><span class="handle">@engagement_ai</span><span class="dot">·</span><span class="time">7h</span></div><p class="txt">Here's a thread on why authenticity matters — crafted entirely by AI to sound authentic.</p></div></article>
             </div>
           </div>
 
@@ -207,36 +206,50 @@
               <div class="dm" id="dm2"><img class="av" src="assets/avatars/elonmusk.jpg" alt="" /><div class="preview"><div class="top"><span class="nm">Elon Musk</span><span class="tm">2h</span></div><div class="msg">As an AI, I can generate...</div></div></div>
               <div class="dm"><img class="av" src="assets/avatars/naval.jpg" alt="" /><div class="preview"><div class="top"><span class="nm">Naval</span><span class="tm">3h</span></div><div class="msg">Read the docs.</div></div></div>
             </div>
-            <div class="convo off" id="convo" style="display:none">
-              <div class="bubble in">Hey — saw your post about slop detection.</div>
-              <div class="bubble out">Yeah, we shipped n.a.t.t.e.</div>
-              <div class="bubble in" id="cb-ai">As an AI language model, I can help you draft engaging replies for your audience.</div>
-              <div class="bubble in" id="cb-real">Nice. Does it work in Chat too?</div>
+            <div class="convo-wrap" id="convo-wrap">
+              <div class="convo-head">
+                <div class="back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" fill="none"/></svg></div>
+                <img class="av" src="assets/avatars/elonmusk.jpg" alt="" style="width:36px;height:36px" />
+                <div><div class="nm">Elon Musk</div><div class="handle">@elonmusk</div></div>
+              </div>
+              <div class="convo" id="convo">
+                <div class="bubble in show" id="cb1">Hey — saw your post about slop detection.</div>
+                <div class="bubble out show" id="cb2">Yeah, we shipped n.a.t.t.e.</div>
+                <div class="typing" id="typing"><span></span><span></span><span></span></div>
+                <div class="bubble in" id="cb-ai">As an AI language model, I can help you draft engaging replies for your audience.</div>
+                <div class="bubble in" id="cb-real">Nice. Does it work in Chat too?</div>
+              </div>
             </div>
-            <div class="chip" id="chip-chat"><span class="n">n</span><span class="lbl">n.a.t.t.e.</span><span class="meta" id="meta-chat">0 AI messages marked</span><span class="hide" id="hide-chat">Hide AI</span></div>
+            <div class="chip" id="chip-chat">
+              <svg class="natte-icon sm" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#fff"/><text x="16" y="22" text-anchor="middle" font-size="18" font-weight="800" fill="#000" font-family="system-ui">n</text><circle cx="26" cy="6" r="5" fill="#1d9bf0"/></svg>
+              <span class="lbl">n.a.t.t.e.</span><span class="meta" id="meta-chat">0 AI messages marked</span><span class="hide" id="hide-chat">Hide AI</span>
+            </div>
           </div>
 
           <div class="bd" id="bd"></div>
           <nav class="sb" id="sb">
             <div class="sb-item"><svg viewBox="0 0 24 24"><path d="M12 1.696L1.393 8.69v7.517l10.607 6.994L22.607 16.2V8.69L12 1.696z"/></svg> Home</div>
             <div class="sb-item"><svg viewBox="0 0 24 24"><path d="M11.996 2c-4.062 0-7.49 3.021-7.999 7.051L2.866 18H7.1c.463 2.282 2.481 4 4.9 4s4.437-1.718 4.9-4h4.236l-1.143-8.949C19.48 5.017 16.054 2 11.996 2z"/></svg> Notifications</div>
-            <div class="sb-item natte" id="natte"><span class="ni">n</span> n.a.t.t.e.</div>
+            <div class="sb-item natte" id="natte">
+              <svg class="natte-icon" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#fff"/><text x="16" y="22" text-anchor="middle" font-size="18" font-weight="800" fill="#000" font-family="system-ui">n</text><circle cx="26" cy="6" r="5" fill="#1d9bf0"/></svg>
+              n.a.t.t.e.
+            </div>
             <div class="sb-item"><svg viewBox="0 0 24 24"><path d="M5.651 19h12.698c-.337-1.8-1.023-3.21-1.945-4.19C15.318 13.687 13.838 13 12 13s-3.317.687-4.404 1.81c-.922.98-1.608 2.39-1.945 4.19zm.486-5.56C7.627 11.85 9.648 11 12 11s4.373.85 5.863 2.44c1.477 1.58 2.366 3.8 2.632 6.46l.11 1.1H3.395l.11-1.1c.266-2.66 1.155-4.88 2.632-6.46zM12 4c-1.105 0-2 .895-2 2s.895 2 2 2 2-.895 2-2-.895-2-2-2z"/></svg> Profile</div>
           </nav>
           <div class="sbg" id="sbg"></div>
           <div class="sheet" id="sheet">
             <div class="grab"></div>
-            <h2 id="sec-title">Proof of Human</h2>
+            <h2>Proof of Human</h2>
             <p class="sub">AI slop blocker</p>
             <div class="pick" id="sec-pick">
               <div class="sel" id="pick-poh">Proof of Human</div>
               <div id="pick-slop">AI slop blocker</div>
             </div>
-            <p class="fl" id="sec-sens-label">Sensitivity</p>
+            <p class="fl">Sensitivity</p>
             <div class="rail" id="rail"><div class="thumb"></div></div>
             <p class="fl" id="tog-label">Activate on feed</p>
-            <div class="togs" id="sec-togs"><div class="tog" id="ta">Following</div><div class="tog" id="tb">For You</div></div>
-            <div class="dur-wrap" id="sec-dur">
+            <div class="togs"><div class="tog" id="ta">Following</div><div class="tog" id="tb">For You</div></div>
+            <div class="dur-wrap">
               <p class="fl">Duration</p>
               <div class="dur-wheel" id="dur-wheel">
                 <div class="dur-lines"></div>
@@ -244,7 +257,8 @@
                   <div id="dur-5">5 minutes</div>
                   <div id="dur-hr">1 hour</div>
                   <div id="dur-day">1 day</div>
-                  <div>1 week</div>
+                  <div id="dur-week">1 week</div>
+                  <div id="dur-always">Always on</div>
                 </div>
               </div>
             </div>
@@ -253,11 +267,22 @@
         </div>
       </div>
 
-      <div class="ktype" id="kt1"><div class="ktype-inner"><span class="w" style="animation-delay:.05s">Proof</span><span class="w" style="animation-delay:.15s">of</span><span class="w" style="animation-delay:.25s">Human</span></div></div>
-      <div class="ktype" id="kt2"><div class="ktype-inner"><span class="w" style="animation-delay:.05s">Mark</span><span class="w" style="animation-delay:.18s">AI</span><span class="w" style="animation-delay:.31s">slop</span></div></div>
-      <div class="ktype" id="kt3"><div class="ktype-inner"><span class="w" style="animation-delay:.05s">On</span><span class="w" style="animation-delay:.15s">X</span><span class="w" style="animation-delay:.25s">Chat</span><span class="w" style="animation-delay:.35s">too</span></div></div>
-      <div class="ktype" id="kt4"><div class="ktype-inner"><span class="w" style="animation-delay:.05s">Human</span><span class="w" style="animation-delay:.2s">verified</span></div></div>
-      <div class="end" id="end"><div class="logo">n</div><h2>n.a.t.t.e.</h2><p>Following · For You · Chat</p></div>
+      <div class="hero" id="hero">
+        <div class="hero-line" id="hero-a"></div>
+        <div class="hero-line sub" id="hero-b"></div>
+      </div>
+
+      <div class="finale" id="finale">
+        <svg class="natte-icon lg" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#fff"/><text x="16" y="22" text-anchor="middle" font-size="18" font-weight="800" fill="#000" font-family="system-ui">n</text><circle cx="26" cy="6" r="5" fill="#1d9bf0"/></svg>
+        <h1>n.a.t.t.e.</h1>
+        <p class="acronym">Normative AI Turing Test that Eliminates slop</p>
+        <ul>
+          <li id="b1">Marks AI-generated posts in your feed</li>
+          <li id="b2">Following &amp; For You timelines</li>
+          <li id="b3">Works in X Chat</li>
+          <li id="b4">Proof of Human — not proof of bot</li>
+        </ul>
+      </div>
     </div>
 
     <script>
@@ -265,20 +290,18 @@
       const vp = $("vp");
       const AI_FOLLOWING = ["f2", "f4"];
       const AI_FORYOU = ["f6", "f8"];
+      const DUR_ITEMS = ["dur-5", "dur-hr", "dur-day", "dur-week", "dur-always"];
 
-      function easeOutBack(t) {
-        const c = 1.70158;
-        return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2);
-      }
+      function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
 
-      function cam(to, dur = 480, origin = [640, 360]) {
+      function cam(to, dur = 650, origin = [640, 360]) {
         const from = cam._s || { s: 1, x: 0, y: 0 };
         const start = performance.now();
         vp.style.transformOrigin = `${origin[0]}px ${origin[1]}px`;
         return new Promise((resolve) => {
           function step(now) {
             const t = Math.min((now - start) / dur, 1);
-            const e = easeOutBack(t);
+            const e = easeOutCubic(t);
             vp.style.transform = `translate(${from.x + (to.x - from.x) * e}px,${from.y + (to.y - from.y) * e}px) scale(${from.s + (to.s - from.s) * e})`;
             if (t < 1) requestAnimationFrame(step);
             else { cam._s = { ...to }; resolve(); }
@@ -287,18 +310,18 @@
         });
       }
       cam._s = { s: 1, x: 0, y: 0 };
-
       const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
       async function pick(el, action) {
         el.classList.add("hl");
-        await wait(260);
+        await wait(380);
         if (action) action();
-        await wait(180);
+        await wait(280);
         el.classList.remove("hl");
+        await wait(200);
       }
 
-      async function camSheet(y, scale = 1.28, dur = 420) {
+      async function camSheet(y, scale = 1.24, dur = 580) {
         return cam({ s: scale, x: 0, y }, dur, [640, 500]);
       }
 
@@ -308,10 +331,8 @@
         $("rail").classList.remove("go");
         $("ta").classList.remove("on");
         $("tb").classList.remove("on");
-        $("dur-track").style.transform = "";
-        $("dur-5").classList.remove("active");
-        $("dur-hr").classList.remove("active");
-        $("dur-day").classList.remove("active");
+        $("dur-track").style.transform = "translateY(40px)";
+        DUR_ITEMS.forEach((id) => $(id).classList.remove("active", "near"));
         $("tog-label").textContent = "Activate on feed";
         $("ta").textContent = "Following";
         $("tb").textContent = "For You";
@@ -324,82 +345,113 @@
         $("tb").textContent = "All Chats";
       }
 
+      function setDurIndex(idx) {
+        DUR_ITEMS.forEach((id, i) => {
+          $(id).classList.toggle("active", i === idx);
+          $(id).classList.toggle("near", Math.abs(i - idx) === 1);
+        });
+        $("dur-track").style.transform = `translateY(${40 - idx * 40}px)`;
+      }
+
+      async function scrollDuration() {
+        await pick($("dur-wheel"));
+        for (let i = 0; i <= 2; i++) {
+          setDurIndex(i);
+          await wait(i === 0 ? 500 : 650);
+        }
+      }
+
       async function sheetFlow(mode) {
-        await camSheet(-30, 1.26, 400);
+        await camSheet(-28, 1.22, 550);
         await pick($("pick-slop"), () => {
           $("pick-poh").classList.remove("sel");
           $("pick-slop").classList.add("sel");
         });
-        await camSheet(-52, 1.28, 360);
+        await camSheet(-50, 1.24, 520);
         await pick($("rail"), () => $("rail").classList.add("go"));
-        await wait(380);
-        await camSheet(-78, 1.3, 360);
-        if (mode === "following") {
-          await pick($("ta"), () => $("ta").classList.add("on"));
-        } else if (mode === "foryou") {
-          await pick($("tb"), () => $("tb").classList.add("on"));
-        } else if (mode === "thischat") {
-          await pick($("ta"), () => $("ta").classList.add("on"));
-        } else if (mode === "allchats") {
-          await pick($("tb"), () => $("tb").classList.add("on"));
-        }
-        await camSheet(-102, 1.32, 340);
-        await pick($("dur-wheel"), () => {
-          $("dur-day").classList.add("active");
-          $("dur-track").style.transform = "translateY(-36px)";
-        });
-        await wait(320);
-        await camSheet(-112, 1.3, 320);
+        await wait(700);
+        await camSheet(-74, 1.26, 520);
+        if (mode === "following") await pick($("ta"), () => $("ta").classList.add("on"));
+        else if (mode === "foryou") await pick($("tb"), () => $("tb").classList.add("on"));
+        else if (mode === "thischat") await pick($("ta"), () => $("ta").classList.add("on"));
+        await camSheet(-98, 1.28, 520);
+        await scrollDuration();
+        await camSheet(-108, 1.26, 500);
         await pick($("sec-go"), () => {
           $("sheet").classList.remove("on");
           $("sbg").classList.remove("on");
         });
       }
 
+      async function hero(title, subtitle = "", hold = 2000) {
+        const h = $("hero"), a = $("hero-a"), b = $("hero-b");
+        a.className = "hero-line out";
+        b.className = "hero-line sub out";
+        b.textContent = "";
+        h.classList.add("show");
+        await wait(550);
+        a.textContent = title;
+        a.className = "hero-line in";
+        if (subtitle) {
+          await wait(450);
+          b.textContent = subtitle;
+          b.className = "hero-line sub in";
+        }
+        await wait(hold);
+        a.className = "hero-line out";
+        b.className = "hero-line sub out";
+        await wait(750);
+        h.classList.remove("show");
+        await wait(450);
+      }
+
       function setFeedTab(which) {
         $("tab-following").classList.toggle("on", which === "following");
         $("tab-foryou").classList.toggle("on", which === "foryou");
-        $("feed-label").textContent = which === "following" ? "Following" : "For You";
-        $("feed-label").classList.add("on");
       }
 
-      async function feedBlock(tab, aiIds) {
+      async function feedDemo(tab, aiIds) {
         setFeedTab(tab);
-        await cam({ s: 1.2, x: 0, y: 40 }, 400, [640, 220]);
+        await cam({ s: 1.14, x: 0, y: 35 }, 600, [640, 240]);
+        await wait(500);
         $("scroll-feed").classList.add("pull"); $("spin-feed").classList.add("on");
-        await wait(600);
+        await wait(900);
         $("scroll-feed").classList.remove("pull"); $("spin-feed").classList.remove("on");
+        await wait(400);
         for (const id of aiIds) {
           $(id).classList.add("marked");
-          await wait(60);
+          await wait(120);
         }
+        await wait(600);
         $("meta-feed").textContent = `${aiIds.length} AI posts marked`;
         $("chip-feed").classList.add("on");
-        await wait(220);
+        await wait(800);
         await pick($("hide-feed"), () => {
           aiIds.forEach((id) => $(id).classList.add("hide"));
           $("meta-feed").textContent = "AI hidden";
         });
-        await cam({ s: 1, x: 0, y: 0 }, 420);
-        await wait(400);
+        await wait(500);
+        await cam({ s: 1, x: 0, y: 0 }, 650);
+        await wait(2200);
       }
 
       function clearFeedMarks() {
-        [...AI_FOLLOWING, ...AI_FORYOU].forEach((id) => {
-          $(id).classList.remove("marked", "hide");
-        });
+        [...AI_FOLLOWING, ...AI_FORYOU].forEach((id) => $(id).classList.remove("marked", "hide"));
         $("chip-feed").classList.remove("on");
         $("meta-feed").textContent = "0 AI posts marked";
       }
 
       async function openNatte(menuBtn) {
         await pick($(menuBtn), () => { $("sb").classList.add("on"); $("bd").classList.add("on"); });
-        await cam({ s: 1.2, x: 72, y: 8 }, 440, [480, 360]);
+        await wait(300);
+        await cam({ s: 1.16, x: 68, y: 6 }, 580, [480, 360]);
+        await wait(350);
         await pick($("natte"), () => {
           $("natte").classList.add("glow");
           $("sheet").classList.add("on");
           $("sbg").classList.add("on");
         });
+        await wait(500);
       }
 
       function closeNatte() {
@@ -407,13 +459,43 @@
         $("natte").classList.remove("glow");
       }
 
-      async function ktypeBeat(id, ms = 620) {
-        $(id).classList.add("on");
-        await wait(ms);
-        $(id).classList.remove("on");
-        $(id).querySelectorAll(".w").forEach((w) => {
-          w.style.animation = "none"; void w.offsetWidth; w.style.animation = "";
+      async function chatDemo() {
+        await pick($("dm2"), () => $("dm2").classList.add("lift"));
+        await wait(600);
+        $("chat-list").style.display = "none";
+        $("convo-wrap").classList.add("open");
+        $("dm2").classList.remove("lift");
+        await cam({ s: 1.12, x: 0, y: 30 }, 650, [640, 360]);
+        await wait(800);
+        $("typing").classList.add("show");
+        await wait(1200);
+        $("typing").classList.remove("show");
+        $("cb-ai").classList.add("show");
+        await wait(500);
+        $("cb-ai").classList.add("marked");
+        await wait(700);
+        $("cb-real").classList.add("show");
+        await wait(600);
+        $("meta-chat").textContent = "1 AI message marked";
+        $("chip-chat").classList.add("on");
+        await wait(800);
+        await pick($("hide-chat"), () => {
+          $("cb-ai").classList.add("hide");
+          $("meta-chat").textContent = "AI hidden";
         });
+        await wait(600);
+        await cam({ s: 1, x: 0, y: 0 }, 650);
+        await wait(1800);
+      }
+
+      async function showFinale() {
+        $("finale").classList.add("on");
+        await wait(800);
+        for (const id of ["b1", "b2", "b3", "b4"]) {
+          $(id).classList.add("show");
+          await wait(450);
+        }
+        await wait(2800);
       }
 
       async function run() {
@@ -421,68 +503,68 @@
         vp.style.transform = "translate(0,0) scale(1)";
         resetSheet();
         clearFeedMarks();
-        $("feed-label").classList.remove("on");
-        $("cb-ai").classList.remove("marked", "hide");
+        setFeedTab(null);
+        $("cb-ai").classList.remove("marked", "hide", "show");
+        $("cb-real").classList.remove("show");
         $("chip-chat").classList.remove("on");
         $("meta-chat").textContent = "0 AI messages marked";
         $("chat-list").style.display = "";
-        $("convo").style.display = "none";
+        $("convo-wrap").classList.remove("open");
+        $("typing").classList.remove("show");
 
-        // ── FOLLOWING FEED ──
-        await wait(700);
+        // ── OPEN & CONFIGURE (Following) ──
+        await wait(1800);
         await openNatte("menu-btn");
-        await ktypeBeat("kt1", 580);
+        await hero("Proof of Human", "AI slop blocker", 2200);
         await sheetFlow("following");
         closeNatte();
-        await cam({ s: 1, x: 0, y: 0 }, 420);
-        await ktypeBeat("kt2", 580);
-        await feedBlock("following", AI_FOLLOWING);
+        await cam({ s: 1, x: 0, y: 0 }, 650);
+        await wait(600);
 
-        // ── FOR YOU FEED ──
+        // ── FOLLOWING — full resolution ──
+        await hero("Mark AI slop", "", 1800);
+        await feedDemo("following", AI_FOLLOWING);
+
+        // ── BRIDGE: Following → For You ──
+        await hero("Following", "AI slop hidden", 2000);
         clearFeedMarks();
-        await openNatte("menu-btn");
+        await wait(400);
+        await hero("For You", "", 1600);
+
+        // ── CONFIGURE For You ──
         resetSheet();
+        await openNatte("menu-btn");
         await sheetFlow("foryou");
         closeNatte();
-        await cam({ s: 1, x: 0, y: 0 }, 420);
-        await feedBlock("foryou", AI_FORYOU);
+        await cam({ s: 1, x: 0, y: 0 }, 650);
+        await wait(600);
+
+        // ── FOR YOU — full resolution ──
+        await feedDemo("foryou", AI_FORYOU);
 
         // ── CHAT ──
-        await ktypeBeat("kt3", 620);
+        await hero("On X Chat", "too", 2200);
         $("panel-feed").classList.add("off");
         $("panel-chat").classList.remove("off");
-        $("feed-label").classList.remove("on");
         cam._s = { s: 1, x: 0, y: 0 };
         vp.style.transform = "translate(0,0) scale(1)";
-        await wait(400);
+        await wait(800);
         resetChatSheet();
         await openNatte("menu-btn-chat");
         await sheetFlow("thischat");
         closeNatte();
-        await cam({ s: 1, x: 0, y: 0 }, 420);
-        await pick($("dm2"), () => {
-          $("chat-list").style.display = "none";
-          $("convo").style.display = "flex";
-        });
-        await wait(200);
-        $("cb-ai").classList.add("marked");
-        $("meta-chat").textContent = "1 AI message marked";
-        $("chip-chat").classList.add("on");
-        await cam({ s: 1.22, x: 0, y: 50 }, 400, [640, 380]);
-        await wait(200);
-        await pick($("hide-chat"), () => {
-          $("cb-ai").classList.add("hide");
-          $("meta-chat").textContent = "AI hidden";
-        });
-        await cam({ s: 1, x: 0, y: 0 }, 400);
-        await ktypeBeat("kt4", 580);
-        await wait(280);
-        $("end").classList.add("on");
+        await cam({ s: 1, x: 0, y: 0 }, 650);
+        await wait(500);
+        await chatDemo();
+
+        // ── FINALE ──
+        await hero("Human verified", "", 2000);
+        await showFinale();
       }
 
       Promise.all([...document.images].map((img) =>
         img.complete ? Promise.resolve() : new Promise((r) => { img.onload = img.onerror = r; })
-      )).then(() => setTimeout(run, 300));
+      )).then(() => setTimeout(run, 400));
     </script>
   </body>
 </html>
