@@ -8,7 +8,7 @@ export type XPostSource = "live" | "mock";
 const MOCK_POSTS: XPost[] = [
   { id: "1", text: "Hello everyone — excited to share my weekend photos!" },
   { id: "2", text: "As an AI assistant, I can generate text that mimics human writing." },
-  { id: "3", text: "Quick demo: this post was written by a human tester for the Proof of Human pilot." },
+  { id: "3", text: "This post was written by a human tester for the Proof of Human pilot." },
 ];
 
 function getBearerToken(): string | undefined {

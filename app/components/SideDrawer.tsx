@@ -1,12 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const navItems = [
-  { label: "Pricing", href: "#pricing" },
-  { label: "Sign Up / Login", href: "#signup" },
-  { label: "About", href: "#about" },
-  { label: "Contact", href: "#contact" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "Sign Up / Login", href: "/signup" },
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export default function SideDrawer() {
@@ -77,13 +78,13 @@ export default function SideDrawer() {
           <ul className="flex flex-1 flex-col gap-1 px-4 py-6">
             {navItems.map((item) => (
               <li key={item.href}>
-                <a
+                <Link
                   href={item.href}
                   onClick={close}
                   className="block rounded-xl px-4 py-3.5 text-base font-medium text-white/80 transition hover:bg-white/5 hover:text-white"
                 >
                   {item.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>

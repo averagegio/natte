@@ -32,7 +32,7 @@ export default function XPostsSection() {
       <GlossyCard>
         <div className="mb-4">
           <div className="flex items-center gap-3">
-            <h2 className="text-2xl font-semibold text-white">Try it with sample posts</h2>
+            <h2 className="text-2xl font-semibold text-white">Try it with posts</h2>
             <span
               className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
                 source === "live"
@@ -40,7 +40,7 @@ export default function XPostsSection() {
                   : "bg-white/10 text-white/50"
               }`}
             >
-              {source === "live" ? "Live X feed" : "Demo data"}
+              {source === "live" ? "Live X feed" : "Cached posts"}
             </span>
           </div>
           <p className="mt-2 text-sm text-white/50">

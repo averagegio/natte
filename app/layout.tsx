@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Proof of Human — AI detection",
-  description: "Detect AI-generated text with a simple demo interface.",
+  description: "Detect AI-generated text with real-time analysis.",
 };
 
 export default function RootLayout({
