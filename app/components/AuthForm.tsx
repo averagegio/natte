@@ -38,7 +38,7 @@ export default function AuthForm() {
 
       setSuccess(mode === "signup" ? "Account created! Redirecting..." : "Logged in! Redirecting...");
       setTimeout(() => {
-        window.location.href = "/pricing";
+        window.location.href = "/dashboard";
       }, 1000);
     } catch {
       setError("Network error. Please try again.");

@@ -12,7 +12,18 @@ export type User = {
   id: string;
   email: string;
   name: string | null;
+  profile_pic: string | null;
   created_at: string;
+};
+
+export type WidgetConnection = {
+  id: string;
+  user_id: string;
+  provider: "x";
+  x_username: string;
+  status: "connected" | "disconnected" | "error";
+  created_at: string;
+  updated_at: string;
 };
 
 export type UserWithPassword = User & {

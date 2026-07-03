@@ -3,15 +3,26 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-const navItems = [
+const baseNavItems = [
   { label: "Pricing", href: "/pricing" },
-  { label: "Sign Up / Login", href: "/signup" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];
 
 export default function SideDrawer() {
   const [open, setOpen] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((json) => setLoggedIn(!!json.user))
+      .catch(() => setLoggedIn(false));
+  }, []);
+
+  const navItems = loggedIn
+    ? [{ label: "Dashboard", href: "/dashboard" }, ...baseNavItems]
+    : [{ label: "Sign Up / Login", href: "/signup" }, ...baseNavItems];
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
