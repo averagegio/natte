@@ -1,4 +1,5 @@
 const { chromium } = require("playwright");
+const { execFileSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 
@@ -22,9 +23,24 @@ async function record() {
 
   if (video) {
     const tempPath = await video.path();
-    const finalPath = path.join(outDir, "agent-builder-demo.webm");
-    fs.renameSync(tempPath, finalPath);
-    console.log(`Agent Builder demo saved to ${finalPath}`);
+    const webmPath = path.join(outDir, "agent-builder-demo.webm");
+    const mp4Path = path.join(outDir, "agent-builder-demo.mp4");
+    fs.renameSync(tempPath, webmPath);
+
+    execFileSync("ffmpeg", [
+      "-y",
+      "-i",
+      webmPath,
+      "-c:v",
+      "libx264",
+      "-pix_fmt",
+      "yuv420p",
+      "-movflags",
+      "+faststart",
+      mp4Path,
+    ], { stdio: "inherit" });
+
+    console.log(`Agent Builder demo saved to ${mp4Path}`);
   }
 }
 
