@@ -41,3 +41,31 @@ export function upgradeTwitterImageUrl(url: string): string {
     return url;
   }
 }
+
+/** Normalize detector URLs copied from docs without protocol or with trailing slashes. */
+export function normalizeDetectorUrl(url: string | undefined): string | undefined {
+  if (!url) return undefined;
+
+  let normalized = url.replace(/[\u200B-\u200D\uFEFF]/g, "").trim();
+  if (!normalized) return undefined;
+
+  if (!/^https?:\/\//i.test(normalized)) {
+    normalized = `https://${normalized}`;
+  }
+
+  try {
+    const parsed = new URL(normalized);
+    parsed.hash = "";
+    return parsed.toString().replace(/\/$/, "");
+  } catch {
+    return undefined;
+  }
+}
+
+function sanitizeEnv(value: string | undefined): string | undefined {
+  if (!value) return undefined;
+  const cleaned = value.replace(/[\u200B-\u200D\uFEFF]/g, "").trim();
+  return cleaned || undefined;
+}
+
+export { sanitizeEnv };

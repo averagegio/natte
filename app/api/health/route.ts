@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import { getDetectorStatus, validateDetectorKey } from "@/lib/detector";
+import { getDetectorStatus, resolveTextDetectorValidation } from "@/lib/detector";
 import { getImageDetectorStatus } from "@/lib/imageDetector";
 import { isSubscriptionRequiredForDetect } from "@/lib/subscriptions";
 import { getXAppStatus } from "@/lib/xConfig";
@@ -54,24 +54,29 @@ export async function GET() {
       checks.ai_detector_url === "set" &&
       checks.ai_detector_key === "set";
 
-    let detectorValidation: Awaited<ReturnType<typeof validateDetectorKey>> | null = null;
+    let textDetector: Awaited<ReturnType<typeof resolveTextDetectorValidation>> | null = null;
     if (detectorStatus.configured) {
-      detectorValidation = await validateDetectorKey();
+      textDetector = await resolveTextDetectorValidation();
       checks.ai_detector_key_valid =
-        detectorValidation.status === "ok"
+        textDetector.activeProvider === "sapling"
           ? "ok"
-          : detectorValidation.status === "invalid"
-            ? "invalid"
-            : detectorValidation.status === "skipped"
-              ? "skipped"
+          : textDetector.activeProvider === "winston"
+            ? "ok_winston_fallback"
+            : textDetector.primary.status === "invalid"
+              ? "invalid"
               : "error";
+      checks.ai_text_detector_active =
+        textDetector.activeProvider || textDetector.primary.status;
     }
 
     return NextResponse.json({
-      ok: ready && checks.ai_detector_key_valid !== "invalid",
+      ok:
+        ready &&
+        (checks.ai_detector_key_valid === "ok" ||
+          checks.ai_detector_key_valid === "ok_winston_fallback"),
       checks,
       detector: detectorStatus,
-      detectorValidation,
+      textDetector,
       imageDetector: imageDetectorStatus,
       x: xStatus,
       message: ready
