@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import { getDetectorStatus } from "@/lib/detector";
+import { getDetectorStatus, validateDetectorKey } from "@/lib/detector";
 import { getImageDetectorStatus } from "@/lib/imageDetector";
 import { isSubscriptionRequiredForDetect } from "@/lib/subscriptions";
 import { getXAppStatus } from "@/lib/xConfig";
@@ -54,10 +54,24 @@ export async function GET() {
       checks.ai_detector_url === "set" &&
       checks.ai_detector_key === "set";
 
+    let detectorValidation: Awaited<ReturnType<typeof validateDetectorKey>> | null = null;
+    if (detectorStatus.configured) {
+      detectorValidation = await validateDetectorKey();
+      checks.ai_detector_key_valid =
+        detectorValidation.status === "ok"
+          ? "ok"
+          : detectorValidation.status === "invalid"
+            ? "invalid"
+            : detectorValidation.status === "skipped"
+              ? "skipped"
+              : "error";
+    }
+
     return NextResponse.json({
-      ok: ready,
+      ok: ready && checks.ai_detector_key_valid !== "invalid",
       checks,
       detector: detectorStatus,
+      detectorValidation,
       imageDetector: imageDetectorStatus,
       x: xStatus,
       message: ready

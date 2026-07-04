@@ -5,6 +5,9 @@ import {
   normalizeProbability,
   type DetectorProvider,
 } from "./detectorScores";
+import { normalizeDetectionText } from "./detectionText";
+
+const WINSTON_TEXT_URL = "https://api.gowinston.ai/v2/ai-content-detection";
 
 export type DetectionResult = "human" | "ai" | "error";
 
@@ -27,21 +30,29 @@ function firstEnv(...names: string[]): string | undefined {
 }
 
 export function getDetectorConfig() {
-  const url = firstEnv("AI_DETECTOR_URL", "DETECTOR_URL");
-  const provider = detectProvider(url);
+  let url = firstEnv("AI_DETECTOR_URL", "DETECTOR_URL");
+  const winstonKey = firstEnv("AI_IMAGE_DETECTOR_KEY", "WINSTON_API_KEY");
   let key = firstEnv("AI_DETECTOR_KEY", "DETECTOR_KEY", "AI_DETECTOR_API_KEY");
+  const provider = detectProvider(url);
 
   if (!key && provider === "winston") {
-    key = firstEnv("AI_IMAGE_DETECTOR_KEY", "WINSTON_API_KEY");
+    key = winstonKey;
   }
 
+  if (!url && winstonKey) {
+    url = WINSTON_TEXT_URL;
+    key = key || winstonKey;
+  }
+
+  const resolvedProvider = detectProvider(url);
   const threshold = Number(firstEnv("AI_DETECTOR_THRESHOLD") ?? "0.5");
   const timeoutMs = Number(firstEnv("AI_DETECTOR_TIMEOUT_MS") ?? "15000");
 
   return {
     url,
     key,
-    provider,
+    provider: resolvedProvider,
+    winstonKey,
     threshold: Number.isFinite(threshold) ? threshold : 0.5,
     timeoutMs: Number.isFinite(timeoutMs) ? timeoutMs : 15000,
   };
@@ -245,6 +256,120 @@ function buildRequestHeaders(url: string, key: string | undefined) {
   return headers;
 }
 
+async function callDetector(
+  url: string,
+  key: string | undefined,
+  text: string,
+  provider: DetectorProvider,
+  timeoutMs: number
+): Promise<{ ok: boolean; status: number; json: unknown; message?: string }> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: buildRequestHeaders(url, key),
+      body: JSON.stringify(buildRequestBody(url, key, text)),
+      signal: controller.signal,
+    });
+
+    const json = await res.json().catch(() => null);
+
+    if (!res.ok) {
+      const message =
+        extractErrorMessage(json) ||
+        `Detector API returned ${res.status} ${res.statusText}`;
+      return { ok: false, status: res.status, json, message };
+    }
+
+    return { ok: true, status: res.status, json };
+  } catch (err) {
+    const message =
+      err instanceof Error && err.name === "AbortError"
+        ? "Detector request timed out."
+        : "Detector request failed.";
+    return { ok: false, status: 0, json: null, message };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function detectWithWinstonFallback(
+  text: string,
+  config: ReturnType<typeof getDetectorConfig>
+): Promise<DetectionResponse | null> {
+  const winstonKey = config.winstonKey;
+  if (!winstonKey || text.length < 300) {
+    return null;
+  }
+
+  const response = await callDetector(
+    WINSTON_TEXT_URL,
+    winstonKey,
+    text,
+    "winston",
+    config.timeoutMs
+  );
+
+  if (!response.ok) {
+    return null;
+  }
+
+  const parsed = parseDetectorPayload(response.json, "winston", config.threshold);
+  if (!parsed || parsed.result === "error") {
+    return null;
+  }
+
+  return {
+    ...parsed,
+    reliability: "high",
+    warning:
+      "Sapling was unavailable for this post, so Winston AI was used instead. Best results need 300+ characters.",
+  };
+}
+
+export async function validateDetectorKey(): Promise<{
+  status: "ok" | "invalid" | "skipped" | "error";
+  message?: string;
+}> {
+  const config = getDetectorConfig();
+  if (!config.url || !config.key) {
+    return { status: "skipped", message: "Detector is not configured." };
+  }
+
+  const sample =
+    config.provider === "winston"
+      ? "This is a validation sample for Winston text detection. ".repeat(12)
+      : "This is a short validation sample for Sapling text detection.";
+
+  const response = await callDetector(
+    config.url,
+    config.key,
+    sample,
+    config.provider,
+    Math.min(config.timeoutMs, 10000)
+  );
+
+  if (response.ok) {
+    const parsed = parseDetectorPayload(response.json, config.provider, config.threshold);
+    if (parsed && parsed.result !== "error") {
+      return { status: "ok" };
+    }
+    return {
+      status: "error",
+      message: "Detector responded but returned an unexpected payload.",
+    };
+  }
+
+  const message = response.message || extractErrorMessage(response.json);
+  if (message?.toLowerCase().includes("invalid api key")) {
+    return { status: "invalid", message };
+  }
+
+  return { status: "error", message: message || "Detector validation failed." };
+}
+
 function getReliabilityWarning(
   provider: DetectorProvider,
   textLength: number
@@ -287,7 +412,7 @@ export async function detectText(text: string): Promise<DetectionResponse> {
     };
   }
 
-  const trimmed = text.trim();
+  const trimmed = normalizeDetectionText(text);
   if (!trimmed) {
     return {
       result: "error",
@@ -297,46 +422,54 @@ export async function detectText(text: string): Promise<DetectionResponse> {
   }
 
   const reliability = getReliabilityWarning(config.provider, trimmed.length);
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), config.timeoutMs);
 
-  try {
-    const res = await fetch(config.url, {
-      method: "POST",
-      headers: buildRequestHeaders(config.url, config.key),
-      body: JSON.stringify(buildRequestBody(config.url, config.key, trimmed)),
-      signal: controller.signal,
-    });
+  const response = await callDetector(
+    config.url,
+    config.key,
+    trimmed,
+    config.provider,
+    config.timeoutMs
+  );
 
-    const json = await res.json().catch(() => null);
-
-    if (!res.ok) {
-      const message =
-        extractErrorMessage(json) ||
-        `Detector API returned ${res.status} ${res.statusText}`;
-      console.error("Detector API error:", res.status, json);
-      return { result: "error", source: "detector", message };
+  if (!response.ok) {
+    console.error("Detector API error:", response.status, response.json);
+    const fallback =
+      config.provider === "sapling" ? await detectWithWinstonFallback(trimmed, config) : null;
+    if (fallback) {
+      return fallback;
     }
 
-    const parsed = parseDetectorPayload(json, config.provider, config.threshold);
-    if (parsed) {
-      return { ...parsed, ...reliability };
-    }
-
-    console.error("Unrecognized detector response:", json);
     return {
       result: "error",
       source: "detector",
-      message: "Detector returned an unexpected response format.",
+      message: response.message || "Detector request failed.",
     };
-  } catch (err) {
-    console.error("Detector request failed:", err);
-    const message =
-      err instanceof Error && err.name === "AbortError"
-        ? "Detector request timed out."
-        : "Detector request failed.";
-    return { result: "error", source: "detector", message };
-  } finally {
-    clearTimeout(timeout);
   }
+
+  const parsed = parseDetectorPayload(response.json, config.provider, config.threshold);
+  if (parsed && parsed.result !== "error") {
+    return { ...parsed, ...reliability };
+  }
+
+  if (parsed?.result === "error") {
+    const fallback =
+      config.provider === "sapling" ? await detectWithWinstonFallback(trimmed, config) : null;
+    if (fallback) {
+      return fallback;
+    }
+    return parsed;
+  }
+
+  console.error("Unrecognized detector response:", response.json);
+  const fallback =
+    config.provider === "sapling" ? await detectWithWinstonFallback(trimmed, config) : null;
+  if (fallback) {
+    return fallback;
+  }
+
+  return {
+    result: "error",
+    source: "detector",
+    message: "Detector returned an unexpected response format.",
+  };
 }

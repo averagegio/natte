@@ -102,6 +102,7 @@
           const res = await fetch(API_DETECT, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
+            credentials: "include",
             body: JSON.stringify({ text: text }),
           });
           const json = await res.json();

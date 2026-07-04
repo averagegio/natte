@@ -43,7 +43,13 @@ export default function AIParserToggle({ text }: Props) {
       const json = await res.json();
 
       if (!res.ok) {
-        setError(json.message || "Detection unavailable");
+        if (json.requiresAuth) {
+          setError("Sign in to run AI text detection.");
+        } else if (json.requiresSubscription) {
+          setError("An active subscription is required to run AI text detection.");
+        } else {
+          setError(json.message || "Detection unavailable");
+        }
         setResult("error");
         return;
       }

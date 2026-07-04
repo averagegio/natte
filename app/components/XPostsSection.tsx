@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import AIParserToggle from "./AIParserToggle";
 import ImageParserToggle from "./ImageParserToggle";
 import GlossyCard from "./GlossyCard";
+import { buildDetectionText } from "@/lib/detectionText";
 
 interface XPostMedia {
   mediaKey: string;
@@ -119,7 +120,7 @@ export default function XPostsSection() {
                 {post.text && (
                   <div className="mb-3 text-sm text-white/70">{post.text}</div>
                 )}
-                <AIParserToggle text={post.text} />
+                <AIParserToggle text={buildDetectionText(post)} />
                 {post.media.length > 0 && (
                   <div className="mt-4 space-y-4">
                     {post.media.map((item) => (
