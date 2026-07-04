@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { getDetectorStatus } from "@/lib/detector";
+import { getImageDetectorStatus } from "@/lib/imageDetector";
 import { isSubscriptionRequiredForDetect } from "@/lib/subscriptions";
 import { getXAppStatus } from "@/lib/xConfig";
 
@@ -11,8 +12,10 @@ export async function GET() {
   checks.auth_secret = process.env.AUTH_SECRET ? "set" : "missing";
 
   const detectorStatus = getDetectorStatus();
+  const imageDetectorStatus = getImageDetectorStatus();
   checks.ai_detector_url = detectorStatus.hasUrl ? "set" : "missing";
   checks.ai_detector_key = detectorStatus.hasApiKey ? "set" : "missing";
+  checks.ai_image_detector_key = imageDetectorStatus.hasApiKey ? "set" : "missing";
   checks.detect_require_subscription = isSubscriptionRequiredForDetect() ? "enabled" : "disabled";
 
   const xStatus = getXAppStatus();
@@ -55,6 +58,7 @@ export async function GET() {
       ok: ready,
       checks,
       detector: detectorStatus,
+      imageDetector: imageDetectorStatus,
       x: xStatus,
       message: ready
         ? "Auth, database, and AI detector are ready."

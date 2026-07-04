@@ -3,11 +3,20 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import AIParserToggle from "./AIParserToggle";
+import ImageParserToggle from "./ImageParserToggle";
 import GlossyCard from "./GlossyCard";
+
+interface XPostMedia {
+  mediaKey: string;
+  type: string;
+  url: string;
+  altText?: string;
+}
 
 interface XPost {
   id: string;
   text: string;
+  media: XPostMedia[];
 }
 
 type PostSource = "live" | "mock" | "unavailable";
@@ -72,7 +81,7 @@ export default function XPostsSection() {
           </div>
           <p className="mt-2 text-sm text-white/50">
             {source === "live"
-              ? "These are your latest posts from X. Toggle AI detection on each one."
+              ? "Detect AI in post text and attached images from your live X feed."
               : "Connect X on your dashboard to load real posts from your timeline."}
           </p>
         </div>
@@ -107,8 +116,21 @@ export default function XPostsSection() {
           <div className="space-y-6">
             {posts.map((post) => (
               <div key={post.id} className="rounded-2xl border border-white/10 p-4">
-                <div className="mb-3 text-sm text-white/70">{post.text}</div>
+                {post.text && (
+                  <div className="mb-3 text-sm text-white/70">{post.text}</div>
+                )}
                 <AIParserToggle text={post.text} />
+                {post.media.length > 0 && (
+                  <div className="mt-4 space-y-4">
+                    {post.media.map((item) => (
+                      <ImageParserToggle
+                        key={item.mediaKey}
+                        imageUrl={item.url}
+                        alt={item.altText}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>

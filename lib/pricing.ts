@@ -19,6 +19,7 @@ export const PRICING_TIERS: PricingTier[] = [
     monthlyPrice: 7,
     features: [
       "1,000 detections / month",
+      "Text + image AI detection",
       "Browser widget access",
       "Email support",
       "Basic API access",
@@ -32,6 +33,7 @@ export const PRICING_TIERS: PricingTier[] = [
     highlighted: true,
     features: [
       "1,000 detections / month",
+      "Text + image AI detection",
       "Browser widget access",
       "Email support",
       "Basic API access",

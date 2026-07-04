@@ -26,9 +26,11 @@
   })();
 
   const API_DETECT = ORIGIN ? ORIGIN + "/api/detect" : "/api/detect";
+  const API_DETECT_IMAGE = ORIGIN ? ORIGIN + "/api/detect/image" : "/api/detect/image";
   const API_POSTS = ORIGIN ? ORIGIN + "/api/x/posts" : "/api/x/posts";
 
   let detectorAvailable = true;
+  let imageDetectorAvailable = true;
 
   fetch(API_DETECT)
     .then(function (res) {
@@ -39,6 +41,17 @@
     })
     .catch(function () {
       detectorAvailable = false;
+    });
+
+  fetch(API_DETECT_IMAGE)
+    .then(function (res) {
+      return res.json();
+    })
+    .then(function (data) {
+      imageDetectorAvailable = Boolean(data.available);
+    })
+    .catch(function () {
+      imageDetectorAvailable = false;
     });
 
   function createToggle(text) {
@@ -119,16 +132,114 @@
     return wrapper;
   }
 
+  function createImageToggle(imageUrl) {
+    const wrapper = document.createElement("div");
+    wrapper.style.cssText = "margin-top:12px";
+
+    const img = document.createElement("img");
+    img.src = imageUrl;
+    img.alt = "Post media";
+    img.style.cssText =
+      "display:block;width:100%;max-height:280px;object-fit:cover;border-radius:12px;border:1px solid rgba(255,255,255,0.1);margin-bottom:8px";
+    wrapper.appendChild(img);
+
+    let on = false;
+    let loading = false;
+    let result = null;
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.style.cssText =
+      "padding:6px 14px;border-radius:999px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#ccc;cursor:pointer;transition:all 0.2s";
+
+    const status = document.createElement("span");
+    status.style.cssText = "margin-left:12px;color:#888;font-size:14px";
+
+    const controls = document.createElement("div");
+    controls.style.cssText = "display:flex;align-items:center;gap:12px";
+    controls.appendChild(btn);
+    controls.appendChild(status);
+    wrapper.appendChild(controls);
+
+    function updateUI() {
+      if (on) {
+        btn.style.borderColor = "rgba(139,92,246,0.5)";
+        btn.style.background = "#7c3aed";
+        btn.style.color = "#fff";
+        btn.textContent = "Image detection: ON";
+      } else {
+        btn.style.borderColor = "rgba(255,255,255,0.2)";
+        btn.style.background = "rgba(255,255,255,0.05)";
+        btn.style.color = "#ccc";
+        btn.textContent = "Image detection: OFF";
+      }
+      status.textContent = loading ? "Checking..." : result ? "Result: " + result : "Idle";
+    }
+
+    btn.addEventListener("click", async function () {
+      if (!imageDetectorAvailable) {
+        status.textContent = "Image detector not configured";
+        status.style.color = "#f87171";
+        return;
+      }
+
+      on = !on;
+      if (on) {
+        loading = true;
+        result = null;
+        updateUI();
+        try {
+          const res = await fetch(API_DETECT_IMAGE, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ imageUrl: imageUrl }),
+          });
+          const json = await res.json();
+          if (!res.ok) {
+            result = "error";
+            status.textContent = json.message || "Access denied";
+            status.style.color = "#f87171";
+          } else {
+            result = json.result || "unknown";
+            status.style.color = "#888";
+          }
+        } catch (_) {
+          result = "error";
+          status.textContent = "Network error";
+          status.style.color = "#f87171";
+        }
+        loading = false;
+      } else {
+        result = null;
+        status.style.color = "#888";
+      }
+      updateUI();
+    });
+
+    updateUI();
+    return wrapper;
+  }
+
   function createPostCard(post) {
     const card = document.createElement("div");
     card.style.cssText =
       "border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px;margin-bottom:12px;font-family:system-ui,sans-serif";
 
-    const text = document.createElement("div");
-    text.style.cssText = "font-size:14px;color:#ccc;margin-bottom:8px";
-    text.textContent = post.text;
-    card.appendChild(text);
-    card.appendChild(createToggle(post.text));
+    if (post.text) {
+      const text = document.createElement("div");
+      text.style.cssText = "font-size:14px;color:#ccc;margin-bottom:8px";
+      text.textContent = post.text;
+      card.appendChild(text);
+      card.appendChild(createToggle(post.text));
+    }
+
+    if (post.media && post.media.length > 0) {
+      post.media.forEach(function (item) {
+        card.appendChild(createImageToggle(item.url));
+      });
+    }
+
     return card;
   }
 

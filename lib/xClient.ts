@@ -3,9 +3,17 @@ import { getDb } from "./db";
 import { getXBearerToken, getXDefaultUsername } from "./xConfig";
 import { refreshAccessToken } from "./xOAuth";
 
+export interface XPostMedia {
+  mediaKey: string;
+  type: string;
+  url: string;
+  altText?: string;
+}
+
 export interface XPost {
   id: string;
   text: string;
+  media: XPostMedia[];
 }
 
 export type XPostSource = "live" | "mock" | "unavailable";
@@ -18,9 +26,21 @@ export type FetchXPostsResult = {
 };
 
 const MOCK_POSTS: XPost[] = [
-  { id: "1", text: "Hello everyone — excited to share my weekend photos!" },
-  { id: "2", text: "As an AI assistant, I can generate text that mimics human writing." },
-  { id: "3", text: "This post was written by a human tester for the Proof of Human pilot." },
+  {
+    id: "1",
+    text: "Hello everyone — excited to share my weekend photos!",
+    media: [],
+  },
+  {
+    id: "2",
+    text: "As an AI assistant, I can generate text that mimics human writing.",
+    media: [],
+  },
+  {
+    id: "3",
+    text: "This post was written by a human tester for the Proof of Human pilot.",
+    media: [],
+  },
 ];
 
 type ConnectionRow = {
@@ -31,13 +51,62 @@ type ConnectionRow = {
   auth_type: string | null;
 };
 
+type XApiMedia = {
+  media_key: string;
+  type?: string;
+  url?: string;
+  preview_image_url?: string;
+  alt_text?: string;
+};
+
+type XApiTweet = {
+  id: string;
+  text: string;
+  attachments?: {
+    media_keys?: string[];
+  };
+};
+
+function mapTweetMedia(
+  tweet: XApiTweet,
+  mediaByKey: Map<string, XApiMedia>
+): XPostMedia[] {
+  const keys = tweet.attachments?.media_keys ?? [];
+  const media: XPostMedia[] = [];
+
+  for (const mediaKey of keys) {
+    const item = mediaByKey.get(mediaKey);
+    if (!item) continue;
+
+    const url = item.url || item.preview_image_url;
+    if (!url) continue;
+
+    media.push({
+      mediaKey: item.media_key,
+      type: item.type || "photo",
+      url,
+      altText: item.alt_text,
+    });
+  }
+
+  return media;
+}
+
 async function fetchPostsWithToken(
   token: string,
   username: string,
   count: number
 ): Promise<XPost[]> {
+  const params = new URLSearchParams({
+    query: `from:${username}`,
+    max_results: String(Math.min(Math.max(count, 10), 100)),
+    "tweet.fields": "text,attachments",
+    expansions: "attachments.media_keys",
+    "media.fields": "url,preview_image_url,type,alt_text",
+  });
+
   const res = await fetch(
-    `https://api.twitter.com/2/tweets/search/recent?query=from:${username}&max_results=${Math.min(Math.max(count, 10), 100)}&tweet.fields=text`,
+    `https://api.twitter.com/2/tweets/search/recent?${params.toString()}`,
     {
       headers: { Authorization: `Bearer ${token}` },
       next: { revalidate: 300 },
@@ -49,9 +118,21 @@ async function fetchPostsWithToken(
   }
 
   const json = await res.json();
-  return (json.data || [])
+  const mediaByKey = new Map<string, XApiMedia>();
+
+  for (const item of (json.includes?.media ?? []) as XApiMedia[]) {
+    if (item.media_key) {
+      mediaByKey.set(item.media_key, item);
+    }
+  }
+
+  return ((json.data || []) as XApiTweet[])
     .slice(0, count)
-    .map((t: { id: string; text: string }) => ({ id: t.id, text: t.text }));
+    .map((tweet) => ({
+      id: tweet.id,
+      text: tweet.text,
+      media: mapTweetMedia(tweet, mediaByKey),
+    }));
 }
 
 async function getUserConnectionToken(

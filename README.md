@@ -59,6 +59,8 @@ Set these in Vercel (or locally via `.env.local`). See `.env.example` for the fu
 | `AI_DETECTOR_URL` | **Yes** | External AI detector endpoint — required before detection is enabled |
 | `AI_DETECTOR_KEY` | No | API key for the external detector |
 | `AI_DETECTOR_THRESHOLD` | No | Score threshold for AI classification (default: `0.5`) |
+| `AI_IMAGE_DETECTOR_URL` | For images | Image detector endpoint (default: Winston AI) |
+| `AI_IMAGE_DETECTOR_KEY` | For images | Winston AI API key (`WINSTON_API_KEY` alias supported) |
 | `DETECT_REQUIRE_SUBSCRIPTION` | No | Require login + active plan (default: `true` in production) |
 
 Without `AI_DETECTOR_URL`, detection returns **503 unavailable** — the heuristic fallback has been removed.
@@ -82,6 +84,17 @@ And return any of these shapes:
 ```
 
 Authorization header is sent when `AI_DETECTOR_KEY` is set.
+
+### Image detection (Winston AI)
+
+Set `AI_IMAGE_DETECTOR_KEY` from [gowinston.ai](https://gowinston.ai/ai-image-detector-api/). The API accepts a public image URL:
+
+```json
+POST { "imageUrl": "https://pbs.twimg.com/media/example.jpg" }
+→ { "result": "ai" | "human", "confidence": 0.87 }
+```
+
+Image detection costs ~300 Winston credits per image. Posts with photos from X are analyzed automatically when media is attached.
 
 ### X Developer App setup
 
