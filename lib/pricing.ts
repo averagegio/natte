@@ -16,7 +16,7 @@ export const PRICING_TIERS: PricingTier[] = [
     id: "starter",
     name: "Starter",
     description: "For individuals exploring AI detection.",
-    monthlyPrice: 20,
+    monthlyPrice: 7,
     features: [
       "1,000 detections / month",
       "Browser widget access",
