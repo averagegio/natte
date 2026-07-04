@@ -41,11 +41,20 @@ export async function POST(request: Request) {
     const sql = getDb();
 
     const rows = await sql`
-      INSERT INTO widget_connections (user_id, provider, x_username, bearer_token_encrypted, status)
-      VALUES (${userId}, 'x', ${verifiedUsername}, ${encryptedToken}, 'connected')
+      INSERT INTO widget_connections (
+        user_id,
+        provider,
+        x_username,
+        bearer_token_encrypted,
+        auth_type,
+        status
+      )
+      VALUES (${userId}, 'x', ${verifiedUsername}, ${encryptedToken}, 'bearer', 'connected')
       ON CONFLICT (user_id, provider, x_username) DO UPDATE
       SET
         bearer_token_encrypted = ${encryptedToken},
+        auth_type = 'bearer',
+        refresh_token_encrypted = NULL,
         status = 'connected',
         updated_at = NOW()
       RETURNING id, provider, x_username, status, created_at, updated_at

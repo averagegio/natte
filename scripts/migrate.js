@@ -87,11 +87,21 @@ const steps = [
       provider TEXT NOT NULL CHECK (provider IN ('x')),
       x_username TEXT NOT NULL,
       bearer_token_encrypted TEXT NOT NULL,
+      refresh_token_encrypted TEXT,
+      auth_type TEXT DEFAULT 'bearer' CHECK (auth_type IN ('bearer', 'oauth2')),
       status TEXT NOT NULL DEFAULT 'connected' CHECK (status IN ('connected', 'disconnected', 'error')),
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       UNIQUE (user_id, provider, x_username)
     )`,
+  },
+  {
+    label: "Add refresh_token_encrypted to widget_connections",
+    sql: `ALTER TABLE widget_connections ADD COLUMN IF NOT EXISTS refresh_token_encrypted TEXT`,
+  },
+  {
+    label: "Add auth_type to widget_connections",
+    sql: `ALTER TABLE widget_connections ADD COLUMN IF NOT EXISTS auth_type TEXT DEFAULT 'bearer'`,
   },
   {
     label: "Create indexes",

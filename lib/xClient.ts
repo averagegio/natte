@@ -1,3 +1,8 @@
+import { decryptSecret, encryptSecret } from "./crypto";
+import { getDb } from "./db";
+import { getXBearerToken, getXDefaultUsername } from "./xConfig";
+import { refreshAccessToken } from "./xOAuth";
+
 export interface XPost {
   id: string;
   text: string;
@@ -11,24 +16,112 @@ const MOCK_POSTS: XPost[] = [
   { id: "3", text: "This post was written by a human tester for the Proof of Human pilot." },
 ];
 
-function getBearerToken(): string | undefined {
-  return (
-    process.env.X_BEARER_TOKEN ||
-    process.env.TWITTER_BEARER_TOKEN ||
-    process.env.X_API_BEARER_TOKEN
+type ConnectionRow = {
+  id: string;
+  x_username: string;
+  bearer_token_encrypted: string;
+  refresh_token_encrypted: string | null;
+  auth_type: string | null;
+};
+
+async function fetchPostsWithToken(
+  token: string,
+  username: string,
+  count: number
+): Promise<XPost[]> {
+  const res = await fetch(
+    `https://api.twitter.com/2/tweets/search/recent?query=from:${username}&max_results=${Math.min(Math.max(count, 10), 100)}&tweet.fields=text`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      next: { revalidate: 300 },
+    }
   );
+
+  if (!res.ok) {
+    throw new Error(`X API error: ${res.status} ${res.statusText}`);
+  }
+
+  const json = await res.json();
+  return (json.data || [])
+    .slice(0, count)
+    .map((t: { id: string; text: string }) => ({ id: t.id, text: t.text }));
 }
 
-function getDefaultUsername(): string {
-  return process.env.X_DEFAULT_USERNAME || "natte";
+async function getUserConnectionToken(userId: string, username?: string): Promise<string | null> {
+  const sql = getDb();
+  let rows: ConnectionRow[];
+
+  if (username) {
+    const cleanUsername = username.replace(/^@/, "");
+    rows = (await sql`
+      SELECT id, x_username, bearer_token_encrypted, refresh_token_encrypted, auth_type
+      FROM widget_connections
+      WHERE user_id = ${userId}
+        AND provider = 'x'
+        AND status = 'connected'
+        AND x_username = ${cleanUsername}
+      LIMIT 1
+    `) as ConnectionRow[];
+  } else {
+    rows = (await sql`
+      SELECT id, x_username, bearer_token_encrypted, refresh_token_encrypted, auth_type
+      FROM widget_connections
+      WHERE user_id = ${userId}
+        AND provider = 'x'
+        AND status = 'connected'
+      ORDER BY updated_at DESC
+      LIMIT 1
+    `) as ConnectionRow[];
+  }
+
+  if (rows.length === 0) {
+    return null;
+  }
+
+  const connection = rows[0];
+  let accessToken = decryptSecret(connection.bearer_token_encrypted);
+
+  if (connection.auth_type === "oauth2" && connection.refresh_token_encrypted) {
+    try {
+      await fetchPostsWithToken(accessToken, connection.x_username, 1);
+    } catch {
+      try {
+        const refreshed = await refreshAccessToken(
+          decryptSecret(connection.refresh_token_encrypted)
+        );
+        accessToken = refreshed.accessToken;
+        await sql`
+          UPDATE widget_connections
+          SET
+            bearer_token_encrypted = ${encryptSecret(refreshed.accessToken)},
+            refresh_token_encrypted = ${refreshed.refreshToken ? encryptSecret(refreshed.refreshToken) : connection.refresh_token_encrypted},
+            updated_at = NOW()
+          WHERE id = ${connection.id}
+        `;
+      } catch (refreshErr) {
+        console.error("X token refresh failed:", refreshErr);
+        await sql`
+          UPDATE widget_connections
+          SET status = 'error', updated_at = NOW()
+          WHERE id = ${connection.id}
+        `;
+        return null;
+      }
+    }
+  }
+
+  return accessToken;
 }
 
 export async function fetchXPosts(
   username?: string,
-  count = 3
+  count = 3,
+  userId?: string
 ): Promise<{ posts: XPost[]; source: XPostSource }> {
-  const token = getBearerToken();
-  const user = username || getDefaultUsername();
+  const user = username || getXDefaultUsername();
+
+  const userToken = userId ? await getUserConnectionToken(userId, username) : null;
+  const token = userToken || getXBearerToken();
 
   if (!token) {
     return {
@@ -38,26 +131,7 @@ export async function fetchXPosts(
   }
 
   try {
-    const res = await fetch(
-      `https://api.twitter.com/2/tweets/search/recent?query=from:${user}&max_results=${Math.min(Math.max(count, 10), 100)}&tweet.fields=text`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-        next: { revalidate: 300 },
-      }
-    );
-
-    if (!res.ok) {
-      console.error(`X API error: ${res.status} ${res.statusText}`);
-      return {
-        posts: MOCK_POSTS.slice(0, count),
-        source: "mock",
-      };
-    }
-
-    const json = await res.json();
-    const posts: XPost[] = (json.data || [])
-      .slice(0, count)
-      .map((t: { id: string; text: string }) => ({ id: t.id, text: t.text }));
+    const posts = await fetchPostsWithToken(token, user, count);
 
     if (posts.length === 0) {
       return {

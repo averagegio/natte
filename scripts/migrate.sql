@@ -33,11 +33,16 @@ CREATE TABLE IF NOT EXISTS widget_connections (
   provider TEXT NOT NULL CHECK (provider IN ('x')),
   x_username TEXT NOT NULL,
   bearer_token_encrypted TEXT NOT NULL,
+  refresh_token_encrypted TEXT,
+  auth_type TEXT DEFAULT 'bearer' CHECK (auth_type IN ('bearer', 'oauth2')),
   status TEXT NOT NULL DEFAULT 'connected' CHECK (status IN ('connected', 'disconnected', 'error')),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE (user_id, provider, x_username)
 );
+
+ALTER TABLE widget_connections ADD COLUMN IF NOT EXISTS refresh_token_encrypted TEXT;
+ALTER TABLE widget_connections ADD COLUMN IF NOT EXISTS auth_type TEXT DEFAULT 'bearer';
 
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_subscriptions_user_id ON subscriptions(user_id);
