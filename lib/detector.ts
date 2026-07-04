@@ -4,6 +4,7 @@ export type DetectionResponse = {
   result: DetectionResult;
   confidence?: number;
   source: "detector" | "unavailable";
+  message?: string;
 };
 
 function firstEnv(...names: string[]): string | undefined {
@@ -29,17 +30,24 @@ export function getDetectorConfig() {
 }
 
 export function isDetectorConfigured() {
-  return Boolean(getDetectorConfig().url);
+  const config = getDetectorConfig();
+  return Boolean(config.url && config.key);
 }
 
 export function getDetectorStatus() {
   const config = getDetectorConfig();
   return {
-    configured: Boolean(config.url),
+    configured: isDetectorConfigured(),
     hasApiKey: Boolean(config.key),
+    hasUrl: Boolean(config.url),
+    provider: config.url?.includes("sapling.ai") ? "sapling" : "custom",
     threshold: config.threshold,
     timeoutMs: config.timeoutMs,
   };
+}
+
+function isSaplingDetector(url: string) {
+  return url.includes("sapling.ai");
 }
 
 function normalizeResult(value: unknown): DetectionResult | null {
@@ -70,12 +78,39 @@ function normalizeResult(value: unknown): DetectionResult | null {
   return null;
 }
 
+function extractErrorMessage(payload: unknown): string | undefined {
+  if (!payload || typeof payload !== "object") {
+    return undefined;
+  }
+
+  const data = payload as Record<string, unknown>;
+  const message = data.msg ?? data.message ?? data.error ?? data.detail;
+
+  if (typeof message === "string" && message.trim()) {
+    return message.trim();
+  }
+
+  if (Array.isArray(data.errors) && typeof data.errors[0] === "string") {
+    return data.errors[0];
+  }
+
+  return undefined;
+}
+
 function parseDetectorPayload(payload: unknown): DetectionResponse | null {
   if (!payload || typeof payload !== "object") {
     return null;
   }
 
   const data = payload as Record<string, unknown>;
+  const errorMessage = extractErrorMessage(payload);
+  if (errorMessage && typeof data.score !== "number") {
+    return {
+      result: "error",
+      source: "detector",
+      message: errorMessage,
+    };
+  }
 
   const direct =
     normalizeResult(data.result) ??
@@ -125,6 +160,18 @@ function parseDetectorPayload(payload: unknown): DetectionResponse | null {
   return null;
 }
 
+function buildRequestBody(url: string, key: string | undefined, text: string) {
+  if (isSaplingDetector(url)) {
+    return {
+      key,
+      text,
+      sent_scores: false,
+    };
+  }
+
+  return { text };
+}
+
 export async function detectText(text: string): Promise<DetectionResponse> {
   const config = getDetectorConfig();
 
@@ -132,13 +179,33 @@ export async function detectText(text: string): Promise<DetectionResponse> {
     return {
       result: "error",
       source: "unavailable",
+      message: "AI_DETECTOR_URL is not configured.",
     };
   }
 
-  if (!text.trim()) {
+  if (!config.key) {
+    return {
+      result: "error",
+      source: "unavailable",
+      message: "AI_DETECTOR_KEY is not configured.",
+    };
+  }
+
+  const trimmed = text.trim();
+  if (!trimmed) {
     return {
       result: "error",
       source: "detector",
+      message: "Text is required.",
+    };
+  }
+
+  if (isSaplingDetector(config.url) && trimmed.length < 50) {
+    return {
+      result: "error",
+      source: "detector",
+      message:
+        "This post is too short for reliable AI detection. Sapling works best with at least 50–300 characters.",
     };
   }
 
@@ -151,17 +218,20 @@ export async function detectText(text: string): Promise<DetectionResponse> {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        ...(config.key ? { Authorization: `Bearer ${config.key}` } : {}),
+        Authorization: `Bearer ${config.key}`,
       },
-      body: JSON.stringify({ text }),
+      body: JSON.stringify(buildRequestBody(config.url, config.key, trimmed)),
       signal: controller.signal,
     });
 
     const json = await res.json().catch(() => null);
 
     if (!res.ok) {
+      const message =
+        extractErrorMessage(json) ||
+        `Detector API returned ${res.status} ${res.statusText}`;
       console.error("Detector API error:", res.status, json);
-      return { result: "error", source: "detector" };
+      return { result: "error", source: "detector", message };
     }
 
     const parsed = parseDetectorPayload(json);
@@ -170,10 +240,18 @@ export async function detectText(text: string): Promise<DetectionResponse> {
     }
 
     console.error("Unrecognized detector response:", json);
-    return { result: "error", source: "detector" };
+    return {
+      result: "error",
+      source: "detector",
+      message: "Detector returned an unexpected response format.",
+    };
   } catch (err) {
     console.error("Detector request failed:", err);
-    return { result: "error", source: "detector" };
+    const message =
+      err instanceof Error && err.name === "AbortError"
+        ? "Detector request timed out."
+        : "Detector request failed.";
+    return { result: "error", source: "detector", message };
   } finally {
     clearTimeout(timeout);
   }
