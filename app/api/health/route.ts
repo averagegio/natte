@@ -11,7 +11,7 @@ export async function GET() {
   checks.auth_secret = process.env.AUTH_SECRET ? "set" : "missing";
 
   const detectorStatus = getDetectorStatus();
-  checks.ai_detector_url = detectorStatus.configured ? "set" : "missing";
+  checks.ai_detector_url = detectorStatus.hasUrl ? "set" : "missing";
   checks.ai_detector_key = detectorStatus.hasApiKey ? "set" : "missing";
   checks.detect_require_subscription = isSubscriptionRequiredForDetect() ? "enabled" : "disabled";
 
@@ -48,7 +48,8 @@ export async function GET() {
     const ready =
       checks.auth_secret === "set" &&
       checks.users_table === "ok" &&
-      checks.ai_detector_url === "set";
+      checks.ai_detector_url === "set" &&
+      checks.ai_detector_key === "set";
 
     return NextResponse.json({
       ok: ready,

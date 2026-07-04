@@ -65,7 +65,8 @@ export async function POST(req: NextRequest) {
       {
         result: "error",
         error: "detector_failed",
-        message: "The AI detector could not analyze this text.",
+        message:
+          detection.message || "The AI detector could not analyze this text.",
         source: detection.source,
       },
       { status: 502 }

@@ -15,6 +15,7 @@ export default function AIParserToggle({ text }: Props) {
   const [on, setOn] = useState(false);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
+  const [confidence, setConfidence] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<DetectStatus | null>(null);
 
@@ -28,11 +29,13 @@ export default function AIParserToggle({ text }: Props) {
   async function check() {
     setLoading(true);
     setResult(null);
+    setConfidence(null);
     setError(null);
     try {
       const res = await fetch("/api/detect", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ text }),
       });
       const json = await res.json();
@@ -44,6 +47,7 @@ export default function AIParserToggle({ text }: Props) {
       }
 
       setResult(json.result ?? "unknown");
+      setConfidence(typeof json.confidence === "number" ? json.confidence : null);
     } catch {
       setError("Network error");
       setResult("error");
@@ -63,6 +67,7 @@ export default function AIParserToggle({ text }: Props) {
     if (newOn) await check();
     else {
       setResult(null);
+      setConfidence(null);
       setError(null);
     }
   }
@@ -89,7 +94,9 @@ export default function AIParserToggle({ text }: Props) {
             : loading
               ? "Checking..."
               : result
-                ? `Result: ${result}`
+                ? `Result: ${result}${
+                    confidence !== null ? ` (${Math.round(confidence * 100)}% AI)` : ""
+                  }`
                 : "Idle"}
         </div>
       </div>
