@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionUserId } from "@/lib/auth";
-import { detectText, isDetectorConfigured } from "@/lib/detector";
+import { detectText, formatDetectorErrorMessage, isDetectorConfigured } from "@/lib/detector";
 import {
   checkDetectionAccess,
   isSubscriptionRequiredForDetect,
@@ -66,7 +66,8 @@ export async function POST(req: NextRequest) {
         result: "error",
         error: "detector_failed",
         message:
-          detection.message || "The AI detector could not analyze this text.",
+          formatDetectorErrorMessage(detection.message) ||
+          "The AI detector could not analyze this text.",
         source: detection.source,
       },
       { status: 502 }

@@ -10,6 +10,45 @@ import {
 import { normalizeDetectionText } from "./detectionText";
 
 const WINSTON_TEXT_URL = "https://api.gowinston.ai/v2/ai-content-detection";
+const ACTIVE_DETECTOR_CACHE_MS = 5 * 60 * 1000;
+
+type ActiveDetectorConfig = {
+  url: string;
+  key: string;
+  provider: DetectorProvider;
+  threshold: number;
+  timeoutMs: number;
+  winstonKey?: string;
+  preference: "auto" | "sapling" | "winston";
+};
+
+type ActiveDetectorCache = ActiveDetectorConfig & {
+  expiresAt: number;
+};
+
+let activeDetectorCache: ActiveDetectorCache | null = null;
+
+function isSaplingUnavailableMessage(message?: string): boolean {
+  if (!message) return false;
+  const normalized = message.toLowerCase();
+  return (
+    normalized.includes("sapling.ai") ||
+    normalized.includes("subscription expired") ||
+    normalized.includes("invalid api key")
+  );
+}
+
+export function formatDetectorErrorMessage(message?: string): string {
+  if (!message) {
+    return "The AI detector could not analyze this text.";
+  }
+
+  if (isSaplingUnavailableMessage(message)) {
+    return "Sapling text API is unavailable (expired or invalid key). Winston is used automatically for longer posts. This is separate from your NATTES subscription.";
+  }
+
+  return message;
+}
 
 export type DetectionResult = "human" | "ai" | "error";
 
@@ -409,6 +448,49 @@ export async function resolveTextDetectorValidation(): Promise<{
   return { activeProvider: null, primary, winston };
 }
 
+export async function getActiveTextDetectorConfig(): Promise<ActiveDetectorConfig> {
+  const config = getDetectorConfig();
+  if (!config.url || !config.key) {
+    throw new Error("Text detector is not configured.");
+  }
+
+  const now = Date.now();
+  if (activeDetectorCache && activeDetectorCache.expiresAt > now) {
+    return activeDetectorCache;
+  }
+
+  if (config.preference === "winston" && config.winstonKey) {
+    activeDetectorCache = {
+      expiresAt: now + ACTIVE_DETECTOR_CACHE_MS,
+      url: WINSTON_TEXT_URL,
+      key: config.winstonKey,
+      provider: "winston",
+      threshold: config.threshold,
+      timeoutMs: config.timeoutMs,
+      winstonKey: config.winstonKey,
+      preference: config.preference,
+    };
+    return activeDetectorCache;
+  }
+
+  const resolved = await resolveTextDetectorValidation();
+  const useWinston =
+    resolved.activeProvider === "winston" && Boolean(config.winstonKey);
+
+  activeDetectorCache = {
+    expiresAt: now + ACTIVE_DETECTOR_CACHE_MS,
+    url: useWinston ? WINSTON_TEXT_URL : config.url,
+    key: useWinston ? config.winstonKey! : config.key,
+    provider: useWinston ? "winston" : config.provider,
+    threshold: config.threshold,
+    timeoutMs: config.timeoutMs,
+    winstonKey: config.winstonKey,
+    preference: config.preference,
+  };
+
+  return activeDetectorCache;
+}
+
 async function validateDetectorEndpoint({
   url,
   key,
@@ -457,7 +539,7 @@ async function validateDetectorEndpoint({
     normalized.includes("unauthorized") ||
     response.status === 401
   ) {
-    return { status: "invalid", provider, message };
+    return { status: "invalid", provider, message: formatDetectorErrorMessage(message) };
   }
 
   if (normalized.includes("invalid detector url") || normalized.includes("failed to parse url")) {
@@ -467,6 +549,14 @@ async function validateDetectorEndpoint({
       message:
         message ||
         "AI_DETECTOR_URL is invalid. Use https://api.sapling.ai/api/v1/aidetect",
+    };
+  }
+
+  if (isSaplingUnavailableMessage(message)) {
+    return {
+      status: "error",
+      provider,
+      message: formatDetectorErrorMessage(message),
     };
   }
 
@@ -531,21 +621,14 @@ function getReliabilityWarning(
 }
 
 export async function detectText(text: string): Promise<DetectionResponse> {
-  const config = getDetectorConfig();
-
-  if (!config.url) {
+  let config: ActiveDetectorConfig;
+  try {
+    config = await getActiveTextDetectorConfig();
+  } catch {
     return {
       result: "error",
       source: "unavailable",
       message: "AI_DETECTOR_URL is not configured.",
-    };
-  }
-
-  if (!config.key) {
-    return {
-      result: "error",
-      source: "unavailable",
-      message: "AI_DETECTOR_KEY is not configured.",
     };
   }
 
@@ -558,28 +641,61 @@ export async function detectText(text: string): Promise<DetectionResponse> {
     };
   }
 
-  const primary = await detectWithConfiguredProvider(
+  if (config.provider === "winston" && trimmed.length < 300) {
+    return {
+      result: "error",
+      source: "detector",
+      message:
+        "This post is too short for Winston text detection (300+ characters). Renew your Sapling API plan for short-post detection, or try a longer post.",
+      reliability: "low",
+    };
+  }
+
+  const result = await detectWithConfiguredProvider(
     trimmed,
-    config,
+    {
+      url: config.url,
+      key: config.key,
+      provider: config.provider,
+      threshold: config.threshold,
+      timeoutMs: config.timeoutMs,
+      winstonKey: config.winstonKey,
+      preference: config.preference,
+    },
     config.url,
     config.key,
     config.provider
   );
 
-  if (primary.result !== "error") {
-    return primary;
+  if (result.result !== "error") {
+    if (config.provider === "winston" && config.preference !== "winston") {
+      return {
+        ...result,
+        warning:
+          result.warning ||
+          "Sapling text API is unavailable, so Winston AI was used for this post.",
+      };
+    }
+    return result;
   }
 
-  if (config.preference === "winston" && config.winstonKey) {
-    return primary;
-  }
-
-  if (config.winstonKey) {
-    const winstonResult = await detectWithWinstonFallback(trimmed, config);
+  if (config.winstonKey && trimmed.length >= 300) {
+    const winstonResult = await detectWithWinstonFallback(trimmed, {
+      url: config.url,
+      key: config.key,
+      provider: config.provider,
+      threshold: config.threshold,
+      timeoutMs: config.timeoutMs,
+      winstonKey: config.winstonKey,
+      preference: config.preference,
+    });
     if (winstonResult) {
       return winstonResult;
     }
   }
 
-  return primary;
+  return {
+    ...result,
+    message: formatDetectorErrorMessage(result.message),
+  };
 }
