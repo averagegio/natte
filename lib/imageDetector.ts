@@ -1,3 +1,10 @@
+import {
+  classifyFromAiProbability,
+  humanScoreToAiProbability,
+  normalizeProbability,
+  upgradeTwitterImageUrl,
+} from "./detectorScores";
+
 export type ImageDetectionResult = "human" | "ai" | "error";
 
 export type ImageDetectionResponse = {
@@ -81,29 +88,35 @@ function parseImagePayload(payload: unknown, threshold: number): ImageDetectionR
   const errorMessage = extractErrorMessage(payload);
 
   if (typeof data.ai_probability === "number") {
+    const aiProbability = normalizeProbability(data.ai_probability);
+    const humanScore =
+      typeof data.score === "number"
+        ? data.score
+        : Math.round((1 - aiProbability) * 100);
     return {
-      result: data.ai_probability >= threshold ? "ai" : "human",
-      confidence: data.ai_probability,
-      humanScore: typeof data.score === "number" ? data.score : undefined,
+      result: classifyFromAiProbability(aiProbability, threshold),
+      confidence: aiProbability,
+      humanScore,
       source: "detector",
     };
   }
 
   if (typeof data.human_probability === "number") {
-    const aiProbability = 1 - data.human_probability;
+    const humanProbability = normalizeProbability(data.human_probability);
+    const aiProbability = 1 - humanProbability;
     return {
-      result: aiProbability >= threshold ? "ai" : "human",
+      result: classifyFromAiProbability(aiProbability, threshold),
       confidence: aiProbability,
-      humanScore: typeof data.score === "number" ? data.score : undefined,
+      humanScore: humanProbability * 100,
       source: "detector",
     };
   }
 
   if (typeof data.score === "number") {
     const humanScore = data.score;
-    const aiProbability = Math.max(0, Math.min(1, (100 - humanScore) / 100));
+    const aiProbability = humanScoreToAiProbability(humanScore);
     return {
-      result: aiProbability >= threshold ? "ai" : "human",
+      result: classifyFromAiProbability(aiProbability, threshold),
       confidence: aiProbability,
       humanScore,
       source: "detector",
@@ -123,7 +136,7 @@ function parseImagePayload(payload: unknown, threshold: number): ImageDetectionR
 
 function buildRequestBody(url: string, imageUrl: string) {
   if (isWinstonDetector(url)) {
-    return { url: imageUrl, version: "latest" };
+    return { url: imageUrl, version: "3" };
   }
 
   return { url: imageUrl, imageUrl };
@@ -165,6 +178,7 @@ export async function detectImage(imageUrl: string): Promise<ImageDetectionRespo
     };
   }
 
+  const analysisUrl = upgradeTwitterImageUrl(trimmedUrl);
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), config.timeoutMs);
 
@@ -176,7 +190,7 @@ export async function detectImage(imageUrl: string): Promise<ImageDetectionRespo
         Accept: "application/json",
         Authorization: `Bearer ${config.key}`,
       },
-      body: JSON.stringify(buildRequestBody(config.url, trimmedUrl)),
+      body: JSON.stringify(buildRequestBody(config.url, analysisUrl)),
       signal: controller.signal,
     });
 

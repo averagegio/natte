@@ -56,14 +56,34 @@ Set these in Vercel (or locally via `.env.local`). See `.env.example` for the fu
 | `X_BEARER_TOKEN` | No | App-only bearer token for live post fetching |
 | `X_DEFAULT_USERNAME` | No | X username to fetch posts from (default: `natte`) |
 | `NEXT_PUBLIC_APP_URL` | Yes (prod) | App URL for OAuth callback and Stripe |
-| `AI_DETECTOR_URL` | **Yes** | External AI detector endpoint — required before detection is enabled |
-| `AI_DETECTOR_KEY` | No | API key for the external detector |
+| `AI_DETECTOR_URL` | **Yes** | Text detector endpoint (Sapling or Winston) |
+| `AI_DETECTOR_KEY` | **Yes** | API key for the text detector (Winston can reuse `AI_IMAGE_DETECTOR_KEY`) |
 | `AI_DETECTOR_THRESHOLD` | No | Score threshold for AI classification (default: `0.5`) |
 | `AI_IMAGE_DETECTOR_URL` | For images | Image detector endpoint (default: Winston AI) |
 | `AI_IMAGE_DETECTOR_KEY` | For images | Winston AI API key (`WINSTON_API_KEY` alias supported) |
 | `DETECT_REQUIRE_SUBSCRIPTION` | No | Require login + active plan (default: `true` in production) |
 
 Without `AI_DETECTOR_URL`, detection returns **503 unavailable** — the heuristic fallback has been removed.
+
+### Text detection
+
+**Sapling (recommended for short posts / tweets):**
+
+```
+AI_DETECTOR_URL=https://api.sapling.ai/api/v1/aidetect
+AI_DETECTOR_KEY=<your 32-char Sapling key>
+```
+
+Sapling returns a 0–1 AI probability score. Short tweets may be less reliable — the UI will warn you but still runs detection.
+
+**Winston AI (better for longer text, 300+ characters):**
+
+```
+AI_DETECTOR_URL=https://api.gowinston.ai/v2/ai-content-detection
+AI_DETECTOR_KEY=<your Winston key>   # or reuse AI_IMAGE_DETECTOR_KEY
+```
+
+Winston returns a 0–100 human score. Use the same key as image detection if you already have Winston configured.
 
 ### Detector API contract
 

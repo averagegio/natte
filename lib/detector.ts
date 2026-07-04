@@ -1,10 +1,21 @@
+import {
+  classifyFromAiProbability,
+  detectProvider,
+  humanScoreToAiProbability,
+  normalizeProbability,
+  type DetectorProvider,
+} from "./detectorScores";
+
 export type DetectionResult = "human" | "ai" | "error";
 
 export type DetectionResponse = {
   result: DetectionResult;
   confidence?: number;
+  humanScore?: number;
   source: "detector" | "unavailable";
   message?: string;
+  reliability?: "high" | "low";
+  warning?: string;
 };
 
 function firstEnv(...names: string[]): string | undefined {
@@ -17,13 +28,20 @@ function firstEnv(...names: string[]): string | undefined {
 
 export function getDetectorConfig() {
   const url = firstEnv("AI_DETECTOR_URL", "DETECTOR_URL");
-  const key = firstEnv("AI_DETECTOR_KEY", "DETECTOR_KEY", "AI_DETECTOR_API_KEY");
+  const provider = detectProvider(url);
+  let key = firstEnv("AI_DETECTOR_KEY", "DETECTOR_KEY", "AI_DETECTOR_API_KEY");
+
+  if (!key && provider === "winston") {
+    key = firstEnv("AI_IMAGE_DETECTOR_KEY", "WINSTON_API_KEY");
+  }
+
   const threshold = Number(firstEnv("AI_DETECTOR_THRESHOLD") ?? "0.5");
   const timeoutMs = Number(firstEnv("AI_DETECTOR_TIMEOUT_MS") ?? "15000");
 
   return {
     url,
     key,
+    provider,
     threshold: Number.isFinite(threshold) ? threshold : 0.5,
     timeoutMs: Number.isFinite(timeoutMs) ? timeoutMs : 15000,
   };
@@ -40,7 +58,7 @@ export function getDetectorStatus() {
     configured: isDetectorConfigured(),
     hasApiKey: Boolean(config.key),
     hasUrl: Boolean(config.url),
-    provider: config.url?.includes("sapling.ai") ? "sapling" : "custom",
+    provider: config.provider,
     threshold: config.threshold,
     timeoutMs: config.timeoutMs,
   };
@@ -50,14 +68,13 @@ function isSaplingDetector(url: string) {
   return url.includes("sapling.ai");
 }
 
+function isWinstonDetector(url: string) {
+  return url.includes("gowinston.ai");
+}
+
 function normalizeResult(value: unknown): DetectionResult | null {
   if (typeof value === "boolean") {
     return value ? "ai" : "human";
-  }
-
-  if (typeof value === "number" && Number.isFinite(value)) {
-    const config = getDetectorConfig();
-    return value >= config.threshold ? "ai" : "human";
   }
 
   if (typeof value !== "string") {
@@ -84,7 +101,7 @@ function extractErrorMessage(payload: unknown): string | undefined {
   }
 
   const data = payload as Record<string, unknown>;
-  const message = data.msg ?? data.message ?? data.error ?? data.detail;
+  const message = data.msg ?? data.message ?? data.error ?? data.detail ?? data.description;
 
   if (typeof message === "string" && message.trim()) {
     return message.trim();
@@ -97,7 +114,33 @@ function extractErrorMessage(payload: unknown): string | undefined {
   return undefined;
 }
 
-function parseDetectorPayload(payload: unknown): DetectionResponse | null {
+function parseScoreValue(
+  score: number,
+  provider: DetectorProvider,
+  threshold: number
+): Pick<DetectionResponse, "result" | "confidence" | "humanScore"> {
+  if (provider === "winston" || score > 1) {
+    const humanScore = score > 1 ? score : score * 100;
+    const aiProbability = humanScoreToAiProbability(humanScore);
+    return {
+      result: classifyFromAiProbability(aiProbability, threshold),
+      confidence: aiProbability,
+      humanScore,
+    };
+  }
+
+  const aiProbability = normalizeProbability(score);
+  return {
+    result: classifyFromAiProbability(aiProbability, threshold),
+    confidence: aiProbability,
+  };
+}
+
+function parseDetectorPayload(
+  payload: unknown,
+  provider: DetectorProvider,
+  threshold: number
+): DetectionResponse | null {
   if (!payload || typeof payload !== "object") {
     return null;
   }
@@ -122,11 +165,11 @@ function parseDetectorPayload(payload: unknown): DetectionResponse | null {
   if (direct) {
     const confidence =
       typeof data.confidence === "number"
-        ? data.confidence
+        ? normalizeProbability(data.confidence)
         : typeof data.score === "number"
-          ? data.score
+          ? parseScoreValue(data.score, provider, threshold).confidence
           : typeof data.probability === "number"
-            ? data.probability
+            ? normalizeProbability(data.probability)
             : undefined;
 
     return { result: direct, confidence, source: "detector" };
@@ -140,19 +183,28 @@ function parseDetectorPayload(payload: unknown): DetectionResponse | null {
   }
 
   if (typeof data.ai_probability === "number") {
-    const config = getDetectorConfig();
+    const aiProbability = normalizeProbability(data.ai_probability);
     return {
-      result: data.ai_probability >= config.threshold ? "ai" : "human",
-      confidence: data.ai_probability,
+      result: classifyFromAiProbability(aiProbability, threshold),
+      confidence: aiProbability,
+      source: "detector",
+    };
+  }
+
+  if (typeof data.human_probability === "number") {
+    const humanProbability = normalizeProbability(data.human_probability);
+    const aiProbability = 1 - humanProbability;
+    return {
+      result: classifyFromAiProbability(aiProbability, threshold),
+      confidence: aiProbability,
+      humanScore: humanProbability * 100,
       source: "detector",
     };
   }
 
   if (typeof data.score === "number") {
-    const config = getDetectorConfig();
     return {
-      result: data.score >= config.threshold ? "ai" : "human",
-      confidence: data.score,
+      ...parseScoreValue(data.score, provider, threshold),
       source: "detector",
     };
   }
@@ -169,7 +221,51 @@ function buildRequestBody(url: string, key: string | undefined, text: string) {
     };
   }
 
+  if (isWinstonDetector(url)) {
+    return {
+      text,
+      version: "latest",
+      sentences: true,
+    };
+  }
+
   return { text };
+}
+
+function buildRequestHeaders(url: string, key: string | undefined) {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  };
+
+  if (key && !isSaplingDetector(url)) {
+    headers.Authorization = `Bearer ${key}`;
+  }
+
+  return headers;
+}
+
+function getReliabilityWarning(
+  provider: DetectorProvider,
+  textLength: number
+): Pick<DetectionResponse, "reliability" | "warning"> {
+  if (provider === "winston" && textLength < 300) {
+    return {
+      reliability: "low",
+      warning:
+        "Short posts are less reliable for Winston text detection. Results work best with 300+ characters.",
+    };
+  }
+
+  if (provider === "sapling" && textLength < 50) {
+    return {
+      reliability: "low",
+      warning:
+        "Short posts are less reliable for AI text detection. Try a longer post for a stronger signal.",
+    };
+  }
+
+  return { reliability: "high" };
 }
 
 export async function detectText(text: string): Promise<DetectionResponse> {
@@ -200,26 +296,14 @@ export async function detectText(text: string): Promise<DetectionResponse> {
     };
   }
 
-  if (isSaplingDetector(config.url) && trimmed.length < 50) {
-    return {
-      result: "error",
-      source: "detector",
-      message:
-        "This post is too short for reliable AI detection. Sapling works best with at least 50–300 characters.",
-    };
-  }
-
+  const reliability = getReliabilityWarning(config.provider, trimmed.length);
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), config.timeoutMs);
 
   try {
     const res = await fetch(config.url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${config.key}`,
-      },
+      headers: buildRequestHeaders(config.url, config.key),
       body: JSON.stringify(buildRequestBody(config.url, config.key, trimmed)),
       signal: controller.signal,
     });
@@ -234,9 +318,9 @@ export async function detectText(text: string): Promise<DetectionResponse> {
       return { result: "error", source: "detector", message };
     }
 
-    const parsed = parseDetectorPayload(json);
+    const parsed = parseDetectorPayload(json, config.provider, config.threshold);
     if (parsed) {
-      return parsed;
+      return { ...parsed, ...reliability };
     }
 
     console.error("Unrecognized detector response:", json);

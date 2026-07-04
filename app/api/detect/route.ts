@@ -80,6 +80,9 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     result: detection.result,
     confidence: detection.confidence,
+    humanScore: detection.humanScore,
+    reliability: detection.reliability,
+    warning: detection.warning,
     source: detection.source,
     usage: access.usage !== undefined ? access.usage + 1 : undefined,
     limit: access.limit,

@@ -17,6 +17,7 @@ export default function AIParserToggle({ text }: Props) {
   const [result, setResult] = useState<string | null>(null);
   const [confidence, setConfidence] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [warning, setWarning] = useState<string | null>(null);
   const [status, setStatus] = useState<DetectStatus | null>(null);
 
   useEffect(() => {
@@ -31,6 +32,7 @@ export default function AIParserToggle({ text }: Props) {
     setResult(null);
     setConfidence(null);
     setError(null);
+    setWarning(null);
     try {
       const res = await fetch("/api/detect", {
         method: "POST",
@@ -48,6 +50,7 @@ export default function AIParserToggle({ text }: Props) {
 
       setResult(json.result ?? "unknown");
       setConfidence(typeof json.confidence === "number" ? json.confidence : null);
+      setWarning(typeof json.warning === "string" ? json.warning : null);
     } catch {
       setError("Network error");
       setResult("error");
@@ -69,6 +72,7 @@ export default function AIParserToggle({ text }: Props) {
       setResult(null);
       setConfidence(null);
       setError(null);
+      setWarning(null);
     }
   }
 
@@ -101,6 +105,7 @@ export default function AIParserToggle({ text }: Props) {
         </div>
       </div>
       {error && <p className="text-xs text-red-300">{error}</p>}
+      {warning && !error && <p className="text-xs text-amber-300">{warning}</p>}
       {status?.requiresSubscription && status.available && (
         <p className="text-xs text-white/40">Sign in with an active plan to run detection.</p>
       )}

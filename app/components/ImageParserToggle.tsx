@@ -17,6 +17,7 @@ export default function ImageParserToggle({ imageUrl, alt }: Props) {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [confidence, setConfidence] = useState<number | null>(null);
+  const [humanScore, setHumanScore] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<DetectStatus | null>(null);
 
@@ -31,6 +32,7 @@ export default function ImageParserToggle({ imageUrl, alt }: Props) {
     setLoading(true);
     setResult(null);
     setConfidence(null);
+    setHumanScore(null);
     setError(null);
 
     try {
@@ -50,6 +52,7 @@ export default function ImageParserToggle({ imageUrl, alt }: Props) {
 
       setResult(json.result ?? "unknown");
       setConfidence(typeof json.confidence === "number" ? json.confidence : null);
+      setHumanScore(typeof json.humanScore === "number" ? json.humanScore : null);
     } catch {
       setError("Network error");
       setResult("error");
@@ -70,6 +73,7 @@ export default function ImageParserToggle({ imageUrl, alt }: Props) {
     else {
       setResult(null);
       setConfidence(null);
+      setHumanScore(null);
       setError(null);
     }
   }
@@ -103,7 +107,11 @@ export default function ImageParserToggle({ imageUrl, alt }: Props) {
                 ? "Checking..."
                 : result
                   ? `Result: ${result}${
-                      confidence !== null ? ` (${Math.round(confidence * 100)}% AI)` : ""
+                      humanScore !== null
+                        ? ` (${Math.round(humanScore)}% human)`
+                        : confidence !== null
+                          ? ` (${Math.round(confidence * 100)}% AI)`
+                          : ""
                     }`
                   : "Idle"}
           </div>
