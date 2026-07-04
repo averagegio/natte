@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import DashboardHeader from "../components/DashboardHeader";
+import DashboardOnboarding from "../components/DashboardOnboarding";
 import SideDrawer from "../components/SideDrawer";
 import StarConstellation from "../components/StarConstellation";
 import WidgetConnectionsList, {
@@ -38,7 +39,7 @@ export default function DashboardPage() {
     if (xConnected) {
       setOauthMessage({
         type: "success",
-        text: `Connected @${xConnected} via your X Developer App.`,
+        text: `Connected @${xConnected}.`,
       });
       router.replace("/dashboard");
     } else if (xError) {
@@ -85,9 +86,12 @@ export default function DashboardPage() {
 
   if (!user) return null;
 
+  const hasConnection = connections.some((c) => c.status === "connected");
+
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-black">
       <SideDrawer />
+      <DashboardOnboarding hasConnection={hasConnection} />
 
       <div className="pointer-events-none fixed inset-0 z-0">
         <StarConstellation />

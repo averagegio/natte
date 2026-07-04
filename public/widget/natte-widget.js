@@ -8,7 +8,7 @@
  *   <script src="https://your-domain.com/widget/natte-widget.js"></script>
  *
  * X Developer App feed embed:
- *   <div data-natte-x-username="yourhandle" data-natte-x-count="3">
+ *   <div data-natte-x-username="yourhandle" data-natte-x-count="10">
  *     <div data-natte-widget></div>
  *   </div>
  *   <script src="https://your-domain.com/widget/natte-widget.js"></script>
@@ -138,10 +138,17 @@
     wrapper.style.cssText = "margin-top:12px";
 
     const img = document.createElement("img");
-    img.src = imageUrl;
+    img.referrerPolicy = "no-referrer";
     img.alt = "Post media";
     img.style.cssText =
       "display:block;width:100%;max-height:280px;object-fit:cover;border-radius:12px;border:1px solid rgba(255,255,255,0.1);margin-bottom:8px";
+    img.addEventListener("error", function onImageError() {
+      if (!img.dataset.proxyTried) {
+        img.dataset.proxyTried = "1";
+        img.src = ORIGIN + "/api/media/proxy?url=" + encodeURIComponent(imageUrl);
+      }
+    });
+    img.src = imageUrl;
     wrapper.appendChild(img);
 
     let on = false;
@@ -248,7 +255,7 @@
     const username = container.getAttribute("data-natte-x-username");
     if (!username) return;
 
-    const count = container.getAttribute("data-natte-x-count") || "3";
+    const count = container.getAttribute("data-natte-x-count") || "10";
     const widgetSlot = container.querySelector("[data-natte-widget]") || container;
     widgetSlot.innerHTML = "";
 

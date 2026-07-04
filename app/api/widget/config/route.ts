@@ -36,7 +36,7 @@ export async function GET() {
     embed: {
       basic: '<div data-natte-text="Your text here"><div data-natte-widget></div></div>',
       xFeed:
-        '<div data-natte-x-username="yourhandle" data-natte-x-count="3"><div data-natte-widget></div></div>',
+        '<div data-natte-x-username="yourhandle" data-natte-x-count="10"><div data-natte-widget></div></div>',
     },
   });
 }

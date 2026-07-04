@@ -36,7 +36,7 @@ export default function NattesSection() {
       '<script src="' + origin + '/widget/natte-widget.js"></script>',
       "",
       "## X feed embed (uses your Developer App)",
-      '<div data-natte-x-username="yourhandle" data-natte-x-count="3">',
+      '<div data-natte-x-username="yourhandle" data-natte-x-count="10">',
       '  <div data-natte-widget></div>',
       "</div>",
       '<script src="' + origin + '/widget/natte-widget.js"></script>',

@@ -5,7 +5,9 @@ import { useEffect, useState } from "react";
 import AIParserToggle from "./AIParserToggle";
 import ImageParserToggle from "./ImageParserToggle";
 import GlossyCard from "./GlossyCard";
+import ToggleOnboarding from "./ToggleOnboarding";
 import { buildDetectionText } from "@/lib/detectionText";
+import { DEFAULT_X_POST_COUNT } from "@/lib/xPostCount";
 
 interface XPostMedia {
   mediaKey: string;
@@ -30,7 +32,7 @@ export default function XPostsSection() {
   const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/x/posts", { credentials: "include" })
+    fetch(`/api/x/posts?count=${DEFAULT_X_POST_COUNT}`, { credentials: "include" })
       .then((res) => res.json())
       .then(
         (data: {
@@ -67,8 +69,12 @@ export default function XPostsSection() {
         ? "bg-amber-500/20 text-amber-300"
         : "bg-white/10 text-white/50";
 
+  const hasPosts = !loading && source !== "unavailable" && posts.length > 0;
+  const hasImages = posts.some((post) => post.media.length > 0);
+
   return (
     <section className="mt-12 space-y-6">
+      <ToggleOnboarding hasPosts={hasPosts} hasImages={hasImages} />
       <GlossyCard>
         <div className="mb-4">
           <div className="flex flex-wrap items-center gap-3">
@@ -80,16 +86,16 @@ export default function XPostsSection() {
               <span className="text-xs text-white/40">@{username}</span>
             )}
           </div>
-          <p className="mt-2 text-sm text-white/50">
-            {source === "live"
-              ? "Detect AI in post text and attached images from your live X feed."
-              : "Connect X on your dashboard to load real posts from your timeline."}
-          </p>
+          {source !== "live" && (
+            <p className="mt-2 text-sm text-white/50">
+              Connect X on your dashboard to load real posts from your timeline.
+            </p>
+          )}
         </div>
 
         {loading ? (
           <div className="space-y-4">
-            {[0, 1, 2].map((i) => (
+            {Array.from({ length: Math.min(DEFAULT_X_POST_COUNT, 5) }, (_, i) => (
               <div key={i} className="h-20 animate-pulse rounded-2xl bg-white/5" />
             ))}
           </div>
@@ -115,20 +121,30 @@ export default function XPostsSection() {
           </div>
         ) : (
           <div className="space-y-6">
-            {posts.map((post) => (
+            {posts.map((post, postIndex) => (
               <div key={post.id} className="rounded-2xl border border-white/10 p-4">
                 {post.text && (
                   <div className="mb-3 text-sm text-white/70">{post.text}</div>
                 )}
-                <AIParserToggle text={buildDetectionText(post)} />
+                <div id={postIndex === 0 ? "toggle-text-detection" : undefined}>
+                  <AIParserToggle text={buildDetectionText(post)} />
+                </div>
                 {post.media.length > 0 && (
                   <div className="mt-4 space-y-4">
-                    {post.media.map((item) => (
-                      <ImageParserToggle
+                    {post.media.map((item, mediaIndex) => (
+                      <div
                         key={item.mediaKey}
-                        imageUrl={item.url}
-                        alt={item.altText}
-                      />
+                        id={
+                          postIndex === 0 && mediaIndex === 0
+                            ? "toggle-image-detection"
+                            : undefined
+                        }
+                      >
+                        <ImageParserToggle
+                          imageUrl={item.url}
+                          alt={item.altText}
+                        />
+                      </div>
                     ))}
                   </div>
                 )}
