@@ -1,6 +1,13 @@
 import { NextResponse } from "next/server";
 import { getSessionUserId } from "@/lib/auth";
 import { getDb } from "@/lib/db";
+import {
+  getActiveSubscription,
+  getMonthlyDetectionLimit,
+  getMonthlyDetectionUsage,
+  getTierName,
+  syncSubscriptionFromStripe,
+} from "@/lib/subscriptions";
 
 export async function GET() {
   try {
@@ -39,9 +46,25 @@ export async function GET() {
       connections = [];
     }
 
+    let subscription =
+      (await getActiveSubscription(userId)) ?? (await syncSubscriptionFromStripe(userId));
+
+    const usage = subscription ? await getMonthlyDetectionUsage(userId) : 0;
+    const limit = subscription ? getMonthlyDetectionLimit(subscription.tier) : null;
+
     return NextResponse.json({
       user: { ...users[0], profile_pic: users[0].profile_pic ?? null },
       connections,
+      subscription: subscription
+        ? {
+            tier: subscription.tier,
+            tierName: getTierName(subscription.tier),
+            billingInterval: subscription.billing_interval,
+            status: subscription.status,
+            usage,
+            limit,
+          }
+        : null,
     });
   } catch (err) {
     console.error("Dashboard error:", err);
