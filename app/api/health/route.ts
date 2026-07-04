@@ -1,11 +1,17 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { getXAppStatus } from "@/lib/xConfig";
 
 export async function GET() {
   const checks: Record<string, string> = {};
 
   checks.database_url = process.env.DATABASE_URL ? "set" : "missing";
   checks.auth_secret = process.env.AUTH_SECRET ? "set" : "missing";
+
+  const xStatus = getXAppStatus();
+  checks.x_oauth = xStatus.oauthConfigured ? "configured" : "missing";
+  checks.x_bearer_token = xStatus.bearerTokenConfigured ? "set" : "missing";
+  checks.x_api_key = xStatus.apiKeyConfigured ? "set" : "missing";
 
   if (!process.env.DATABASE_URL) {
     return NextResponse.json({
@@ -38,6 +44,7 @@ export async function GET() {
     return NextResponse.json({
       ok: ready,
       checks,
+      x: xStatus,
       message: ready
         ? "Auth and database are ready."
         : "Configuration incomplete. See checks for details.",

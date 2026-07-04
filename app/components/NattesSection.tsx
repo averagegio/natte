@@ -19,6 +19,38 @@ export default function NattesSection() {
     link.click();
   };
 
+  const downloadXEmbedGuide = () => {
+    const origin = window.location.origin;
+    const guide = [
+      "# NATTES Widget — X Developer App Embed",
+      "",
+      "1. Register your app at https://developer.x.com/en/portal/dashboard",
+      "2. Set callback URL: " + origin + "/api/connections/x/callback",
+      "3. Add env vars: X_CLIENT_ID, X_CLIENT_SECRET, X_BEARER_TOKEN",
+      "4. Connect your account at " + origin + "/dashboard",
+      "",
+      "## Basic embed",
+      '<div data-natte-text="Post text here">',
+      '  <div data-natte-widget></div>',
+      "</div>",
+      '<script src="' + origin + '/widget/natte-widget.js"></script>',
+      "",
+      "## X feed embed (uses your Developer App)",
+      '<div data-natte-x-username="yourhandle" data-natte-x-count="3">',
+      '  <div data-natte-widget></div>',
+      "</div>",
+      '<script src="' + origin + '/widget/natte-widget.js"></script>',
+    ].join("\n");
+
+    const blob = new Blob([guide], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "natte-x-widget-setup.md";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   const openBrowserWidget = () => {
     window.open("/widget/demo.html", "_blank", "noopener,noreferrer");
   };
@@ -56,7 +88,7 @@ export default function NattesSection() {
         ))}
       </div>
 
-      <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+      <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:flex-wrap sm:justify-center">
         <button
           type="button"
           onClick={downloadWidget}
@@ -72,6 +104,22 @@ export default function NattesSection() {
             />
           </svg>
           Download widget locally
+        </button>
+        <button
+          type="button"
+          onClick={downloadXEmbedGuide}
+          className="inline-flex items-center gap-2 rounded-full border border-violet-500/40 bg-violet-500/10 px-6 py-3 text-sm font-medium text-violet-300 transition hover:border-violet-500/60 hover:bg-violet-500/20"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path
+              d="M4 2h8l2 3v9H2V2h2z"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinejoin="round"
+            />
+            <path d="M6 7h4M6 10h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+          X Developer App setup guide
         </button>
         <button
           type="button"

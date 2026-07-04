@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import GlossyCard from "./GlossyCard";
 
 export type WidgetConnection = {
@@ -15,15 +15,42 @@ export type WidgetConnection = {
 type Props = {
   connections: WidgetConnection[];
   onChange: (connections: WidgetConnection[]) => void;
+  oauthMessage?: { type: "success" | "error"; text: string } | null;
 };
 
-export default function WidgetConnectionsList({ connections, onChange }: Props) {
+export default function WidgetConnectionsList({
+  connections,
+  onChange,
+  oauthMessage,
+}: Props) {
   const [showForm, setShowForm] = useState(false);
   const [xUsername, setXUsername] = useState("");
   const [bearerToken, setBearerToken] = useState("");
   const [loading, setLoading] = useState(false);
   const [disconnecting, setDisconnecting] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [oauthConfigured, setOauthConfigured] = useState(false);
+  const [statusLoading, setStatusLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/connections/x/status")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data) setOauthConfigured(Boolean(data.oauthConfigured));
+      })
+      .catch(() => setOauthConfigured(false))
+      .finally(() => setStatusLoading(false));
+  }, []);
+
+  useEffect(() => {
+    if (oauthMessage?.type === "error") {
+      setError(oauthMessage.text);
+    }
+  }, [oauthMessage]);
+
+  function connectWithOAuth() {
+    window.location.href = "/api/connections/x/oauth";
+  }
 
   async function connectX(e: React.FormEvent) {
     e.preventDefault();
@@ -80,17 +107,65 @@ export default function WidgetConnectionsList({ connections, onChange }: Props) 
         <div>
           <h2 className="text-xl font-semibold text-white">Widget connections</h2>
           <p className="mt-1 text-sm text-white/50">
-            Connect your X API credentials to power the NATTES detection widget on your posts.
+            Connect your X Developer App to power the NATTES detection widget on your posts.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => setShowForm((v) => !v)}
-          className="self-start rounded-full border border-sky-500/40 bg-sky-500/10 px-5 py-2 text-sm font-medium text-sky-300 transition hover:border-sky-500/60 hover:bg-sky-500/20"
-        >
-          {showForm ? "Cancel" : "+ Connect X API"}
-        </button>
+        {!statusLoading && oauthConfigured ? (
+          <button
+            type="button"
+            onClick={connectWithOAuth}
+            className="self-start rounded-full border border-sky-500/40 bg-sky-500/10 px-5 py-2 text-sm font-medium text-sky-300 transition hover:border-sky-500/60 hover:bg-sky-500/20"
+          >
+            Connect with X
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setShowForm((v) => !v)}
+            className="self-start rounded-full border border-sky-500/40 bg-sky-500/10 px-5 py-2 text-sm font-medium text-sky-300 transition hover:border-sky-500/60 hover:bg-sky-500/20"
+          >
+            {showForm ? "Cancel" : "+ Connect X API"}
+          </button>
+        )}
       </div>
+
+      {oauthMessage?.type === "success" && (
+        <p className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">
+          {oauthMessage.text}
+        </p>
+      )}
+
+      {!statusLoading && oauthConfigured && (
+        <GlossyCard className="mb-6">
+          <p className="text-sm text-white/60">
+            Your X Developer App credentials are configured. Click{" "}
+            <strong className="text-white">Connect with X</strong> to authorize via OAuth 2.0.
+            Add{" "}
+            <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs text-sky-300">
+              {typeof window !== "undefined"
+                ? `${window.location.origin}/api/connections/x/callback`
+                : "/api/connections/x/callback"}
+            </code>{" "}
+            as a callback URL in the{" "}
+            <a
+              href="https://developer.x.com/en/portal/dashboard"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sky-400 hover:underline"
+            >
+              X Developer Portal
+            </a>
+            .
+          </p>
+          <button
+            type="button"
+            onClick={() => setShowForm((v) => !v)}
+            className="mt-4 text-xs text-white/40 underline hover:text-white/60"
+          >
+            {showForm ? "Hide manual token entry" : "Use bearer token instead"}
+          </button>
+        </GlossyCard>
+      )}
 
       {showForm && (
         <GlossyCard className="mb-6">
@@ -167,7 +242,9 @@ export default function WidgetConnectionsList({ connections, onChange }: Props) 
             </div>
             <p className="text-white/70">No widget connections yet</p>
             <p className="mt-2 text-sm text-white/40">
-              Connect your X API to start detecting AI-generated posts on your timeline.
+              {oauthConfigured
+                ? "Connect your X account to start detecting AI-generated posts on your timeline."
+                : "Connect your X API to start detecting AI-generated posts on your timeline."}
             </p>
           </div>
         </GlossyCard>

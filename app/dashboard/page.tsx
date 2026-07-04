@@ -21,6 +21,30 @@ export default function DashboardPage() {
   const [user, setUser] = useState<DashboardUser | null>(null);
   const [connections, setConnections] = useState<WidgetConnection[]>([]);
   const [loading, setLoading] = useState(true);
+  const [oauthMessage, setOauthMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const xConnected = params.get("x_connected");
+    const xError = params.get("x_error");
+
+    if (xConnected) {
+      setOauthMessage({
+        type: "success",
+        text: `Connected @${xConnected} via your X Developer App.`,
+      });
+      router.replace("/dashboard");
+    } else if (xError) {
+      setOauthMessage({
+        type: "error",
+        text: `X connection failed: ${xError}`,
+      });
+      router.replace("/dashboard");
+    }
+  }, [router]);
 
   useEffect(() => {
     async function load() {
@@ -68,7 +92,11 @@ export default function DashboardPage() {
         <DashboardHeader user={user} onUpdate={setUser} />
 
         <div className="mt-10">
-          <WidgetConnectionsList connections={connections} onChange={setConnections} />
+          <WidgetConnectionsList
+            connections={connections}
+            onChange={setConnections}
+            oauthMessage={oauthMessage}
+          />
         </div>
       </div>
     </div>
