@@ -8,7 +8,14 @@ export interface XPost {
   text: string;
 }
 
-export type XPostSource = "live" | "mock";
+export type XPostSource = "live" | "mock" | "unavailable";
+
+export type FetchXPostsResult = {
+  posts: XPost[];
+  source: XPostSource;
+  username: string;
+  message?: string;
+};
 
 const MOCK_POSTS: XPost[] = [
   { id: "1", text: "Hello everyone — excited to share my weekend photos!" },
@@ -47,7 +54,10 @@ async function fetchPostsWithToken(
     .map((t: { id: string; text: string }) => ({ id: t.id, text: t.text }));
 }
 
-async function getUserConnectionToken(userId: string, username?: string): Promise<string | null> {
+async function getUserConnectionToken(
+  userId: string,
+  username?: string
+): Promise<{ token: string; username: string } | null> {
   const sql = getDb();
   let rows: ConnectionRow[];
 
@@ -110,42 +120,69 @@ async function getUserConnectionToken(userId: string, username?: string): Promis
     }
   }
 
-  return accessToken;
+  return { token: accessToken, username: connection.x_username };
 }
 
 export async function fetchXPosts(
   username?: string,
   count = 3,
-  userId?: string
-): Promise<{ posts: XPost[]; source: XPostSource }> {
-  const user = username || getXDefaultUsername();
-
-  const userToken = userId ? await getUserConnectionToken(userId, username) : null;
-  const token = userToken || getXBearerToken();
+  userId?: string,
+  options?: { allowMock?: boolean }
+): Promise<FetchXPostsResult> {
+  const requestedUser = (username || getXDefaultUsername()).replace(/^@/, "");
+  const connection = userId ? await getUserConnectionToken(userId, username) : null;
+  const resolvedUsername = connection?.username || requestedUser;
+  const token = connection?.token || getXBearerToken();
 
   if (!token) {
+    if (options?.allowMock) {
+      return {
+        posts: MOCK_POSTS.slice(0, count),
+        source: "mock",
+        username: resolvedUsername,
+        message: "Demo posts shown. Connect X or set X_BEARER_TOKEN for live posts.",
+      };
+    }
+
     return {
-      posts: MOCK_POSTS.slice(0, count),
-      source: "mock",
+      posts: [],
+      source: "unavailable",
+      username: resolvedUsername,
+      message:
+        "Live X posts are unavailable. Connect your X account on the dashboard or configure X_BEARER_TOKEN.",
     };
   }
 
   try {
-    const posts = await fetchPostsWithToken(token, user, count);
+    const posts = await fetchPostsWithToken(token, resolvedUsername, count);
 
     if (posts.length === 0) {
       return {
-        posts: MOCK_POSTS.slice(0, count),
-        source: "mock",
+        posts: [],
+        source: "unavailable",
+        username: resolvedUsername,
+        message: `No recent posts found for @${resolvedUsername}.`,
       };
     }
 
-    return { posts, source: "live" };
+    return { posts, source: "live", username: resolvedUsername };
   } catch (err) {
     console.error("X API fetch failed:", err);
+
+    if (options?.allowMock) {
+      return {
+        posts: MOCK_POSTS.slice(0, count),
+        source: "mock",
+        username: resolvedUsername,
+        message: "X API request failed. Showing demo posts instead.",
+      };
+    }
+
     return {
-      posts: MOCK_POSTS.slice(0, count),
-      source: "mock",
+      posts: [],
+      source: "unavailable",
+      username: resolvedUsername,
+      message: "Could not load live X posts. Check your X API credentials.",
     };
   }
 }

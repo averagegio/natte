@@ -130,7 +130,7 @@ export default function NattesSection() {
             <rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.5" />
             <path d="M2 5.5h12" stroke="currentColor" strokeWidth="1.5" />
           </svg>
-          Use widget in browser
+          Use live widget in browser
         </button>
       </div>
     </section>
