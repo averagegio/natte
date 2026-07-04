@@ -28,6 +28,19 @@
   const API_DETECT = ORIGIN ? ORIGIN + "/api/detect" : "/api/detect";
   const API_POSTS = ORIGIN ? ORIGIN + "/api/x/posts" : "/api/x/posts";
 
+  let detectorAvailable = true;
+
+  fetch(API_DETECT)
+    .then(function (res) {
+      return res.json();
+    })
+    .then(function (data) {
+      detectorAvailable = Boolean(data.available);
+    })
+    .catch(function () {
+      detectorAvailable = false;
+    });
+
   function createToggle(text) {
     const wrapper = document.createElement("div");
     wrapper.style.cssText =
@@ -61,6 +74,12 @@
     }
 
     btn.addEventListener("click", async function () {
+      if (!detectorAvailable) {
+        status.textContent = "Detector not configured";
+        status.style.color = "#f87171";
+        return;
+      }
+
       on = !on;
       if (on) {
         loading = true;
@@ -73,13 +92,23 @@
             body: JSON.stringify({ text: text }),
           });
           const json = await res.json();
-          result = json.result || "unknown";
+          if (!res.ok) {
+            result = "error";
+            status.textContent = json.message || "Access denied";
+            status.style.color = "#f87171";
+          } else {
+            result = json.result || "unknown";
+            status.style.color = "#888";
+          }
         } catch (_) {
           result = "error";
+          status.textContent = "Network error";
+          status.style.color = "#f87171";
         }
         loading = false;
       } else {
         result = null;
+        status.style.color = "#888";
       }
       updateUI();
     });

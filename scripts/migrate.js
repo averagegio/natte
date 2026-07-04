@@ -115,6 +115,18 @@ const steps = [
     label: "Create widget_connections index",
     sql: `CREATE INDEX IF NOT EXISTS idx_widget_connections_user_id ON widget_connections(user_id)`,
   },
+  {
+    label: "Create detection_usage table",
+    sql: `CREATE TABLE IF NOT EXISTS detection_usage (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )`,
+  },
+  {
+    label: "Create detection_usage index",
+    sql: `CREATE INDEX IF NOT EXISTS idx_detection_usage_user_month ON detection_usage(user_id, created_at)`,
+  },
 ];
 
 async function main() {
@@ -142,6 +154,7 @@ async function main() {
   console.log("  - users");
   console.log("  - subscriptions");
   console.log("  - widget_connections");
+  console.log("  - detection_usage");
 }
 
 main();

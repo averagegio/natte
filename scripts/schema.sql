@@ -45,3 +45,11 @@ ALTER TABLE widget_connections ADD COLUMN IF NOT EXISTS auth_type TEXT DEFAULT '
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_subscriptions_user_id ON subscriptions(user_id);
 CREATE INDEX IF NOT EXISTS idx_widget_connections_user_id ON widget_connections(user_id);
+
+CREATE TABLE IF NOT EXISTS detection_usage (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_detection_usage_user_month ON detection_usage(user_id, created_at);

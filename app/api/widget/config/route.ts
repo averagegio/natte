@@ -1,14 +1,22 @@
 import { NextResponse } from "next/server";
+import { getDetectorStatus, isDetectorConfigured } from "@/lib/detector";
+import { isSubscriptionRequiredForDetect } from "@/lib/subscriptions";
 import { getXAppStatus } from "@/lib/xConfig";
 
 export async function GET() {
   const xStatus = getXAppStatus();
+  const detectorStatus = getDetectorStatus();
 
   return NextResponse.json({
     name: "NATTES Proof of Human Widget",
-    version: "1.1.0",
+    version: "1.2.0",
     detectEndpoint: "/api/detect",
     postsEndpoint: "/api/x/posts",
+    detection: {
+      available: isDetectorConfigured(),
+      requiresSubscription: isSubscriptionRequiredForDetect(),
+      threshold: detectorStatus.threshold,
+    },
     x: {
       oauthConfigured: xStatus.oauthConfigured,
       bearerTokenConfigured: xStatus.bearerTokenConfigured,

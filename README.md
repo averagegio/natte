@@ -56,10 +56,32 @@ Set these in Vercel (or locally via `.env.local`). See `.env.example` for the fu
 | `X_BEARER_TOKEN` | No | App-only bearer token for live post fetching |
 | `X_DEFAULT_USERNAME` | No | X username to fetch posts from (default: `natte`) |
 | `NEXT_PUBLIC_APP_URL` | Yes (prod) | App URL for OAuth callback and Stripe |
-| `AI_DETECTOR_URL` | No | External AI detector endpoint |
+| `AI_DETECTOR_URL` | **Yes** | External AI detector endpoint — required before detection is enabled |
 | `AI_DETECTOR_KEY` | No | API key for the external detector |
+| `AI_DETECTOR_THRESHOLD` | No | Score threshold for AI classification (default: `0.5`) |
+| `DETECT_REQUIRE_SUBSCRIPTION` | No | Require login + active plan (default: `true` in production) |
 
-Without `X_BEARER_TOKEN` or an OAuth-connected account, the app falls back to demo post data.
+Without `AI_DETECTOR_URL`, detection returns **503 unavailable** — the heuristic fallback has been removed.
+
+### Detector API contract
+
+Your detector should accept:
+
+```json
+POST { "text": "string to analyze" }
+```
+
+And return any of these shapes:
+
+```json
+{ "result": "ai" }
+{ "result": "human" }
+{ "score": 0.92 }
+{ "is_ai": true }
+{ "ai_probability": 0.92 }
+```
+
+Authorization header is sent when `AI_DETECTOR_KEY` is set.
 
 ### X Developer App setup
 
