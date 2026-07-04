@@ -32,6 +32,9 @@ export default function WidgetConnectionsList({
   const [oauthConfigured, setOauthConfigured] = useState(false);
   const [statusLoading, setStatusLoading] = useState(true);
 
+  const activeConnection = connections.find((c) => c.status === "connected");
+  const isConnected = Boolean(activeConnection);
+
   useEffect(() => {
     fetch("/api/connections/x/status")
       .then((res) => (res.ok ? res.json() : null))
@@ -102,15 +105,19 @@ export default function WidgetConnectionsList({
   }
 
   return (
-    <section>
+    <section id="dashboard-connections">
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-white">Widget connections</h2>
-          <p className="mt-1 text-sm text-white/50">
-            Connect your X Developer App to power the NATTES detection widget on your posts.
-          </p>
+          <h2 className="text-xl font-semibold text-white">
+            {isConnected ? "X connection" : "Connect X"}
+          </h2>
+          {!isConnected && (
+            <p className="mt-1 text-sm text-white/50">
+              Link your X account to load live posts on the homepage.
+            </p>
+          )}
         </div>
-        {!statusLoading && oauthConfigured ? (
+        {!isConnected && !statusLoading && oauthConfigured && (
           <button
             type="button"
             onClick={connectWithOAuth}
@@ -118,7 +125,8 @@ export default function WidgetConnectionsList({
           >
             Connect with X
           </button>
-        ) : (
+        )}
+        {!isConnected && !statusLoading && !oauthConfigured && (
           <button
             type="button"
             onClick={() => setShowForm((v) => !v)}
@@ -135,39 +143,33 @@ export default function WidgetConnectionsList({
         </p>
       )}
 
-      {!statusLoading && oauthConfigured && (
+      {!isConnected && !statusLoading && oauthConfigured && (
         <GlossyCard className="mb-6">
           <p className="text-sm text-white/60">
-            Your X Developer App credentials are configured. Click{" "}
-            <strong className="text-white">Connect with X</strong> to authorize via OAuth 2.0.
-            Add{" "}
-            <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs text-sky-300">
-              {typeof window !== "undefined"
-                ? `${window.location.origin}/api/connections/x/callback`
-                : "/api/connections/x/callback"}
-            </code>{" "}
-            as a callback URL in the{" "}
-            <a
-              href="https://developer.x.com/en/portal/dashboard"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sky-400 hover:underline"
+            Authorize with OAuth, or{" "}
+            <button
+              type="button"
+              onClick={() => setShowForm((v) => !v)}
+              className="text-sky-400 underline hover:text-sky-300"
             >
-              X Developer Portal
-            </a>
+              enter a bearer token
+            </button>
             .
           </p>
-          <button
-            type="button"
-            onClick={() => setShowForm((v) => !v)}
-            className="mt-4 text-xs text-white/40 underline hover:text-white/60"
-          >
-            {showForm ? "Hide manual token entry" : "Use bearer token instead"}
-          </button>
+          {showForm && (
+            <p className="mt-3 text-xs text-white/40">
+              Callback URL:{" "}
+              <code className="rounded bg-white/10 px-1.5 py-0.5 text-sky-300">
+                {typeof window !== "undefined"
+                  ? `${window.location.origin}/api/connections/x/callback`
+                  : "/api/connections/x/callback"}
+              </code>
+            </p>
+          )}
         </GlossyCard>
       )}
 
-      {showForm && (
+      {showForm && !isConnected && (
         <GlossyCard className="mb-6">
           <form onSubmit={connectX} className="space-y-4">
             <div>
@@ -197,18 +199,6 @@ export default function WidgetConnectionsList({
                 className="mt-1 w-full rounded-xl border border-white/10 bg-black/60 px-4 py-3 text-white placeholder:text-white/30 focus:border-sky-500/50 focus:outline-none"
                 placeholder="AAAAAAAAAAAAAAAAAAAA..."
               />
-              <p className="mt-2 text-xs text-white/40">
-                Get your token from the{" "}
-                <a
-                  href="https://developer.x.com/en/portal/dashboard"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sky-400 hover:underline"
-                >
-                  X Developer Portal
-                </a>
-                . Your token is encrypted before storage.
-              </p>
             </div>
 
             {error && (
@@ -240,12 +230,7 @@ export default function WidgetConnectionsList({
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white/5 text-xl font-bold text-white/60">
               𝕏
             </div>
-            <p className="text-white/70">No widget connections yet</p>
-            <p className="mt-2 text-sm text-white/40">
-              {oauthConfigured
-                ? "Connect your X account to start detecting AI-generated posts on your timeline."
-                : "Connect your X API to start detecting AI-generated posts on your timeline."}
-            </p>
+            <p className="text-white/70">Not connected yet</p>
           </div>
         </GlossyCard>
       ) : (
@@ -259,7 +244,7 @@ export default function WidgetConnectionsList({
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-white">X (Twitter)</h3>
+                      <h3 className="font-semibold text-white">@{connection.x_username}</h3>
                       <span
                         className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                           connection.status === "connected"
@@ -270,10 +255,6 @@ export default function WidgetConnectionsList({
                         {connection.status}
                       </span>
                     </div>
-                    <p className="mt-1 text-sm text-white/50">@{connection.x_username}</p>
-                    <p className="mt-1 text-xs text-white/30">
-                      Connected {new Date(connection.created_at).toLocaleDateString()}
-                    </p>
                   </div>
                 </div>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import PostMediaImage from "./PostMediaImage";
 
 type Props = {
   imageUrl: string;
@@ -82,7 +83,7 @@ export default function ImageParserToggle({ imageUrl, alt }: Props) {
 
   return (
     <div className="space-y-3">
-      <img
+      <PostMediaImage
         src={imageUrl}
         alt={alt || "Post media"}
         className="max-h-72 w-full rounded-xl border border-white/10 object-cover"

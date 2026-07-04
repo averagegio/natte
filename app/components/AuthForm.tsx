@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import GlossyCard from "./GlossyCard";
+import { requestOnboarding, ONBOARDING_KEYS } from "@/lib/onboarding";
 
 type Mode = "login" | "signup";
 
@@ -37,6 +38,9 @@ export default function AuthForm() {
       }
 
       setSuccess(mode === "signup" ? "Account created! Redirecting..." : "Logged in! Redirecting...");
+      if (mode === "signup") {
+        requestOnboarding([ONBOARDING_KEYS.dashboard, ONBOARDING_KEYS.toggles]);
+      }
       setTimeout(() => {
         window.location.href = "/dashboard";
       }, 1000);

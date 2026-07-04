@@ -79,7 +79,7 @@ export default function DashboardHeader({ user, onUpdate }: Props) {
   }
 
   return (
-    <header className="overflow-hidden rounded-[2rem] border border-white/10 bg-black/40 p-8 shadow-2xl backdrop-blur-md">
+    <header id="dashboard-header" className="overflow-hidden rounded-[2rem] border border-white/10 bg-black/40 p-8 shadow-2xl backdrop-blur-md">
       <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-5">
           <div className="relative">
@@ -132,6 +132,7 @@ export default function DashboardHeader({ user, onUpdate }: Props) {
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <Link
+            id="dashboard-home-link"
             href="/"
             className="self-start rounded-full border border-white/20 bg-white/5 px-5 py-2 text-sm font-medium text-white/70 transition hover:border-white/40 hover:bg-white/10 hover:text-white"
           >

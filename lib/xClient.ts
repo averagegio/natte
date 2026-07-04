@@ -1,6 +1,8 @@
 import { decryptSecret, encryptSecret } from "./crypto";
 import { getDb } from "./db";
+import { resolveMediaUrl, type XApiMediaItem } from "./mediaUrl";
 import { getXBearerToken, getXDefaultUsername } from "./xConfig";
+import { DEFAULT_X_POST_COUNT } from "./xPostCount";
 import { refreshAccessToken } from "./xOAuth";
 
 export interface XPostMedia {
@@ -51,14 +53,6 @@ type ConnectionRow = {
   auth_type: string | null;
 };
 
-type XApiMedia = {
-  media_key: string;
-  type?: string;
-  url?: string;
-  preview_image_url?: string;
-  alt_text?: string;
-};
-
 type XApiTweet = {
   id: string;
   text: string;
@@ -67,9 +61,11 @@ type XApiTweet = {
   };
 };
 
+const MEDIA_FIELDS = "url,preview_image_url,type,alt_text,variants";
+
 function mapTweetMedia(
   tweet: XApiTweet,
-  mediaByKey: Map<string, XApiMedia>
+  mediaByKey: Map<string, XApiMediaItem>
 ): XPostMedia[] {
   const keys = tweet.attachments?.media_keys ?? [];
   const media: XPostMedia[] = [];
@@ -78,7 +74,7 @@ function mapTweetMedia(
     const item = mediaByKey.get(mediaKey);
     if (!item) continue;
 
-    const url = item.url || item.preview_image_url;
+    const url = resolveMediaUrl(item);
     if (!url) continue;
 
     media.push({
@@ -92,7 +88,90 @@ function mapTweetMedia(
   return media;
 }
 
-async function fetchPostsWithToken(
+function buildMediaMap(includes: { media?: XApiMediaItem[] } | undefined) {
+  const mediaByKey = new Map<string, XApiMediaItem>();
+
+  for (const item of includes?.media ?? []) {
+    if (item.media_key) {
+      mediaByKey.set(item.media_key, item);
+    }
+  }
+
+  return mediaByKey;
+}
+
+function mapTweets(json: { data?: XApiTweet[]; includes?: { media?: XApiMediaItem[] } }, count: number): XPost[] {
+  const mediaByKey = buildMediaMap(json.includes);
+
+  return ((json.data || []) as XApiTweet[])
+    .slice(0, count)
+    .map((tweet) => ({
+      id: tweet.id,
+      text: tweet.text,
+      media: mapTweetMedia(tweet, mediaByKey),
+    }));
+}
+
+async function getAuthenticatedUserId(token: string): Promise<string | null> {
+  const res = await fetch("https://api.twitter.com/2/users/me", {
+    headers: { Authorization: `Bearer ${token}` },
+    next: { revalidate: 300 },
+  });
+
+  if (!res.ok) {
+    return null;
+  }
+
+  const json = await res.json();
+  return json.data?.id ?? null;
+}
+
+async function getUserIdByUsername(token: string, username: string): Promise<string | null> {
+  const res = await fetch(
+    `https://api.twitter.com/2/users/by/username/${encodeURIComponent(username)}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      next: { revalidate: 300 },
+    }
+  );
+
+  if (!res.ok) {
+    return null;
+  }
+
+  const json = await res.json();
+  return json.data?.id ?? null;
+}
+
+async function fetchUserTimeline(
+  token: string,
+  userId: string,
+  count: number
+): Promise<XPost[]> {
+  const params = new URLSearchParams({
+    max_results: String(Math.min(Math.max(count, 5), 100)),
+    "tweet.fields": "text,attachments",
+    expansions: "attachments.media_keys",
+    "media.fields": MEDIA_FIELDS,
+  });
+
+  const res = await fetch(
+    `https://api.twitter.com/2/users/${userId}/tweets?${params.toString()}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      next: { revalidate: 300 },
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error(`X API error: ${res.status} ${res.statusText}`);
+  }
+
+  const json = await res.json();
+  return mapTweets(json, count);
+}
+
+async function fetchPostsBySearch(
   token: string,
   username: string,
   count: number
@@ -102,7 +181,7 @@ async function fetchPostsWithToken(
     max_results: String(Math.min(Math.max(count, 10), 100)),
     "tweet.fields": "text,attachments",
     expansions: "attachments.media_keys",
-    "media.fields": "url,preview_image_url,type,alt_text",
+    "media.fields": MEDIA_FIELDS,
   });
 
   const res = await fetch(
@@ -118,27 +197,36 @@ async function fetchPostsWithToken(
   }
 
   const json = await res.json();
-  const mediaByKey = new Map<string, XApiMedia>();
+  return mapTweets(json, count);
+}
 
-  for (const item of (json.includes?.media ?? []) as XApiMedia[]) {
-    if (item.media_key) {
-      mediaByKey.set(item.media_key, item);
+async function fetchPostsWithToken(
+  token: string,
+  username: string,
+  count: number,
+  options?: { preferTimeline?: boolean }
+): Promise<XPost[]> {
+  if (options?.preferTimeline) {
+    const userId =
+      (await getAuthenticatedUserId(token)) ||
+      (await getUserIdByUsername(token, username));
+
+    if (userId) {
+      try {
+        return await fetchUserTimeline(token, userId, count);
+      } catch (timelineError) {
+        console.warn("X user timeline fetch failed, falling back to search:", timelineError);
+      }
     }
   }
 
-  return ((json.data || []) as XApiTweet[])
-    .slice(0, count)
-    .map((tweet) => ({
-      id: tweet.id,
-      text: tweet.text,
-      media: mapTweetMedia(tweet, mediaByKey),
-    }));
+  return fetchPostsBySearch(token, username, count);
 }
 
 async function getUserConnectionToken(
   userId: string,
   username?: string
-): Promise<{ token: string; username: string } | null> {
+): Promise<{ token: string; username: string; authType: string | null } | null> {
   const sql = getDb();
   let rows: ConnectionRow[];
 
@@ -201,12 +289,16 @@ async function getUserConnectionToken(
     }
   }
 
-  return { token: accessToken, username: connection.x_username };
+  return {
+    token: accessToken,
+    username: connection.x_username,
+    authType: connection.auth_type,
+  };
 }
 
 export async function fetchXPosts(
   username?: string,
-  count = 3,
+  count = DEFAULT_X_POST_COUNT,
   userId?: string,
   options?: { allowMock?: boolean }
 ): Promise<FetchXPostsResult> {
@@ -235,7 +327,9 @@ export async function fetchXPosts(
   }
 
   try {
-    const posts = await fetchPostsWithToken(token, resolvedUsername, count);
+    const posts = await fetchPostsWithToken(token, resolvedUsername, count, {
+      preferTimeline: connection?.authType === "oauth2",
+    });
 
     if (posts.length === 0) {
       return {

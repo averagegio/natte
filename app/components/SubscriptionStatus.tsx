@@ -50,7 +50,7 @@ export default function SubscriptionStatus({ subscription, onSync }: Props) {
   }
 
   return (
-    <GlossyCard className="mb-6">
+    <GlossyCard className="mb-6" id="dashboard-subscription">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-xl font-semibold text-white">Subscription</h2>
