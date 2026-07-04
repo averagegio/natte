@@ -21,8 +21,12 @@ export default function SideDrawer() {
   }, []);
 
   const navItems = loggedIn
-    ? [{ label: "Dashboard", href: "/dashboard" }, ...baseNavItems]
-    : [{ label: "Sign Up / Login", href: "/signup" }, ...baseNavItems];
+    ? [
+        { label: "Home", href: "/" },
+        { label: "Dashboard", href: "/dashboard" },
+        ...baseNavItems,
+      ]
+    : [{ label: "Home", href: "/" }, { label: "Sign Up / Login", href: "/signup" }, ...baseNavItems];
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";

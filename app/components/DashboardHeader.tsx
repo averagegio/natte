@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRef, useState } from "react";
 import { getAvatarColor, getInitials } from "@/lib/avatar";
 
@@ -129,13 +130,21 @@ export default function DashboardHeader({ user, onUpdate }: Props) {
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setEditing((v) => !v)}
-          className="self-start rounded-full border border-white/20 bg-white/5 px-5 py-2 text-sm font-medium text-white transition hover:border-white/40 hover:bg-white/10"
-        >
-          {editing ? "Cancel" : "Edit profile"}
-        </button>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <Link
+            href="/"
+            className="self-start rounded-full border border-white/20 bg-white/5 px-5 py-2 text-sm font-medium text-white/70 transition hover:border-white/40 hover:bg-white/10 hover:text-white"
+          >
+            ← Back to home
+          </Link>
+          <button
+            type="button"
+            onClick={() => setEditing((v) => !v)}
+            className="self-start rounded-full border border-white/20 bg-white/5 px-5 py-2 text-sm font-medium text-white transition hover:border-white/40 hover:bg-white/10"
+          >
+            {editing ? "Cancel" : "Edit profile"}
+          </button>
+        </div>
       </div>
 
       {editing && (
