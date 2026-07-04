@@ -154,8 +154,8 @@
 
       if (!json.posts || json.posts.length === 0) {
         const empty = document.createElement("div");
-        empty.style.cssText = "font-size:13px;color:#888";
-        empty.textContent = "No posts found.";
+        empty.style.cssText = "font-size:13px;color:#888;line-height:1.5";
+        empty.textContent = json.message || "No live posts found. Connect X on your dashboard.";
         widgetSlot.appendChild(empty);
         return;
       }

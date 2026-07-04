@@ -6,9 +6,10 @@ export async function GET(request: NextRequest) {
   const username = request.nextUrl.searchParams.get("username") ?? undefined;
   const countParam = request.nextUrl.searchParams.get("count");
   const count = countParam ? parseInt(countParam, 10) : 3;
+  const allowMock = request.nextUrl.searchParams.get("demo") === "true";
   const userId = await getSessionUserId();
 
-  const { posts, source } = await fetchXPosts(username, count, userId ?? undefined);
+  const result = await fetchXPosts(username, count, userId ?? undefined, { allowMock });
 
-  return NextResponse.json({ posts, source });
+  return NextResponse.json(result);
 }

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>NATTES Widget — Browser Demo</title>
+    <title>NATTES Widget — Live X Feed</title>
     <style>
       * { box-sizing: border-box; margin: 0; padding: 0; }
       body {
@@ -14,7 +14,16 @@
         padding: 40px 24px;
       }
       h1 { font-size: 1.5rem; margin-bottom: 8px; }
-      .subtitle { color: #888; margin-bottom: 32px; font-size: 0.9rem; }
+      .subtitle { color: #888; margin-bottom: 8px; font-size: 0.9rem; }
+      .badge {
+        display: inline-block;
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 0.75rem;
+        margin-bottom: 24px;
+      }
+      .badge.live { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; }
+      .badge.unavailable { background: rgba(255,255,255,0.08); color: #aaa; }
       .post {
         border: 1px solid rgba(255,255,255,0.1);
         background: rgba(255,255,255,0.03);
@@ -23,7 +32,17 @@
         margin-bottom: 16px;
         max-width: 600px;
       }
-      .post p { line-height: 1.6; margin-bottom: 12px; }
+      .setup {
+        border: 1px solid rgba(255,255,255,0.1);
+        background: rgba(255,255,255,0.03);
+        padding: 20px;
+        border-radius: 16px;
+        max-width: 600px;
+        color: #aaa;
+        font-size: 0.9rem;
+        line-height: 1.6;
+      }
+      .setup a { color: #7dd3fc; }
       code {
         display: block;
         background: #111;
@@ -38,21 +57,68 @@
     </style>
   </head>
   <body>
-    <h1>NATTES Widget — Browser Demo</h1>
-    <p class="subtitle">Proof of Human detection running in your browser.</p>
-
-    <div class="post" data-natte-text="Hello everyone — excited to share my weekend photos from the coast!">
-      <p>Hello everyone — excited to share my weekend photos from the coast!</p>
-      <div data-natte-widget></div>
-    </div>
-
-    <div class="post" data-natte-text="As an AI language model, I can help you with a wide range of tasks including writing, analysis, and more.">
-      <p>As an AI language model, I can help you with a wide range of tasks including writing, analysis, and more.</p>
-      <div data-natte-widget></div>
-    </div>
-
-    <code>&lt;script src="https://your-domain.com/widget/natte-widget.js"&gt;&lt;/script&gt;</code>
+    <h1>NATTES Widget — Live X Feed</h1>
+    <p class="subtitle">Real posts from X with AI detection toggles.</p>
+    <span id="status-badge" class="badge unavailable">Loading...</span>
+    <div id="feed"></div>
 
     <script src="/widget/natte-widget.js"></script>
+    <script>
+      (function () {
+        var feed = document.getElementById("feed");
+        var badge = document.getElementById("status-badge");
+
+        fetch("/api/widget/config")
+          .then(function (res) { return res.json(); })
+          .then(function (config) {
+            var username = config.x.defaultUsername;
+            return fetch("/api/x/posts?username=" + encodeURIComponent(username) + "&count=5")
+              .then(function (res) { return res.json(); })
+              .then(function (data) {
+                if (data.source === "live" && data.posts && data.posts.length > 0) {
+                  badge.textContent = "Live X feed · @" + data.username;
+                  badge.className = "badge live";
+
+                  data.posts.forEach(function (post) {
+                    var card = document.createElement("div");
+                    card.className = "post";
+                    card.setAttribute("data-natte-text", post.text);
+
+                    var text = document.createElement("p");
+                    text.textContent = post.text;
+                    text.style.lineHeight = "1.6";
+                    text.style.marginBottom = "12px";
+                    card.appendChild(text);
+
+                    var widget = document.createElement("div");
+                    widget.setAttribute("data-natte-widget", "");
+                    card.appendChild(widget);
+
+                    feed.appendChild(card);
+                  });
+
+                  if (window.NatteWidget) {
+                    window.NatteWidget.init();
+                  }
+                  return;
+                }
+
+                badge.textContent = "Live feed unavailable";
+                badge.className = "badge unavailable";
+                feed.innerHTML =
+                  '<div class="setup">' +
+                  (data.message || "Could not load live X posts.") +
+                  '<br><br>' +
+                  '<a href="/dashboard">Connect X on your dashboard</a> or set <code style="display:inline;padding:2px 6px;">X_BEARER_TOKEN</code> in Vercel.' +
+                  "</div>";
+              });
+          })
+          .catch(function () {
+            badge.textContent = "Live feed unavailable";
+            feed.innerHTML =
+              '<div class="setup">Failed to load widget config. <a href="/">Return home</a></div>';
+          });
+      })();
+    </script>
   </body>
 </html>
