@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import GlossyCard from "./GlossyCard";
 import {
   PRICING_TIERS,
@@ -18,6 +18,30 @@ export default function PricingCards() {
   });
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("success") !== "true") {
+      return;
+    }
+
+    fetch("/api/subscription", { method: "POST" })
+      .then(async (res) => {
+        const json = await res.json();
+        if (res.ok) {
+          setSuccessMessage(
+            `Subscription active: ${json.subscription.tierName} (${json.subscription.billingInterval}).`
+          );
+        }
+      })
+      .catch(() => {
+        setSuccessMessage("Payment received. Open your dashboard to sync your subscription.");
+      })
+      .finally(() => {
+        window.history.replaceState({}, "", "/pricing");
+      });
+  }, []);
 
   function setInterval(tierId: string, interval: BillingInterval) {
     setIntervals((prev) => ({ ...prev, [tierId]: interval }));
@@ -52,6 +76,11 @@ export default function PricingCards() {
 
   return (
     <div>
+      {successMessage && (
+        <p className="mb-6 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">
+          {successMessage}
+        </p>
+      )}
       {error && (
         <p className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
           {error}

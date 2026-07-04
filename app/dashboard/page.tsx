@@ -8,6 +8,9 @@ import StarConstellation from "../components/StarConstellation";
 import WidgetConnectionsList, {
   type WidgetConnection,
 } from "../components/WidgetConnectionsList";
+import SubscriptionStatus, {
+  type SubscriptionInfo,
+} from "../components/SubscriptionStatus";
 
 type DashboardUser = {
   id: string;
@@ -20,6 +23,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<DashboardUser | null>(null);
   const [connections, setConnections] = useState<WidgetConnection[]>([]);
+  const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [oauthMessage, setOauthMessage] = useState<{
     type: "success" | "error";
@@ -61,6 +65,7 @@ export default function DashboardPage() {
         }
         setUser(json.user);
         setConnections(json.connections);
+        setSubscription(json.subscription ?? null);
       } catch {
         router.replace("/signup");
       } finally {
@@ -92,6 +97,7 @@ export default function DashboardPage() {
         <DashboardHeader user={user} onUpdate={setUser} />
 
         <div className="mt-10">
+          <SubscriptionStatus subscription={subscription} onSync={setSubscription} />
           <WidgetConnectionsList
             connections={connections}
             onChange={setConnections}

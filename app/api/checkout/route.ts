@@ -77,6 +77,13 @@ export async function POST(request: Request) {
       line_items: lineItems,
       success_url: `${origin}/pricing?success=true`,
       cancel_url: `${origin}/pricing?canceled=true`,
+      subscription_data: {
+        metadata: {
+          userId,
+          tierId,
+          interval,
+        },
+      },
       metadata: {
         userId,
         tierId,

@@ -1,5 +1,6 @@
 import { getDb } from "./db";
 import { PRICING_TIERS } from "./pricing";
+import { getStripe } from "./stripe";
 
 export type ActiveSubscription = {
   id: string;
@@ -94,7 +95,8 @@ export async function checkDetectionAccess(userId: string | null): Promise<{
     };
   }
 
-  const subscription = await getActiveSubscription(userId);
+  const subscription =
+    (await getActiveSubscription(userId)) ?? (await syncSubscriptionFromStripe(userId));
   if (!subscription) {
     return {
       allowed: false,
@@ -129,4 +131,132 @@ export async function checkDetectionAccess(userId: string | null): Promise<{
 
 export function getTierName(tierId: string) {
   return PRICING_TIERS.find((tier) => tier.id === tierId)?.name ?? tierId;
+}
+
+function inferTierFromAmount(amountCents: number, interval: "monthly" | "yearly") {
+  const amount = amountCents / 100;
+  for (const tier of PRICING_TIERS) {
+    if (interval === "monthly" && tier.monthlyPrice === amount) {
+      return tier.id;
+    }
+    if (interval === "yearly" && Math.round(tier.monthlyPrice * 12 * 0.8) === amount) {
+      return tier.id;
+    }
+  }
+  return null;
+}
+
+export async function syncSubscriptionFromStripe(
+  userId: string
+): Promise<ActiveSubscription | null> {
+  try {
+    const sql = getDb();
+    const users = await sql`
+      SELECT stripe_customer_id, email
+      FROM users
+      WHERE id = ${userId}
+    `;
+
+    if (users.length === 0) {
+      return null;
+    }
+
+    const stripe = getStripe();
+    let customerId = users[0].stripe_customer_id as string | null;
+
+    if (!customerId) {
+      const customers = await stripe.customers.list({
+        email: users[0].email,
+        limit: 1,
+      });
+      if (customers.data.length === 0) {
+        return null;
+      }
+      customerId = customers.data[0].id;
+      await sql`UPDATE users SET stripe_customer_id = ${customerId} WHERE id = ${userId}`;
+    }
+
+    let subscriptions = await stripe.subscriptions.list({
+      customer: customerId,
+      status: "active",
+      limit: 1,
+      expand: ["data.items.data.price"],
+    });
+
+    if (subscriptions.data.length === 0) {
+      subscriptions = await stripe.subscriptions.list({
+        customer: customerId,
+        status: "trialing",
+        limit: 1,
+        expand: ["data.items.data.price"],
+      });
+    }
+
+    if (subscriptions.data.length === 0) {
+      return null;
+    }
+
+    const sub = subscriptions.data[0];
+    const price = sub.items.data[0]?.price;
+    const billingInterval =
+      price?.recurring?.interval === "year" ? "yearly" : "monthly";
+
+    let tierId = sub.metadata?.tierId || null;
+    let interval = sub.metadata?.interval || billingInterval;
+
+    if (!tierId) {
+      const sessions = await stripe.checkout.sessions.list({
+        customer: customerId,
+        limit: 10,
+      });
+      const session = sessions.data.find(
+        (item) => String(item.subscription) === sub.id
+      );
+      if (session?.metadata?.tierId) {
+        tierId = session.metadata.tierId;
+        interval = session.metadata.interval || interval;
+      }
+    }
+
+    if (!tierId && price?.unit_amount) {
+      tierId = inferTierFromAmount(price.unit_amount, billingInterval);
+    }
+
+    if (!tierId) {
+      tierId = "starter";
+    }
+
+    const status = sub.status === "active" || sub.status === "trialing" ? "active" : "inactive";
+
+    await sql`
+      INSERT INTO subscriptions (
+        user_id,
+        stripe_subscription_id,
+        stripe_price_id,
+        tier,
+        billing_interval,
+        status
+      )
+      VALUES (
+        ${userId},
+        ${sub.id},
+        ${price?.id ?? null},
+        ${tierId},
+        ${interval},
+        ${status}
+      )
+      ON CONFLICT (stripe_subscription_id) DO UPDATE
+      SET
+        stripe_price_id = ${price?.id ?? null},
+        tier = ${tierId},
+        billing_interval = ${interval},
+        status = ${status},
+        updated_at = NOW()
+    `;
+
+    return getActiveSubscription(userId);
+  } catch (err) {
+    console.error("Stripe subscription sync failed:", err);
+    return null;
+  }
 }
