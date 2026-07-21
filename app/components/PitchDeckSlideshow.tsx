@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import type { PitchDeck, PitchSlide } from "@/lib/pitchDeck";
 
 type PitchDeckSlideshowProps = {
@@ -16,29 +16,31 @@ export default function PitchDeckSlideshow({ deck }: PitchDeckSlideshowProps) {
   const isFirst = index === 0;
   const isLast = index === slides.length - 1;
 
-  const goTo = useCallback(
-    (next: number) => {
-      if (next < 0 || next >= slides.length || next === index) return;
-      setEntering(false);
-      window.setTimeout(() => {
-        setIndex(next);
-        setEntering(true);
-      }, 160);
-    },
-    [index, slides.length]
-  );
+  function goTo(next: number) {
+    if (next < 0 || next >= slides.length || next === index) return;
+    setEntering(false);
+    window.setTimeout(() => {
+      setIndex(next);
+      setEntering(true);
+    }, 160);
+  }
 
-  const next = useCallback(() => goTo(index + 1), [goTo, index]);
-  const prev = useCallback(() => goTo(index - 1), [goTo, index]);
+  function next() {
+    goTo(index + 1);
+  }
+
+  function prev() {
+    goTo(index - 1);
+  }
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "ArrowRight" || event.key === " " || event.key === "PageDown") {
         event.preventDefault();
-        next();
+        goTo(index + 1);
       } else if (event.key === "ArrowLeft" || event.key === "PageUp") {
         event.preventDefault();
-        prev();
+        goTo(index - 1);
       } else if (event.key === "Home") {
         event.preventDefault();
         goTo(0);
@@ -50,7 +52,7 @@ export default function PitchDeckSlideshow({ deck }: PitchDeckSlideshowProps) {
 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [goTo, next, prev, slides.length]);
+  }, [index, slides.length]);
 
   return (
     <div className="pitch-deck relative flex min-h-screen flex-col overflow-hidden bg-black text-white">
@@ -181,7 +183,7 @@ function SlideContent({
         </pre>
       ) : null}
 
-      {slide.cta && isTitle === false && slide.id === "close" ? (
+      {slide.cta && !isTitle && slide.id === "close" ? (
         <div className="mt-2 flex flex-wrap gap-3">
           <Link
             href={slide.cta.href}
