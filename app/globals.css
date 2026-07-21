@@ -96,3 +96,55 @@ main {
     #000000 100%
   );
 }
+
+/* Pitch deck slideshow */
+.pitch-atmosphere {
+  background:
+    radial-gradient(ellipse 80% 55% at 15% 10%, rgba(56, 189, 248, 0.14), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 90% 80%, rgba(255, 255, 255, 0.05), transparent 50%),
+    linear-gradient(180deg, #05070c 0%, #000000 55%, #02040a 100%);
+  animation: pitch-glow 12s ease-in-out infinite alternate;
+}
+
+.pitch-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
+}
+
+.pitch-slide-enter {
+  animation: pitch-enter 0.45s ease-out both;
+}
+
+.pitch-slide-exit {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+.pitch-code {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  white-space: pre-wrap;
+}
+
+@keyframes pitch-enter {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pitch-glow {
+  from {
+    filter: brightness(1);
+  }
+  to {
+    filter: brightness(1.12);
+  }
+}
