@@ -35,24 +35,29 @@ export default function PitchDeckSlideshow({ deck }: PitchDeckSlideshowProps) {
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
+      const move = (getNext: (current: number) => number) => {
+        event.preventDefault();
+        setEntering(false);
+        window.setTimeout(() => {
+          setIndex((current) => getNext(current));
+          setEntering(true);
+        }, 160);
+      };
+
       if (event.key === "ArrowRight" || event.key === " " || event.key === "PageDown") {
-        event.preventDefault();
-        goTo(index + 1);
+        move((current) => Math.min(current + 1, slides.length - 1));
       } else if (event.key === "ArrowLeft" || event.key === "PageUp") {
-        event.preventDefault();
-        goTo(index - 1);
+        move((current) => Math.max(current - 1, 0));
       } else if (event.key === "Home") {
-        event.preventDefault();
-        goTo(0);
+        move(() => 0);
       } else if (event.key === "End") {
-        event.preventDefault();
-        goTo(slides.length - 1);
+        move(() => slides.length - 1);
       }
     };
 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [index, slides.length]);
+  }, [slides.length]);
 
   return (
     <div className="pitch-deck relative flex min-h-screen flex-col overflow-hidden bg-black text-white">
