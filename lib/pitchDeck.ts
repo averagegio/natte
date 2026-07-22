@@ -1,3 +1,10 @@
+export type PitchProjection = {
+  year: string;
+  customers: number;
+  arr: number;
+  note: string;
+};
+
 export type PitchSlide = {
   id: string;
   eyebrow: string;
@@ -5,6 +12,7 @@ export type PitchSlide = {
   body: string;
   detail?: string;
   code?: string;
+  projections?: PitchProjection[];
   cta?: { label: string; href: string };
 };
 
@@ -20,7 +28,7 @@ export const PITCH_DECK: PitchDeck = {
   brand: "Proof of Human",
   product: "NATTES",
   tagline: "AI detection API for the real web.",
-  version: "1.0",
+  version: "1.1",
   slides: [
     {
       id: "title",
@@ -71,6 +79,33 @@ export const PITCH_DECK: PitchDeck = {
       detail: "OAuth connections · usage limits · Stripe plans",
     },
     {
+      id: "sales",
+      eyebrow: "Sales projections",
+      title: "Path to seven figures.",
+      body: "Conservative SaaS ramp on Starter ($7), Pro ($50), and Business ($100) — weighted toward Pro as teams adopt the API and widget.",
+      detail: "ARR assumes blended net revenue after yearly discounts.",
+      projections: [
+        {
+          year: "Year 1",
+          customers: 420,
+          arr: 148000,
+          note: "Founder-led sales · widget pilots",
+        },
+        {
+          year: "Year 2",
+          customers: 1600,
+          arr: 620000,
+          note: "Self-serve + partner channels",
+        },
+        {
+          year: "Year 3",
+          customers: 3800,
+          arr: 1450000,
+          note: "Enterprise seats · API volume",
+        },
+      ],
+    },
+    {
       id: "why",
       eyebrow: "Why NATTES",
       title: "Fast signals. Clear answers.",
@@ -90,4 +125,15 @@ export const PITCH_DECK: PitchDeck = {
 
 export function getPitchDeck(): PitchDeck {
   return PITCH_DECK;
+}
+
+export function formatArr(amount: number): string {
+  if (amount >= 1_000_000) {
+    const millions = amount / 1_000_000;
+    return `$${millions % 1 === 0 ? millions.toFixed(0) : millions.toFixed(2)}M`;
+  }
+  if (amount >= 1_000) {
+    return `$${Math.round(amount / 1_000)}K`;
+  }
+  return `$${amount}`;
 }

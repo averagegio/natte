@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import type { PitchDeck, PitchSlide } from "@/lib/pitchDeck";
+import { formatArr, type PitchDeck, type PitchSlide } from "@/lib/pitchDeck";
 
 type PitchDeckSlideshowProps = {
   deck: PitchDeck;
@@ -188,6 +188,10 @@ function SlideContent({
         </pre>
       ) : null}
 
+      {slide.projections?.length ? (
+        <SalesProjections projections={slide.projections} />
+      ) : null}
+
       {slide.cta && !isTitle && slide.id === "close" ? (
         <div className="mt-2 flex flex-wrap gap-3">
           <Link
@@ -204,6 +208,53 @@ function SlideContent({
           </Link>
         </div>
       ) : null}
+    </div>
+  );
+}
+
+function SalesProjections({
+  projections,
+}: {
+  projections: NonNullable<PitchSlide["projections"]>;
+}) {
+  const maxArr = Math.max(...projections.map((row) => row.arr));
+
+  return (
+    <div className="pitch-projections mt-4 w-full max-w-3xl" aria-label="Sales projections">
+      <div className="flex flex-col gap-5">
+        {projections.map((row, index) => {
+          const width = Math.max(12, Math.round((row.arr / maxArr) * 100));
+
+          return (
+            <div
+              key={row.year}
+              className="pitch-projection-row"
+              style={{ animationDelay: `${index * 90}ms` }}
+            >
+              <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
+                <div className="flex items-baseline gap-3">
+                  <span className="text-sm font-medium tracking-[0.14em] text-sky-300/90 uppercase">
+                    {row.year}
+                  </span>
+                  <span className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+                    {formatArr(row.arr)}
+                  </span>
+                  <span className="text-sm text-white/40">ARR</span>
+                </div>
+                <p className="text-sm text-white/45">
+                  {row.customers.toLocaleString()} customers · {row.note}
+                </p>
+              </div>
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+                <div
+                  className="pitch-projection-bar h-full rounded-full bg-gradient-to-r from-sky-500/80 to-sky-300/90"
+                  style={{ width: `${width}%` }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
