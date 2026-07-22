@@ -129,6 +129,26 @@ main {
   white-space: pre-wrap;
 }
 
+.pitch-projection-row {
+  animation: pitch-enter 0.55s ease-out both;
+}
+
+.pitch-projection-bar {
+  transform-origin: left center;
+  animation: pitch-bar 0.7s ease-out both;
+}
+
+@keyframes pitch-bar {
+  from {
+    transform: scaleX(0.15);
+    opacity: 0.4;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
 @keyframes pitch-enter {
   from {
     opacity: 0;
