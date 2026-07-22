@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "record-demo": "node scripts/record-demo.js",
+    "record-widget-demo": "node scripts/record-widget-demo.js",
+    "record-widget-demo:app": "node scripts/record-widget-demo.js app",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
