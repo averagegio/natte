@@ -12,6 +12,7 @@ import WidgetConnectionsList, {
 import SubscriptionStatus, {
   type SubscriptionInfo,
 } from "../components/SubscriptionStatus";
+import { ONBOARDING_KEYS, requestOnboarding } from "@/lib/onboarding";
 
 type DashboardUser = {
   id: string;
@@ -35,20 +36,35 @@ export default function DashboardPage() {
     const params = new URLSearchParams(window.location.search);
     const xConnected = params.get("x_connected");
     const xError = params.get("x_error");
+    const onboarding = params.get("onboarding");
+    const oauthNewUser = document.cookie
+      .split("; ")
+      .some((part) => part.startsWith("poh_oauth_new_user="));
 
-    if (xConnected) {
-      setOauthMessage({
-        type: "success",
-        text: `Connected @${xConnected}.`,
-      });
-      router.replace("/dashboard");
-    } else if (xError) {
-      setOauthMessage({
-        type: "error",
-        text: `X connection failed: ${xError}`,
-      });
-      router.replace("/dashboard");
+    if (onboarding === "1" || oauthNewUser) {
+      requestOnboarding([ONBOARDING_KEYS.dashboard, ONBOARDING_KEYS.toggles]);
+      document.cookie = "poh_oauth_new_user=; Max-Age=0; path=/";
     }
+
+    const timer = window.setTimeout(() => {
+      if (xConnected) {
+        setOauthMessage({
+          type: "success",
+          text: `Connected @${xConnected}.`,
+        });
+        router.replace("/dashboard");
+      } else if (xError) {
+        setOauthMessage({
+          type: "error",
+          text: `X connection failed: ${xError}`,
+        });
+        router.replace("/dashboard");
+      } else if (onboarding === "1") {
+        router.replace("/dashboard");
+      }
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, [router]);
 
   useEffect(() => {

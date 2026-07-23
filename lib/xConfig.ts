@@ -16,6 +16,14 @@ function firstEnv(...names: string[]): string | undefined {
   return undefined;
 }
 
+export function getXLoginRedirectUri(): string {
+  const appUrl = firstEnv("NEXT_PUBLIC_APP_URL", "APP_BASE_URL") || "http://127.0.0.1:3000";
+  return (
+    firstEnv("X_LOGIN_REDIRECT_URI") ||
+    `${appUrl.replace(/\/$/, "")}/api/auth/x/callback`
+  );
+}
+
 export function getXAppConfig(): XAppConfig | null {
   const clientId = firstEnv("X_CLIENT_ID", "TWITTER_CLIENT_ID");
   const clientSecret = firstEnv("X_CLIENT_SECRET", "TWITTER_CLIENT_SECRET");
@@ -66,6 +74,7 @@ export function getXAppStatus() {
     bearerTokenConfigured: Boolean(getXBearerToken()),
     apiKeyConfigured: Boolean(config?.apiKey),
     redirectUri: config?.redirectUri ?? null,
+    loginRedirectUri: config ? getXLoginRedirectUri() : null,
     defaultUsername: getXDefaultUsername(),
   };
 }
