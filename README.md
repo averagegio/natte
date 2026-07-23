@@ -133,12 +133,30 @@ POST { "imageUrl": "https://pbs.twimg.com/media/example.jpg" }
 
 Image detection costs ~300 Winston credits per image. Posts with photos from X are analyzed automatically when media is attached.
 
+### Sign in with X
+
+The signup page supports X social login when credentials are configured.
+
+1. In the X Developer Portal, add callback:
+   - `https://your-domain.com/api/auth/x/callback` (sign-in / sign-up)
+   - keep `https://your-domain.com/api/connections/x/callback` for Connect X
+2. Set `X_CLIENT_ID` and `X_CLIENT_SECRET` (same app can serve both callbacks)
+3. Optional: `X_LOGIN_REDIRECT_URI` if you need an explicit override
+
+Then run migrations so `oauth_accounts` exists:
+
+```bash
+npm run db:migrate
+```
+
 ### X Developer App setup
 
 1. Create an app at [developer.x.com](https://developer.x.com/en/portal/dashboard)
-2. Enable OAuth 2.0 and add callback URL: `https://your-domain.com/api/connections/x/callback`
+2. Enable OAuth 2.0 and add callback URLs:
+   - `https://your-domain.com/api/auth/x/callback` (Sign up / Log in with X)
+   - `https://your-domain.com/api/connections/x/callback` (Connect X for posts)
 3. Set `X_CLIENT_ID`, `X_CLIENT_SECRET`, and `X_BEARER_TOKEN` in Vercel env vars
-4. Go to `/dashboard` and click **Connect with X**
+4. Go to `/signup` to sign in with X, or `/dashboard` to **Connect with X** for feed access
 
 The downloadable widget supports X feed embeds via `data-natte-x-username` — see the setup guide on the homepage.
 

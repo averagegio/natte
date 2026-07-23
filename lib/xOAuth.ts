@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from "crypto";
-import { getXAppConfig } from "./xConfig";
+import { getXAppConfig, getXLoginRedirectUri } from "./xConfig";
 
 const X_AUTHORIZE_URL = "https://x.com/i/oauth2/authorize";
 const X_TOKEN_URL = "https://api.twitter.com/2/oauth2/token";
@@ -27,7 +27,11 @@ export function generateOAuthState() {
   return base64UrlEncode(randomBytes(16));
 }
 
-export function buildAuthorizationUrl(state: string, codeChallenge: string) {
+export function buildAuthorizationUrl(
+  state: string,
+  codeChallenge: string,
+  redirectUri?: string
+) {
   const config = getXAppConfig();
   if (!config) {
     throw new Error("X OAuth is not configured");
@@ -36,7 +40,7 @@ export function buildAuthorizationUrl(state: string, codeChallenge: string) {
   const params = new URLSearchParams({
     response_type: "code",
     client_id: config.clientId,
-    redirect_uri: config.redirectUri,
+    redirect_uri: redirectUri || config.redirectUri,
     scope: X_OAUTH_SCOPES.join(" "),
     state,
     code_challenge: codeChallenge,
@@ -44,6 +48,10 @@ export function buildAuthorizationUrl(state: string, codeChallenge: string) {
   });
 
   return `${X_AUTHORIZE_URL}?${params.toString()}`;
+}
+
+export function buildLoginAuthorizationUrl(state: string, codeChallenge: string) {
+  return buildAuthorizationUrl(state, codeChallenge, getXLoginRedirectUri());
 }
 
 export type XOAuthTokens = {
@@ -55,7 +63,8 @@ export type XOAuthTokens = {
 
 export async function exchangeAuthorizationCode(
   code: string,
-  codeVerifier: string
+  codeVerifier: string,
+  redirectUri?: string
 ): Promise<XOAuthTokens> {
   const config = getXAppConfig();
   if (!config) {
@@ -66,7 +75,7 @@ export async function exchangeAuthorizationCode(
     code,
     grant_type: "authorization_code",
     client_id: config.clientId,
-    redirect_uri: config.redirectUri,
+    redirect_uri: redirectUri || config.redirectUri,
     code_verifier: codeVerifier,
   });
 
@@ -95,6 +104,10 @@ export async function exchangeAuthorizationCode(
     expiresIn: json.expires_in,
     tokenType: json.token_type || "bearer",
   };
+}
+
+export async function exchangeLoginAuthorizationCode(code: string, codeVerifier: string) {
+  return exchangeAuthorizationCode(code, codeVerifier, getXLoginRedirectUri());
 }
 
 export async function refreshAccessToken(refreshToken: string): Promise<XOAuthTokens> {
@@ -137,7 +150,10 @@ export async function refreshAccessToken(refreshToken: string): Promise<XOAuthTo
 }
 
 export async function fetchAuthenticatedUser(accessToken: string) {
-  const res = await fetch(X_USERS_ME_URL, {
+  const url = new URL(X_USERS_ME_URL);
+  url.searchParams.set("user.fields", "profile_image_url,name,username");
+
+  const res = await fetch(url.toString(), {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
 
@@ -156,5 +172,6 @@ export async function fetchAuthenticatedUser(accessToken: string) {
     id: String(user.id),
     username: String(user.username),
     name: user.name ? String(user.name) : undefined,
+    profileImageUrl: user.profile_image_url ? String(user.profile_image_url) : undefined,
   };
 }

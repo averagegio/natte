@@ -27,5 +27,5 @@ export type WidgetConnection = {
 };
 
 export type UserWithPassword = User & {
-  password_hash: string;
+  password_hash: string | null;
 };

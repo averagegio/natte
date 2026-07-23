@@ -24,6 +24,17 @@ export async function POST(request: Request) {
     }
 
     const user = rows[0] as UserWithPassword;
+
+    if (!user.password_hash) {
+      return NextResponse.json(
+        {
+          error:
+            "This account uses social sign-in. Continue with X instead of a password.",
+        },
+        { status: 401 }
+      );
+    }
+
     const valid = await verifyPassword(password, user.password_hash);
 
     if (!valid) {

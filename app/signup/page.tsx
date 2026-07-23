@@ -5,8 +5,8 @@ export default function SignupPage() {
   return (
     <NavPageLayout title="Sign Up / Login">
       <p className="mb-6">
-        Create an account to access the full Proof of Human platform, manage subscriptions,
-        and use the NATTES detection API.
+        Sign up or log in with X or email to access Proof of Human, manage
+        subscriptions, and use the NATTES detection API.
       </p>
       <AuthForm />
     </NavPageLayout>

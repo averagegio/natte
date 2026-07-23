@@ -127,6 +127,28 @@ const steps = [
     label: "Create detection_usage index",
     sql: `CREATE INDEX IF NOT EXISTS idx_detection_usage_user_month ON detection_usage(user_id, created_at)`,
   },
+  {
+    label: "Allow OAuth-only users (nullable password_hash)",
+    sql: `ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL`,
+  },
+  {
+    label: "Create oauth_accounts table",
+    sql: `CREATE TABLE IF NOT EXISTS oauth_accounts (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      provider TEXT NOT NULL CHECK (provider IN ('x')),
+      provider_user_id TEXT NOT NULL,
+      email TEXT,
+      username TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      UNIQUE (provider, provider_user_id)
+    )`,
+  },
+  {
+    label: "Create oauth_accounts user index",
+    sql: `CREATE INDEX IF NOT EXISTS idx_oauth_accounts_user_id ON oauth_accounts(user_id)`,
+  },
 ];
 
 async function main() {
@@ -155,6 +177,7 @@ async function main() {
   console.log("  - subscriptions");
   console.log("  - widget_connections");
   console.log("  - detection_usage");
+  console.log("  - oauth_accounts");
 }
 
 main();
