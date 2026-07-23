@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error:
-            "This account uses social sign-in. Continue with X or Google instead of a password.",
+            "This account uses social sign-in. Continue with X instead of a password.",
         },
         { status: 401 }
       );

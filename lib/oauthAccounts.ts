@@ -1,7 +1,7 @@
 import { getDb } from "./db";
 import { createSessionToken, setSessionCookie } from "./auth";
 
-export type OAuthProvider = "x" | "google";
+export type OAuthProvider = "x";
 export type OAuthIntent = "signup" | "login";
 
 export type OAuthProfile = {
@@ -89,7 +89,7 @@ export async function signInWithOAuthProfile(
     if (intent === "login" && !linkedUserId) {
       throw new OAuthAccountError(
         "account_not_found",
-        "No account found for this social login. Sign up with X or Google first."
+        "No account found for this social login. Sign up with X first."
       );
     }
 

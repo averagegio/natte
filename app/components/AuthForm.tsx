@@ -8,16 +8,12 @@ type Mode = "login" | "signup";
 
 type AuthProviders = {
   x: { available: boolean; loginPath: string };
-  google: { available: boolean; loginPath: string };
 };
 
 function friendlyOAuthError(raw: string) {
   const normalized = raw.toLowerCase();
   if (normalized.includes("account_not_found")) {
-    return "No account found for that social login. Use Sign Up with X or Google first.";
-  }
-  if (normalized.includes("google_email_required")) {
-    return "Google did not share an email address. Allow email access and try again.";
+    return "No account found for that social login. Use Sign Up with X first.";
   }
   return raw.replace(/_/g, " ");
 }
@@ -87,9 +83,8 @@ export default function AuthForm() {
     }
   }
 
-  const showSocial = Boolean(providers?.x.available || providers?.google.available);
+  const showSocial = Boolean(providers?.x.available);
   const xLabel = mode === "signup" ? "Sign up with X" : "Log in with X";
-  const googleLabel = mode === "signup" ? "Sign up with Google" : "Log in with Google";
   const socialDivider = mode === "signup" ? "or sign up with email" : "or log in with email";
 
   function startOAuth(path: string) {
@@ -141,34 +136,6 @@ export default function AuthForm() {
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.727-8.913L1.254 2.25H8.08l4.259 5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
               </svg>
               {xLabel}
-            </button>
-          ) : null}
-
-          {providers?.google.available ? (
-            <button
-              type="button"
-              onClick={() => startOAuth(providers.google.loginPath)}
-              className="flex w-full items-center justify-center gap-3 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
-                <path
-                  fill="#EA4335"
-                  d="M12 10.2v3.9h5.5c-.2 1.3-1.6 3.9-5.5 3.9-3.3 0-6-2.7-6-6s2.7-6 6-6c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.4 14.6 2.4 12 2.4 6.9 2.4 2.8 6.5 2.8 11.6S6.9 20.8 12 20.8c5.5 0 9.1-3.9 9.1-9.3 0-.6-.1-1.1-.2-1.6H12z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M3.9 7.5l3.2 2.3C8 7.4 9.8 6.1 12 6.1c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.4 14.6 2.4 12 2.4 8.2 2.4 4.9 4.5 3.9 7.5z"
-                />
-                <path
-                  fill="#4A90E2"
-                  d="M12 20.8c2.5 0 4.6-.8 6.1-2.2l-3-2.4c-.8.6-1.9 1-3.1 1-2.4 0-4.4-1.6-5.1-3.8l-3.2 2.5c1.5 3 4.5 4.9 8.3 4.9z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M6.9 13.4c-.2-.6-.3-1.2-.3-1.8s.1-1.2.3-1.8L3.7 7.3C3.1 8.5 2.8 10 2.8 11.6s.3 3.1.9 4.3l3.2-2.5z"
-                />
-              </svg>
-              {googleLabel}
             </button>
           ) : null}
 

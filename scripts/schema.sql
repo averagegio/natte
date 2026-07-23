@@ -59,7 +59,7 @@ ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL;
 CREATE TABLE IF NOT EXISTS oauth_accounts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  provider TEXT NOT NULL CHECK (provider IN ('x', 'google')),
+  provider TEXT NOT NULL CHECK (provider IN ('x')),
   provider_user_id TEXT NOT NULL,
   email TEXT,
   username TEXT,

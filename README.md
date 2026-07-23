@@ -72,8 +72,6 @@ Set these in Vercel (or locally via `.env.local`). See `.env.example` for the fu
 | `X_CLIENT_SECRET` | For OAuth | X Developer App client secret |
 | `X_BEARER_TOKEN` | No | App-only bearer token for live post fetching |
 | `X_DEFAULT_USERNAME` | No | X username to fetch posts from (default: `natte`) |
-| `GOOGLE_CLIENT_ID` | For Google sign-in | Google OAuth client ID |
-| `GOOGLE_CLIENT_SECRET` | For Google sign-in | Google OAuth client secret |
 | `NEXT_PUBLIC_APP_URL` | Yes (prod) | App URL for OAuth callback and Stripe |
 | `AI_DETECTOR_URL` | **Yes** | Text detector endpoint (Sapling or Winston) |
 | `AI_DETECTOR_KEY` | **Yes** | API key for the text detector (Winston can reuse `AI_IMAGE_DETECTOR_KEY`) |
@@ -135,23 +133,15 @@ POST { "imageUrl": "https://pbs.twimg.com/media/example.jpg" }
 
 Image detection costs ~300 Winston credits per image. Posts with photos from X are analyzed automatically when media is attached.
 
-### Sign in with X or Google
+### Sign in with X
 
-The signup page supports social login when credentials are configured.
-
-**X**
+The signup page supports X social login when credentials are configured.
 
 1. In the X Developer Portal, add callback:
-   - `https://your-domain.com/api/auth/x/callback` (sign-in)
+   - `https://your-domain.com/api/auth/x/callback` (sign-in / sign-up)
    - keep `https://your-domain.com/api/connections/x/callback` for Connect X
 2. Set `X_CLIENT_ID` and `X_CLIENT_SECRET` (same app can serve both callbacks)
 3. Optional: `X_LOGIN_REDIRECT_URI` if you need an explicit override
-
-**Google**
-
-1. Create an OAuth 2.0 Client ID in [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
-2. Add authorized redirect URI: `https://your-domain.com/api/auth/google/callback`
-3. Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`
 
 Then run migrations so `oauth_accounts` exists:
 
@@ -163,7 +153,7 @@ npm run db:migrate
 
 1. Create an app at [developer.x.com](https://developer.x.com/en/portal/dashboard)
 2. Enable OAuth 2.0 and add callback URLs:
-   - `https://your-domain.com/api/auth/x/callback` (Sign in with X)
+   - `https://your-domain.com/api/auth/x/callback` (Sign up / Log in with X)
    - `https://your-domain.com/api/connections/x/callback` (Connect X for posts)
 3. Set `X_CLIENT_ID`, `X_CLIENT_SECRET`, and `X_BEARER_TOKEN` in Vercel env vars
 4. Go to `/signup` to sign in with X, or `/dashboard` to **Connect with X** for feed access
