@@ -37,5 +37,12 @@ export default function DashboardOnboarding({ hasConnection }: Props) {
     },
   ];
 
-  return <OnboardingTour steps={steps} storageKey={ONBOARDING_KEYS.dashboard} />;
+  return (
+    <OnboardingTour
+      steps={steps}
+      storageKey={ONBOARDING_KEYS.dashboard}
+      promptTitle="Tour your dashboard?"
+      promptBody="We'll highlight your profile, subscription, and X connection — or skip and look around yourself."
+    />
+  );
 }
