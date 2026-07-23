@@ -11,6 +11,17 @@ type AuthProviders = {
   google: { available: boolean; loginPath: string };
 };
 
+function friendlyOAuthError(raw: string) {
+  const normalized = raw.toLowerCase();
+  if (normalized.includes("account_not_found")) {
+    return "No account found for that social login. Use Sign Up with X or Google first.";
+  }
+  if (normalized.includes("google_email_required")) {
+    return "Google did not share an email address. Allow email access and try again.";
+  }
+  return raw.replace(/_/g, " ");
+}
+
 export default function AuthForm() {
   const [mode, setMode] = useState<Mode>("signup");
   const [email, setEmail] = useState("");
@@ -27,7 +38,7 @@ export default function AuthForm() {
 
     const timer = window.setTimeout(() => {
       if (oauthError) {
-        setError(decodeURIComponent(oauthError).replace(/_/g, " "));
+        setError(friendlyOAuthError(decodeURIComponent(oauthError)));
         window.history.replaceState({}, "", "/signup");
       }
     }, 0);
@@ -76,12 +87,16 @@ export default function AuthForm() {
     }
   }
 
+  const showSocial = Boolean(providers?.x.available || providers?.google.available);
+  const xLabel = mode === "signup" ? "Sign up with X" : "Log in with X";
+  const googleLabel = mode === "signup" ? "Sign up with Google" : "Log in with Google";
+  const socialDivider = mode === "signup" ? "or sign up with email" : "or log in with email";
+
   function startOAuth(path: string) {
     setError(null);
-    window.location.href = path;
+    const intent = mode === "login" ? "login" : "signup";
+    window.location.href = `${path}?intent=${intent}`;
   }
-
-  const showSocial = Boolean(providers?.x.available || providers?.google.available);
 
   return (
     <GlossyCard>
@@ -125,7 +140,7 @@ export default function AuthForm() {
               <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.727-8.913L1.254 2.25H8.08l4.259 5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
               </svg>
-              Continue with X
+              {xLabel}
             </button>
           ) : null}
 
@@ -153,13 +168,13 @@ export default function AuthForm() {
                   d="M6.9 13.4c-.2-.6-.3-1.2-.3-1.8s.1-1.2.3-1.8L3.7 7.3C3.1 8.5 2.8 10 2.8 11.6s.3 3.1.9 4.3l3.2-2.5z"
                 />
               </svg>
-              Continue with Google
+              {googleLabel}
             </button>
           ) : null}
 
           <div className="flex items-center gap-3 pt-1">
             <div className="h-px flex-1 bg-white/10" />
-            <span className="text-xs tracking-wide text-white/40 uppercase">or email</span>
+            <span className="text-xs tracking-wide text-white/40 uppercase">{socialDivider}</span>
             <div className="h-px flex-1 bg-white/10" />
           </div>
         </div>

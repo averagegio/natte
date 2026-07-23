@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { isXOAuthConfigured } from "@/lib/xConfig";
+import { parseOAuthIntent } from "@/lib/oauthAccounts";
 import {
   buildLoginAuthorizationUrl,
   generateCodeChallenge,
@@ -16,7 +17,7 @@ const OAUTH_COOKIE_OPTS = {
   maxAge: 600,
 };
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     if (!isXOAuthConfigured()) {
       return NextResponse.json(
@@ -28,6 +29,7 @@ export async function GET() {
       );
     }
 
+    const intent = parseOAuthIntent(request.nextUrl.searchParams.get("intent"));
     const codeVerifier = generateCodeVerifier();
     const codeChallenge = generateCodeChallenge(codeVerifier);
     const state = generateOAuthState();
@@ -36,6 +38,7 @@ export async function GET() {
     const cookieStore = await cookies();
     cookieStore.set("x_login_verifier", codeVerifier, OAUTH_COOKIE_OPTS);
     cookieStore.set("x_login_state", state, OAUTH_COOKIE_OPTS);
+    cookieStore.set("x_login_intent", intent, OAUTH_COOKIE_OPTS);
 
     return NextResponse.redirect(authorizeUrl);
   } catch (err) {

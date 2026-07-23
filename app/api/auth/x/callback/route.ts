@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { assertAuthConfigured, getAuthErrorMessage } from "@/lib/auth-errors";
-import { signInWithOAuthProfile } from "@/lib/oauthAccounts";
+import {
+  OAuthAccountError,
+  parseOAuthIntent,
+  signInWithOAuthProfile,
+} from "@/lib/oauthAccounts";
 import {
   exchangeLoginAuthorizationCode,
   fetchAuthenticatedUser,
@@ -40,9 +44,11 @@ export async function GET(request: NextRequest) {
     const cookieStore = await cookies();
     const savedState = cookieStore.get("x_login_state")?.value;
     const codeVerifier = cookieStore.get("x_login_verifier")?.value;
+    const intent = parseOAuthIntent(cookieStore.get("x_login_intent")?.value);
 
     cookieStore.delete("x_login_state");
     cookieStore.delete("x_login_verifier");
+    cookieStore.delete("x_login_intent");
 
     if (!savedState || !codeVerifier || savedState !== state) {
       return signupRedirect(request, "invalid_state");
@@ -51,14 +57,17 @@ export async function GET(request: NextRequest) {
     const tokens = await exchangeLoginAuthorizationCode(code, codeVerifier);
     const xUser = await fetchAuthenticatedUser(tokens.accessToken);
 
-    const result = await signInWithOAuthProfile({
-      provider: "x",
-      providerUserId: xUser.id,
-      name: xUser.name || xUser.username,
-      username: xUser.username,
-      avatarUrl: xUser.profileImageUrl || null,
-      email: null,
-    });
+    const result = await signInWithOAuthProfile(
+      {
+        provider: "x",
+        providerUserId: xUser.id,
+        name: xUser.name || xUser.username,
+        username: xUser.username,
+        avatarUrl: xUser.profileImageUrl || null,
+        email: null,
+      },
+      intent
+    );
 
     if (result.isNewUser) {
       cookieStore.set("poh_oauth_new_user", "1", {
@@ -73,6 +82,9 @@ export async function GET(request: NextRequest) {
     return dashboardRedirect(request, result.isNewUser);
   } catch (err) {
     console.error("X login callback error:", err);
+    if (err instanceof OAuthAccountError) {
+      return signupRedirect(request, err.code);
+    }
     const message = getAuthErrorMessage(err, "x_signin_failed");
     return signupRedirect(request, message.slice(0, 120));
   }

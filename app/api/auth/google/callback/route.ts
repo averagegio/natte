@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { assertAuthConfigured, getAuthErrorMessage } from "@/lib/auth-errors";
-import { signInWithOAuthProfile } from "@/lib/oauthAccounts";
+import {
+  OAuthAccountError,
+  parseOAuthIntent,
+  signInWithOAuthProfile,
+} from "@/lib/oauthAccounts";
 import {
   exchangeGoogleAuthorizationCode,
   fetchGoogleUser,
@@ -40,9 +44,11 @@ export async function GET(request: NextRequest) {
     const cookieStore = await cookies();
     const savedState = cookieStore.get("google_login_state")?.value;
     const codeVerifier = cookieStore.get("google_login_verifier")?.value;
+    const intent = parseOAuthIntent(cookieStore.get("google_login_intent")?.value);
 
     cookieStore.delete("google_login_state");
     cookieStore.delete("google_login_verifier");
+    cookieStore.delete("google_login_intent");
 
     if (!savedState || !codeVerifier || savedState !== state) {
       return signupRedirect(request, "invalid_state");
@@ -55,13 +61,16 @@ export async function GET(request: NextRequest) {
       return signupRedirect(request, "google_email_required");
     }
 
-    const result = await signInWithOAuthProfile({
-      provider: "google",
-      providerUserId: googleUser.id,
-      email: googleUser.email,
-      name: googleUser.name,
-      avatarUrl: googleUser.picture,
-    });
+    const result = await signInWithOAuthProfile(
+      {
+        provider: "google",
+        providerUserId: googleUser.id,
+        email: googleUser.email,
+        name: googleUser.name,
+        avatarUrl: googleUser.picture,
+      },
+      intent
+    );
 
     if (result.isNewUser) {
       cookieStore.set("poh_oauth_new_user", "1", {
@@ -76,6 +85,9 @@ export async function GET(request: NextRequest) {
     return dashboardRedirect(request, result.isNewUser);
   } catch (err) {
     console.error("Google login callback error:", err);
+    if (err instanceof OAuthAccountError) {
+      return signupRedirect(request, err.code);
+    }
     const message = getAuthErrorMessage(err, "google_signin_failed");
     return signupRedirect(request, message.slice(0, 120));
   }

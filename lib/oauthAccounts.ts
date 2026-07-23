@@ -2,6 +2,7 @@ import { getDb } from "./db";
 import { createSessionToken, setSessionCookie } from "./auth";
 
 export type OAuthProvider = "x" | "google";
+export type OAuthIntent = "signup" | "login";
 
 export type OAuthProfile = {
   provider: OAuthProvider;
@@ -12,15 +13,32 @@ export type OAuthProfile = {
   username?: string | null;
 };
 
+export class OAuthAccountError extends Error {
+  code: string;
+
+  constructor(code: string, message: string) {
+    super(message);
+    this.code = code;
+  }
+}
+
 function syntheticEmail(provider: OAuthProvider, providerUserId: string) {
   return `${provider}_${providerUserId}@oauth.natte.local`;
 }
 
+export function parseOAuthIntent(value: string | null | undefined): OAuthIntent {
+  return value === "login" ? "login" : "signup";
+}
+
 /**
  * Find or create a user from an OAuth identity, then establish a session cookie.
- * Links to an existing email account when the provider returns a matching email.
+ * - signup: create a new account when needed (or sign into an existing linked account)
+ * - login: require an existing oauth link or matching email account
  */
-export async function signInWithOAuthProfile(profile: OAuthProfile) {
+export async function signInWithOAuthProfile(
+  profile: OAuthProfile,
+  intent: OAuthIntent = "signup"
+) {
   const sql = getDb();
   const providerUserId = String(profile.providerUserId);
   const email = profile.email?.trim().toLowerCase() || null;
@@ -66,6 +84,13 @@ export async function signInWithOAuthProfile(profile: OAuthProfile) {
       if (byEmail.length > 0) {
         linkedUserId = String(byEmail[0].id);
       }
+    }
+
+    if (intent === "login" && !linkedUserId) {
+      throw new OAuthAccountError(
+        "account_not_found",
+        "No account found for this social login. Sign up with X or Google first."
+      );
     }
 
     if (linkedUserId) {
@@ -126,5 +151,6 @@ export async function signInWithOAuthProfile(profile: OAuthProfile) {
   return {
     user: users[0],
     isNewUser,
+    intent,
   };
 }
