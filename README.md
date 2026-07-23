@@ -20,9 +20,26 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
+## Chrome extension
+
+Block AI slop on X with the unpacked extension in `extension/`.
+
+1. Run the app (`npm run dev`) or deploy it
+2. Open Chrome → `chrome://extensions` → Developer mode → **Load unpacked** → select `extension/`
+3. In the popup, set the API base URL (default `http://127.0.0.1:3000`) and sign in via **Open dashboard**
+4. Browse [x.com](https://x.com) — posts are labeled and AI content can be blurred
+
+Pack a downloadable zip (also served at `/extension/natte-chrome.zip`):
+
+```bash
+npm run extension:pack
+```
+
+See [`extension/README.md`](extension/README.md) for settings and permissions.
+
 ## Proof of Human — X Pilot
 
-This repo includes a small `AIParserToggle` widget that checks whether a piece of text looks AI-generated. It exposes a server API at `app/api/detect/route.ts` which can proxy to an external detector (set `AI_DETECTOR_URL` and optional `AI_DETECTOR_KEY`) or fall back to a simple heuristic.
+This repo includes a small `AIParserToggle` widget that checks whether a piece of text looks AI-generated. It exposes a server API at `app/api/detect/route.ts` which can proxy to an external detector (set `AI_DETECTOR_URL` and optional `AI_DETECTOR_KEY`).
 
 Quick demo (creates a short screen recording using Playwright):
 

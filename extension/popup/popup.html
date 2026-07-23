@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>natte</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <div class="brand">
+        <img src="../icons/icon48.png" width="28" height="28" alt="" />
+        <div>
+          <strong>natte</strong>
+          <span>Proof of Human</span>
+        </div>
+      </div>
+      <label class="switch" title="Enable on X">
+        <input id="enabled" type="checkbox" />
+        <span></span>
+      </label>
+    </header>
+
+    <p class="tagline">AI blocker for your feed. The slop stops here.</p>
+
+    <section class="status" id="status">
+      <div class="status-dot" id="statusDot"></div>
+      <div>
+        <strong id="statusTitle">Checking…</strong>
+        <span id="statusDetail">Connecting to natte API</span>
+      </div>
+    </section>
+
+    <section class="controls">
+      <label class="row">
+        <span>
+          <strong>Auto-scan posts</strong>
+          <small>Detect AI as you scroll on X</small>
+        </span>
+        <input id="autoScan" type="checkbox" />
+      </label>
+      <label class="row">
+        <span>
+          <strong>Block AI posts</strong>
+          <small>Blur and hide flagged content</small>
+        </span>
+        <input id="blockAi" type="checkbox" />
+      </label>
+      <label class="row">
+        <span>
+          <strong>Scan images</strong>
+          <small>Also check post media (uses more credits)</small>
+        </span>
+        <input id="scanImages" type="checkbox" />
+      </label>
+    </section>
+
+    <section class="api">
+      <label for="apiBaseUrl">API base URL</label>
+      <div class="api-row">
+        <input id="apiBaseUrl" type="url" placeholder="http://127.0.0.1:3000" />
+        <button id="saveApi" type="button">Save</button>
+      </div>
+      <p class="hint">Sign in on this URL so detection can use your session.</p>
+    </section>
+
+    <footer>
+      <button id="openApp" type="button" class="ghost">Open dashboard</button>
+      <button id="refresh" type="button" class="ghost">Refresh status</button>
+    </footer>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

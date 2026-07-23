@@ -8,10 +8,17 @@ const LETTERS = [
   { letter: "T", word: "Text", detail: "Analyzes writing style, tone, and structure." },
   { letter: "T", word: "Trust", detail: "Gives clear human vs. AI signals you can act on." },
   { letter: "E", word: "Evaluation", detail: "Scores content instantly with transparent results." },
-  { letter: "S", word: "System", detail: "A complete detection stack — API, widget, and dashboard." },
+  { letter: "S", word: "System", detail: "A complete detection stack — API, Chrome extension, widget, and dashboard." },
 ];
 
 export default function NattesSection() {
+  const downloadChromeExtension = () => {
+    const link = document.createElement("a");
+    link.href = "/extension/natte-chrome.zip";
+    link.download = "natte-chrome.zip";
+    link.click();
+  };
+
   const downloadWidget = () => {
     const link = document.createElement("a");
     link.href = "/widget/natte-widget.js";
@@ -91,6 +98,18 @@ export default function NattesSection() {
       <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:flex-wrap sm:justify-center">
         <button
           type="button"
+          onClick={downloadChromeExtension}
+          className="inline-flex items-center gap-2 rounded-full border border-sky-500/40 bg-sky-500/15 px-6 py-3 text-sm font-medium text-sky-200 transition hover:border-sky-400/70 hover:bg-sky-500/25"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.5" />
+            <circle cx="8" cy="8" r="2.25" stroke="currentColor" strokeWidth="1.5" />
+            <path d="M8 2v2.5M8 11.5V14M2 8h2.5M11.5 8H14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+          Get Chrome extension
+        </button>
+        <button
+          type="button"
           onClick={downloadWidget}
           className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-6 py-3 text-sm font-medium text-white transition hover:border-white/40 hover:bg-white/10"
         >
@@ -124,7 +143,7 @@ export default function NattesSection() {
         <button
           type="button"
           onClick={openBrowserWidget}
-          className="inline-flex items-center gap-2 rounded-full border border-sky-500/40 bg-sky-500/10 px-6 py-3 text-sm font-medium text-sky-300 transition hover:border-sky-500/60 hover:bg-sky-500/20"
+          className="inline-flex items-center gap-2 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-6 py-3 text-sm font-medium text-emerald-300 transition hover:border-emerald-500/60 hover:bg-emerald-500/20"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.5" />

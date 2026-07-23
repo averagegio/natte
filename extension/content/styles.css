@@ -1,0 +1,132 @@
+.natte-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-size: 12px;
+  line-height: 1.2;
+  user-select: none;
+}
+
+.natte-badge button {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(15, 23, 42, 0.85);
+  color: rgba(255, 255, 255, 0.85);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.natte-badge button:hover {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: rgba(125, 211, 252, 0.45);
+}
+
+.natte-badge button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.natte-badge[data-state="ai"] button {
+  background: rgba(127, 29, 29, 0.85);
+  border-color: rgba(248, 113, 113, 0.55);
+  color: #fecaca;
+}
+
+.natte-badge[data-state="human"] button {
+  background: rgba(6, 78, 59, 0.85);
+  border-color: rgba(52, 211, 153, 0.55);
+  color: #a7f3d0;
+}
+
+.natte-badge[data-state="loading"] button {
+  background: rgba(30, 58, 138, 0.75);
+  border-color: rgba(125, 211, 252, 0.4);
+  color: #bae6fd;
+}
+
+.natte-badge[data-state="error"] button {
+  background: rgba(69, 26, 3, 0.85);
+  border-color: rgba(251, 146, 60, 0.5);
+  color: #fed7aa;
+}
+
+.natte-badge .natte-meta {
+  color: rgba(148, 163, 184, 0.95);
+  font-weight: 500;
+}
+
+.natte-blocked {
+  position: relative;
+}
+
+.natte-blocked > *:not(.natte-block-overlay):not(.natte-badge) {
+  filter: blur(7px);
+  opacity: 0.35;
+  pointer-events: none;
+  user-select: none;
+}
+
+.natte-block-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: linear-gradient(
+    180deg,
+    rgba(2, 6, 23, 0.35),
+    rgba(2, 6, 23, 0.72)
+  );
+  border-radius: 12px;
+}
+
+.natte-block-card {
+  max-width: 320px;
+  text-align: center;
+  font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+  color: #e2e8f0;
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.natte-block-card strong {
+  display: block;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  margin-bottom: 4px;
+  color: #fecaca;
+}
+
+.natte-block-card span {
+  display: block;
+  font-size: 12px;
+  color: rgba(203, 213, 225, 0.9);
+  margin-bottom: 10px;
+}
+
+.natte-block-card button {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.06);
+  color: #f8fafc;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.natte-block-card button:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
