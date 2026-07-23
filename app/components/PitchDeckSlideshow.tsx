@@ -192,20 +192,32 @@ function SlideContent({
         <SalesProjections projections={slide.projections} />
       ) : null}
 
-      {slide.cta && !isTitle && slide.id === "close" ? (
+      {slide.cta && !isTitle ? (
         <div className="mt-2 flex flex-wrap gap-3">
-          <Link
-            href={slide.cta.href}
-            className="inline-flex rounded-full border border-sky-400/40 bg-sky-500/15 px-6 py-3 text-sm font-medium text-sky-100 transition hover:bg-sky-500/25"
-          >
-            {slide.cta.label}
-          </Link>
-          <Link
-            href="/api/pitch"
-            className="inline-flex rounded-full border border-white/15 px-6 py-3 text-sm text-white/70 transition hover:border-white/30 hover:text-white"
-          >
-            Open JSON API
-          </Link>
+          {slide.cta.href.endsWith(".zip") ? (
+            <a
+              href={slide.cta.href}
+              download
+              className="inline-flex rounded-full border border-sky-400/40 bg-sky-500/15 px-6 py-3 text-sm font-medium text-sky-100 transition hover:bg-sky-500/25"
+            >
+              {slide.cta.label}
+            </a>
+          ) : (
+            <Link
+              href={slide.cta.href}
+              className="inline-flex rounded-full border border-sky-400/40 bg-sky-500/15 px-6 py-3 text-sm font-medium text-sky-100 transition hover:bg-sky-500/25"
+            >
+              {slide.cta.label}
+            </Link>
+          )}
+          {slide.id === "close" ? (
+            <Link
+              href="/api/pitch"
+              className="inline-flex rounded-full border border-white/15 px-6 py-3 text-sm text-white/70 transition hover:border-white/30 hover:text-white"
+            >
+              Open JSON API
+            </Link>
+          ) : null}
         </div>
       ) : null}
     </div>

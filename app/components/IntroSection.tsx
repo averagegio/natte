@@ -19,7 +19,7 @@ export default function IntroSection({ onEnter }: IntroSectionProps) {
           </span>
         </h1>
         <p className="mt-6 max-w-md text-base leading-relaxed text-white/50">
-          AI detection for the real world. Scroll to explore.
+          Chrome extension AI detection for the real world. Scroll to explore.
         </p>
         <button
           type="button"

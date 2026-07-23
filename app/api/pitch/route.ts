@@ -15,6 +15,7 @@ export async function GET() {
         text: "/api/detect",
         image: "/api/detect/image",
         pitch: "/api/pitch",
+        chromeExtension: "/extension/natte-chrome.zip",
       },
     },
   });

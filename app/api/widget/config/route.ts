@@ -11,10 +11,16 @@ export async function GET() {
 
   return NextResponse.json({
     name: "NATTES Proof of Human Widget",
-    version: "1.3.0",
+    version: "1.4.0",
     detectEndpoint: "/api/detect",
     imageDetectEndpoint: "/api/detect/image",
     postsEndpoint: "/api/x/posts",
+    chromeExtension: {
+      download: "/extension/natte-chrome.zip",
+      source: "/extension",
+      install:
+        "Unzip natte-chrome.zip, open chrome://extensions, enable Developer mode, Load unpacked.",
+    },
     detection: {
       text: {
         available: isDetectorConfigured(),
