@@ -16,7 +16,7 @@ export default function ToggleOnboarding({ hasPosts, hasImages }: Props) {
       targetId: "toggle-text-detection",
       title: "Text detection toggle",
       body: "Turn this on to scan a post's text for AI-generated writing. Results appear beside the toggle.",
-      placement: "bottom",
+      placement: "top",
     },
   ];
 
@@ -29,5 +29,12 @@ export default function ToggleOnboarding({ hasPosts, hasImages }: Props) {
     });
   }
 
-  return <OnboardingTour steps={steps} storageKey={ONBOARDING_KEYS.toggles} />;
+  return (
+    <OnboardingTour
+      steps={steps}
+      storageKey={ONBOARDING_KEYS.toggles}
+      promptTitle="Want a quick tour of detection?"
+      promptBody="See how to flip AI detection on for post text and images. You can skip and explore anytime."
+    />
+  );
 }
