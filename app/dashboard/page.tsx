@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import DashboardHeader from "../components/DashboardHeader";
 import DashboardOnboarding from "../components/DashboardOnboarding";
+import DeleteAccount from "../components/DeleteAccount";
 import SideDrawer from "../components/SideDrawer";
 import StarConstellation from "../components/StarConstellation";
 import WidgetConnectionsList, {
@@ -123,6 +124,7 @@ export default function DashboardPage() {
             onChange={setConnections}
             oauthMessage={oauthMessage}
           />
+          <DeleteAccount hasSubscription={Boolean(subscription)} />
         </div>
       </div>
     </div>
