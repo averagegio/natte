@@ -13,7 +13,11 @@
 # testing
 /coverage
 /demo/.ext-profile/
-/demo/videos/
+/demo/videos/*
+!/demo/videos/.gitkeep
+!/demo/videos/first-time-walkthrough.webm
+!/demo/videos/first-time-walkthrough.mp4
+!/demo/videos/README.md
 
 # next.js
 /.next/
