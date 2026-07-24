@@ -50,11 +50,19 @@ npm install
 npx playwright install
 ```
 
-2. Run the recorder (it opens `demo/demo.html` and saves a video in `demo/videos/`):
+2. Run the classic widget recorder (opens `demo/demo.html`):
 
 ```bash
 npm run record-demo
 ```
+
+3. Or record the first-time user walkthrough (extension install → dashboard tour → AI block on X):
+
+```bash
+npm run record-walkthrough
+```
+
+Videos land in `demo/videos/` (including `first-time-walkthrough.webm` / `.mp4`).
 
 You can also run the Next.js app and see the widget at the homepage:
 

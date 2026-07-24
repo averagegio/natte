@@ -1,0 +1,1024 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>natte — First-time walkthrough</title>
+    <style>
+      :root {
+        --bg: #03050a;
+        --panel: rgba(255, 255, 255, 0.04);
+        --border: rgba(255, 255, 255, 0.12);
+        --text: #f8fafc;
+        --muted: #94a3b8;
+        --sky: #38bdf8;
+        --violet: #a78bfa;
+        --ok: #34d399;
+        --bad: #f87171;
+      }
+
+      * { box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+      }
+
+      body {
+        background:
+          radial-gradient(90% 70% at 15% 10%, rgba(56, 189, 248, 0.16), transparent 55%),
+          radial-gradient(80% 60% at 90% 0%, rgba(167, 139, 250, 0.12), transparent 50%),
+          var(--bg);
+      }
+
+      #stage {
+        position: relative;
+        width: 1280px;
+        height: 720px;
+        margin: 0 auto;
+        overflow: hidden;
+      }
+
+      .caption {
+        position: absolute;
+        left: 40px;
+        right: 40px;
+        bottom: 36px;
+        z-index: 30;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 24px;
+        pointer-events: none;
+      }
+
+      .caption-card {
+        max-width: 640px;
+        padding: 16px 18px;
+        border-radius: 16px;
+        border: 1px solid rgba(56, 189, 248, 0.35);
+        background: rgba(2, 6, 23, 0.82);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+        opacity: 0;
+        transform: translateY(12px);
+        transition: opacity 0.35s ease, transform 0.35s ease;
+      }
+
+      .caption-card.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .caption-card .step {
+        font-size: 11px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--sky);
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+
+      .caption-card h2 {
+        margin: 0;
+        font-size: 22px;
+        line-height: 1.25;
+      }
+
+      .caption-card p {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .progress {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+
+      .progress span {
+        width: 28px;
+        height: 4px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.12);
+      }
+
+      .progress span.on {
+        background: linear-gradient(90deg, var(--sky), var(--violet));
+      }
+
+      .scene {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(10px) scale(0.985);
+        transition: opacity 0.45s ease, transform 0.45s ease;
+        padding: 48px 56px 140px;
+      }
+
+      .scene.active {
+        opacity: 1;
+        pointer-events: auto;
+        transform: none;
+      }
+
+      .brand-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .hero-title {
+        margin: 28px 0 12px;
+        font-size: 64px;
+        line-height: 0.95;
+        letter-spacing: -0.03em;
+        font-weight: 750;
+        max-width: 780px;
+      }
+
+      .hero-title span {
+        background: linear-gradient(90deg, #fff, rgba(255, 255, 255, 0.45));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .hero-sub {
+        max-width: 520px;
+        color: var(--muted);
+        font-size: 18px;
+        line-height: 1.55;
+      }
+
+      .panel {
+        border: 1px solid var(--border);
+        background: var(--panel);
+        border-radius: 20px;
+        padding: 22px;
+        backdrop-filter: blur(8px);
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 24px;
+        height: 100%;
+        align-items: start;
+      }
+
+      .chrome-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(0, 0, 0, 0.35);
+        border-radius: 16px 16px 0 0;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #64748b;
+      }
+
+      .dot.r { background: #f87171; }
+      .dot.y { background: #fbbf24; }
+      .dot.g { background: #34d399; }
+
+      .url {
+        flex: 1;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.04);
+        padding: 6px 12px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .browser {
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+        background: rgba(2, 6, 23, 0.65);
+        min-height: 420px;
+      }
+
+      .browser-body {
+        padding: 18px;
+      }
+
+      .popup {
+        width: 320px;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        background:
+          radial-gradient(120% 80% at 0% 0%, rgba(56, 189, 248, 0.16), transparent 55%),
+          #05070d;
+        padding: 14px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      }
+
+      .popup header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .popup .brand {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .popup .logo {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: linear-gradient(145deg, #0f172a, #020617);
+        border: 1px solid rgba(56, 189, 248, 0.4);
+        display: grid;
+        place-items: center;
+        color: var(--sky);
+        font-weight: 800;
+        font-size: 12px;
+      }
+
+      .switch {
+        width: 42px;
+        height: 24px;
+        border-radius: 999px;
+        background: rgba(56, 189, 248, 0.35);
+        border: 1px solid rgba(56, 189, 248, 0.55);
+        position: relative;
+      }
+
+      .switch::after {
+        content: "";
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--sky);
+        top: 2px;
+        left: 20px;
+      }
+
+      .row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.03);
+        margin-top: 8px;
+      }
+
+      .row strong { display: block; font-size: 12px; }
+      .row small { display: block; color: var(--muted); font-size: 11px; margin-top: 2px; }
+
+      .status {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        padding: 10px 12px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        margin: 12px 0;
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-top: 5px;
+        background: var(--ok);
+        box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.15);
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        border: 1px solid rgba(56, 189, 248, 0.4);
+        background: rgba(56, 189, 248, 0.15);
+        color: #e0f2fe;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 650;
+      }
+
+      .btn.ghost {
+        background: rgba(255, 255, 255, 0.04);
+        border-color: var(--border);
+        color: var(--text);
+      }
+
+      .btn.primary {
+        background: linear-gradient(90deg, #0ea5e9, #8b5cf6);
+        border: none;
+        color: white;
+      }
+
+      .btn.highlight {
+        outline: 2px solid rgba(56, 189, 248, 0.85);
+        outline-offset: 3px;
+        box-shadow: 0 0 0 6px rgba(56, 189, 248, 0.15);
+      }
+
+      .tweet {
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 16px;
+        margin-bottom: 12px;
+        position: relative;
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .tweet .meta {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 10px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #334155, #0f172a);
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .badge button {
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: rgba(15, 23, 42, 0.85);
+        color: rgba(255, 255, 255, 0.85);
+        padding: 4px 10px;
+        font-size: 12px;
+        font-weight: 650;
+      }
+
+      .badge[data-state="ai"] button {
+        background: rgba(127, 29, 29, 0.85);
+        border-color: rgba(248, 113, 113, 0.55);
+        color: #fecaca;
+      }
+
+      .badge[data-state="human"] button {
+        background: rgba(6, 78, 59, 0.85);
+        border-color: rgba(52, 211, 153, 0.55);
+        color: #a7f3d0;
+      }
+
+      .badge[data-state="loading"] button {
+        background: rgba(30, 58, 138, 0.75);
+        border-color: rgba(125, 211, 252, 0.4);
+        color: #bae6fd;
+      }
+
+      .blocked > *:not(.overlay) {
+        filter: blur(7px);
+        opacity: 0.35;
+      }
+
+      .overlay {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(180deg, rgba(2, 6, 23, 0.35), rgba(2, 6, 23, 0.72));
+        border-radius: 16px;
+        z-index: 2;
+      }
+
+      .overlay-card {
+        width: 280px;
+        text-align: center;
+        background: rgba(15, 23, 42, 0.92);
+        border: 1px solid rgba(248, 113, 113, 0.35);
+        border-radius: 14px;
+        padding: 14px 16px;
+      }
+
+      .overlay-card strong {
+        display: block;
+        color: #fecaca;
+        margin-bottom: 4px;
+      }
+
+      .overlay-card span {
+        display: block;
+        color: rgba(203, 213, 225, 0.9);
+        font-size: 12px;
+        margin-bottom: 10px;
+      }
+
+      .tour-card {
+        width: 300px;
+        border-radius: 16px;
+        border: 1px solid rgba(56, 189, 248, 0.4);
+        background: rgba(0, 0, 0, 0.95);
+        padding: 18px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+        position: absolute;
+        z-index: 5;
+      }
+
+      .tour-card h3 {
+        color: #fff;
+        font-size: 16px;
+        font-weight: 650;
+      }
+
+      .tour-card p {
+        color: rgba(255, 255, 255, 0.65) !important;
+        min-height: 36px;
+      }
+
+      .tour-card .kicker {
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #7dd3fc;
+        font-weight: 700;
+      }
+
+      .spotlight {
+        position: absolute;
+        border: 2px solid rgba(56, 189, 248, 0.9);
+        border-radius: 16px;
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.65);
+        z-index: 4;
+        transition: all 0.35s ease;
+      }
+
+      .dash-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+
+      .dash-card h3 {
+        margin: 0 0 6px;
+        font-size: 15px;
+      }
+
+      .dash-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      #cursor {
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        border-radius: 50% 50% 50% 0;
+        transform: rotate(-15deg);
+        background: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+        z-index: 50;
+        pointer-events: none;
+        opacity: 0;
+        transition: left 0.55s cubic-bezier(0.2, 0.8, 0.2, 1), top 0.55s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s;
+      }
+
+      #cursor.click {
+        transform: rotate(-15deg) scale(0.85);
+      }
+
+      .checklist {
+        list-style: none;
+        padding: 0;
+        margin: 18px 0 0;
+      }
+
+      .checklist li {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        color: var(--muted);
+        font-size: 15px;
+      }
+
+      .checklist li.done {
+        color: var(--text);
+      }
+
+      .check {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        border: 1px solid var(--border);
+        display: grid;
+        place-items: center;
+        font-size: 12px;
+        color: transparent;
+      }
+
+      .checklist li.done .check {
+        background: rgba(52, 211, 153, 0.2);
+        border-color: rgba(52, 211, 153, 0.5);
+        color: var(--ok);
+      }
+
+      .extensions-list .item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.03);
+        margin-top: 12px;
+      }
+
+      .extensions-list .item.active {
+        border-color: rgba(56, 189, 248, 0.45);
+        background: rgba(56, 189, 248, 0.08);
+      }
+
+      .muted { color: var(--muted); }
+      .small { font-size: 13px; }
+    </style>
+  </head>
+  <body>
+    <div id="stage" data-demo="first-time-walkthrough">
+      <div id="cursor" aria-hidden="true"></div>
+
+      <!-- Scene 0: Welcome -->
+      <section class="scene" data-scene="0">
+        <span class="brand-pill">Proof of Human</span>
+        <h1 class="hero-title">Welcome to <span>natte</span></h1>
+        <p class="hero-sub">A 60-second walkthrough for first-time users — from install to blocking AI slop on X.</p>
+        <div style="margin-top: 28px" class="btn primary" id="start-cta">Start walkthrough</div>
+      </section>
+
+      <!-- Scene 1: Landing / get extension -->
+      <section class="scene" data-scene="1">
+        <div class="grid-2">
+          <div>
+            <span class="brand-pill">Homepage</span>
+            <h1 class="hero-title" style="font-size: 48px">The slop<br /><span>stops here.</span></h1>
+            <p class="hero-sub">Install the Chrome extension to label and block AI posts in your feed.</p>
+            <div style="margin-top: 24px; display: flex; gap: 12px">
+              <div class="btn primary" id="get-extension">Get Chrome extension</div>
+              <div class="btn ghost">Download widget</div>
+            </div>
+          </div>
+          <div class="panel">
+            <p class="small muted" style="margin-top: 0">Native AI Text Trust Evaluation System</p>
+            <ul class="checklist" id="landing-checks">
+              <li><span class="check">✓</span> Fast detection API</li>
+              <li><span class="check">✓</span> Chrome extension for X</li>
+              <li><span class="check">✓</span> Dashboard + plans</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 2: Load unpacked -->
+      <section class="scene" data-scene="2">
+        <div class="browser">
+          <div class="chrome-bar">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <div class="url">chrome://extensions</div>
+          </div>
+          <div class="browser-body">
+            <div style="display: flex; justify-content: space-between; align-items: center">
+              <div>
+                <h2 style="margin: 0 0 4px; font-size: 28px">Extensions</h2>
+                <p class="muted small" style="margin: 0">Developer mode is on</p>
+              </div>
+              <div class="btn" id="load-unpacked">Load unpacked</div>
+            </div>
+            <div class="extensions-list">
+              <div class="item" id="ext-item">
+                <div>
+                  <strong>natte — Proof of Human</strong>
+                  <div class="muted small">AI blocker for X · version 1.0.0</div>
+                </div>
+                <span class="muted small" id="ext-state">Not loaded</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 3: Popup setup -->
+      <section class="scene" data-scene="3">
+        <div class="grid-2">
+          <div>
+            <span class="brand-pill">Extension popup</span>
+            <h2 style="font-size: 36px; margin: 18px 0 10px">Connect to your natte API</h2>
+            <p class="hero-sub">Set the API base URL, keep auto-scan on, and open the dashboard to sign in.</p>
+          </div>
+          <div class="popup" id="ext-popup">
+            <header>
+              <div class="brand">
+                <div class="logo">N</div>
+                <div>
+                  <strong>natte</strong>
+                  <div class="muted" style="font-size: 11px">Proof of Human</div>
+                </div>
+              </div>
+              <div class="switch"></div>
+            </header>
+            <p class="muted" style="font-size: 12px; line-height: 1.4">AI blocker for your feed. The slop stops here.</p>
+            <div class="status">
+              <div class="status-dot"></div>
+              <div>
+                <strong style="font-size: 12px" id="auth-title">Sign in required</strong>
+                <div class="muted" style="font-size: 11px" id="auth-detail">Open the dashboard, sign in, then return here.</div>
+              </div>
+            </div>
+            <label class="row"><span><strong>Auto-scan posts</strong><small>Detect AI as you scroll</small></span>✓</label>
+            <label class="row"><span><strong>Block AI posts</strong><small>Blur flagged content</small></span>✓</label>
+            <div style="margin-top: 12px">
+              <div class="muted" style="font-size: 11px; margin-bottom: 6px">API base URL</div>
+              <div class="url" id="api-url" style="border-radius: 10px">http://127.0.0.1:3000</div>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 12px">
+              <div class="btn ghost" style="flex: 1" id="open-dashboard">Open dashboard</div>
+              <div class="btn ghost" style="flex: 1">Refresh</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 4: Dashboard tour -->
+      <section class="scene" data-scene="4">
+        <div class="browser" style="position: relative">
+          <div class="chrome-bar">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <div class="url">http://127.0.0.1:3000/dashboard</div>
+          </div>
+          <div class="browser-body">
+            <h2 style="margin: 0 0 14px; font-size: 24px">Dashboard</h2>
+            <div class="dash-grid">
+              <div class="panel dash-card" id="dash-profile">
+                <h3>Your profile</h3>
+                <p>Add a display name and photo so your dashboard feels like home.</p>
+              </div>
+              <div class="panel dash-card" id="dash-sub">
+                <h3>Subscription</h3>
+                <p>Sync your plan to unlock AI detection on posts and images.</p>
+              </div>
+              <div class="panel dash-card" id="dash-x">
+                <h3>Connect X</h3>
+                <p>Link your X account so live posts can power detection demos.</p>
+              </div>
+              <div class="panel dash-card" id="dash-home">
+                <h3>Try detection</h3>
+                <p>Head back to the homepage or open X with the extension on.</p>
+              </div>
+            </div>
+            <div class="spotlight" id="tour-spot" hidden></div>
+            <div class="tour-card" id="tour-card" hidden>
+              <div class="kicker" id="tour-step">Step 1 of 4</div>
+              <h3 style="margin: 6px 0" id="tour-title">Your profile</h3>
+              <p class="muted small" id="tour-body" style="margin: 0">Add a display name and photo.</p>
+              <div style="margin-top: 12px; text-align: right">
+                <div class="btn primary" id="tour-next">Next →</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 5: Feed detection -->
+      <section class="scene" data-scene="5">
+        <div class="browser">
+          <div class="chrome-bar">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <div class="url">https://x.com/home</div>
+          </div>
+          <div class="browser-body" style="max-width: 640px">
+            <div class="tweet" id="tweet-human">
+              <div class="meta"><div class="avatar"></div><div><strong style="color: white">@maya</strong> · 2m</div></div>
+              <div>Just got back from the farmer’s market — the peaches were ridiculous this week.</div>
+              <div class="badge" data-state="idle" id="badge-human"><button>Check with natte</button></div>
+            </div>
+            <div class="tweet" id="tweet-ai">
+              <div class="meta"><div class="avatar"></div><div><strong style="color: white">@growthbot</strong> · 5m</div></div>
+              <div>As an AI thought leader, here are 7 paradigm-shifting synergies to unlock 10x engagement in Q3…</div>
+              <div class="badge" data-state="idle" id="badge-ai"><button>Check with natte</button></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 6: Block + done -->
+      <section class="scene" data-scene="6">
+        <div class="grid-2">
+          <div class="browser">
+            <div class="chrome-bar">
+              <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+              <div class="url">https://x.com/home</div>
+            </div>
+            <div class="browser-body">
+              <div class="tweet blocked" id="blocked-tweet">
+                <div class="meta"><div class="avatar"></div><div><strong style="color: white">@growthbot</strong> · 5m</div></div>
+                <div>As an AI thought leader, here are 7 paradigm-shifting synergies…</div>
+                <div class="badge" data-state="ai"><button>AI detected</button></div>
+                <div class="overlay">
+                  <div class="overlay-card">
+                    <strong>AI slop blocked</strong>
+                    <span>natte flagged this post as AI-generated.</span>
+                    <div class="btn ghost">Show anyway</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <span class="brand-pill">You're ready</span>
+            <h2 style="font-size: 40px; margin: 18px 0 10px">First-time setup complete</h2>
+            <p class="hero-sub">Extension installed, account connected, and AI posts blocked in the feed.</p>
+            <ul class="checklist" id="done-checks">
+              <li><span class="check">✓</span> Loaded the Chrome extension</li>
+              <li><span class="check">✓</span> Signed in on the dashboard</li>
+              <li><span class="check">✓</span> Auto-scan + block AI enabled</li>
+              <li><span class="check">✓</span> Saw human vs AI labels on X</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <div class="caption">
+        <div class="caption-card" id="caption">
+          <div class="progress" id="progress"></div>
+          <div class="step" id="caption-step">Step 1</div>
+          <h2 id="caption-title">Welcome</h2>
+          <p id="caption-body">Getting started with natte.</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const scenes = [
+          {
+            title: "Welcome to natte",
+            body: "A quick first-time walkthrough: install, sign in, and block AI on X.",
+            duration: 2800,
+            run: async (api) => {
+              await api.moveTo("#start-cta");
+              await api.wait(400);
+              api.clickPulse("#start-cta");
+            },
+          },
+          {
+            title: "Grab the Chrome extension",
+            body: "From the homepage, download natte for Chrome — or load the unpacked folder from the repo.",
+            duration: 3200,
+            run: async (api) => {
+              document.querySelectorAll("#landing-checks li").forEach((li, i) => {
+                setTimeout(() => li.classList.add("done"), 300 + i * 350);
+              });
+              await api.wait(700);
+              await api.moveTo("#get-extension");
+              api.highlight("#get-extension");
+              await api.wait(500);
+              api.clickPulse("#get-extension");
+            },
+          },
+          {
+            title: "Load unpacked in Chrome",
+            body: "Open chrome://extensions, enable Developer mode, and load the extension/ folder.",
+            duration: 3400,
+            run: async (api) => {
+              await api.moveTo("#load-unpacked");
+              api.highlight("#load-unpacked");
+              await api.wait(500);
+              api.clickPulse("#load-unpacked");
+              await api.wait(400);
+              const item = document.getElementById("ext-item");
+              const state = document.getElementById("ext-state");
+              item.classList.add("active");
+              state.textContent = "Enabled";
+              state.style.color = "#34d399";
+            },
+          },
+          {
+            title: "Configure the popup",
+            body: "Confirm your API URL, leave auto-scan and block on, then open the dashboard to sign in.",
+            duration: 3800,
+            run: async (api) => {
+              await api.moveTo("#api-url");
+              await api.wait(500);
+              await api.moveTo("#open-dashboard");
+              api.highlight("#open-dashboard");
+              await api.wait(400);
+              api.clickPulse("#open-dashboard");
+              await api.wait(700);
+              document.getElementById("auth-title").textContent = "Signed in · you@natte.app";
+              document.getElementById("auth-detail").textContent = "Ready · http://127.0.0.1:3000";
+            },
+          },
+          {
+            title: "Dashboard onboarding tour",
+            body: "First visit walks you through profile, subscription, X connection, and trying detection.",
+            duration: 6000,
+            run: async (api) => {
+              const steps = [
+                { id: "dash-profile", title: "Your profile", body: "Add a display name and photo so your dashboard feels like home." },
+                { id: "dash-sub", title: "Subscription", body: "Sync your plan here to unlock AI detection on posts and images." },
+                { id: "dash-x", title: "Connect X", body: "Connect your X account so live posts can power detection." },
+                { id: "dash-home", title: "Try detection", body: "Open X with the extension — posts get labeled as you scroll." },
+              ];
+              const spot = document.getElementById("tour-spot");
+              const card = document.getElementById("tour-card");
+              spot.hidden = false;
+              card.hidden = false;
+
+              for (let i = 0; i < steps.length; i++) {
+                const step = steps[i];
+                const el = document.getElementById(step.id);
+                const rect = el.getBoundingClientRect();
+                const stage = document.getElementById("stage").getBoundingClientRect();
+                const browserBody = el.closest(".browser-body");
+                const bodyRect = browserBody.getBoundingClientRect();
+
+                spot.style.top = rect.top - stage.top - 6 + "px";
+                spot.style.left = rect.left - stage.left - 6 + "px";
+                spot.style.width = rect.width + 12 + "px";
+                spot.style.height = rect.height + 12 + "px";
+
+                const placeAbove = rect.bottom > bodyRect.top + bodyRect.height * 0.55;
+                let cardTop = placeAbove
+                  ? rect.top - stage.top - 150
+                  : rect.bottom - stage.top + 14;
+                let cardLeft = Math.min(Math.max(24, rect.left - stage.left), 520);
+                cardTop = Math.max(70, Math.min(cardTop, 430));
+
+                card.style.top = cardTop + "px";
+                card.style.left = cardLeft + "px";
+                document.getElementById("tour-step").textContent = "Step " + (i + 1) + " of 4";
+                document.getElementById("tour-title").textContent = step.title;
+                document.getElementById("tour-body").textContent = step.body;
+                document.getElementById("tour-next").textContent = i === steps.length - 1 ? "Got it" : "Next →";
+
+                await api.moveTo("#tour-next");
+                await api.wait(650);
+                api.clickPulse("#tour-next");
+                await api.wait(400);
+              }
+              spot.hidden = true;
+              card.hidden = true;
+            },
+          },
+          {
+            title: "Auto-scan the X feed",
+            body: "As posts appear, natte checks them and labels human vs AI writing.",
+            duration: 4200,
+            run: async (api) => {
+              const human = document.getElementById("badge-human");
+              const ai = document.getElementById("badge-ai");
+              human.dataset.state = "loading";
+              human.querySelector("button").textContent = "Checking…";
+              await api.wait(900);
+              human.dataset.state = "human";
+              human.querySelector("button").textContent = "Human";
+              await api.wait(500);
+              ai.dataset.state = "loading";
+              ai.querySelector("button").textContent = "Checking…";
+              await api.moveTo("#badge-ai button");
+              await api.wait(900);
+              ai.dataset.state = "ai";
+              ai.querySelector("button").textContent = "AI detected";
+            },
+          },
+          {
+            title: "AI slop blocked",
+            body: "With Block AI on, flagged posts are blurred until you choose to show them.",
+            duration: 4000,
+            run: async (api) => {
+              document.querySelectorAll("#done-checks li").forEach((li, i) => {
+                setTimeout(() => li.classList.add("done"), 250 + i * 280);
+              });
+              await api.moveTo("#blocked-tweet .overlay-card");
+              await api.wait(1200);
+            },
+          },
+        ];
+
+        const stage = document.getElementById("stage");
+        const cursor = document.getElementById("cursor");
+        const caption = document.getElementById("caption");
+        const progress = document.getElementById("progress");
+        const captionStep = document.getElementById("caption-step");
+        const captionTitle = document.getElementById("caption-title");
+        const captionBody = document.getElementById("caption-body");
+
+        scenes.forEach((_, i) => {
+          const s = document.createElement("span");
+          if (i === 0) s.classList.add("on");
+          progress.appendChild(s);
+        });
+
+        function wait(ms) {
+          return new Promise((resolve) => setTimeout(resolve, ms));
+        }
+
+        function moveTo(selector) {
+          const el = document.querySelector(selector);
+          if (!el) return wait(0);
+          const rect = el.getBoundingClientRect();
+          const stageRect = stage.getBoundingClientRect();
+          cursor.style.opacity = "1";
+          cursor.style.left = rect.left - stageRect.left + rect.width / 2 + "px";
+          cursor.style.top = rect.top - stageRect.top + rect.height / 2 + "px";
+          return wait(560);
+        }
+
+        function clickPulse(selector) {
+          cursor.classList.add("click");
+          const el = document.querySelector(selector);
+          if (el) {
+            el.style.transform = "scale(0.97)";
+            setTimeout(() => {
+              el.style.transform = "";
+            }, 180);
+          }
+          setTimeout(() => cursor.classList.remove("click"), 180);
+        }
+
+        function highlight(selector) {
+          document.querySelectorAll(".highlight").forEach((el) => el.classList.remove("highlight"));
+          const el = document.querySelector(selector);
+          if (el) el.classList.add("highlight");
+        }
+
+        function showScene(index) {
+          document.querySelectorAll(".scene").forEach((scene) => {
+            scene.classList.toggle("active", Number(scene.dataset.scene) === index);
+          });
+          [...progress.children].forEach((dot, i) => {
+            dot.classList.toggle("on", i <= index);
+          });
+          const scene = scenes[index];
+          caption.classList.remove("show");
+          captionStep.textContent = "Step " + (index + 1) + " of " + scenes.length;
+          captionTitle.textContent = scene.title;
+          captionBody.textContent = scene.body;
+          requestAnimationFrame(() => caption.classList.add("show"));
+        }
+
+        const api = { wait, moveTo, clickPulse, highlight };
+
+        async function play() {
+          stage.dataset.playing = "true";
+          for (let i = 0; i < scenes.length; i++) {
+            showScene(i);
+            const started = Date.now();
+            await scenes[i].run(api);
+            const remaining = scenes[i].duration - (Date.now() - started);
+            if (remaining > 0) await wait(remaining);
+          }
+          stage.dataset.playing = "done";
+          cursor.style.opacity = "0";
+        }
+
+        // Auto-start for recording; small delay so the first frame is painted.
+        window.__natteWalkthrough = { play, scenes };
+        setTimeout(play, 600);
+      })();
+    </script>
+  </body>
+</html>

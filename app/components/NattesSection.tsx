@@ -12,6 +12,10 @@ const LETTERS = [
 ];
 
 export default function NattesSection() {
+  const openWalkthrough = () => {
+    window.open("/demo/first-time-walkthrough.html", "_blank", "noopener,noreferrer");
+  };
+
   const downloadChromeExtension = () => {
     const link = document.createElement("a");
     link.href = "/extension/natte-chrome.zip";
@@ -96,6 +100,16 @@ export default function NattesSection() {
       </div>
 
       <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:flex-wrap sm:justify-center">
+        <button
+          type="button"
+          onClick={openWalkthrough}
+          className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-6 py-3 text-sm font-medium text-white transition hover:border-white/40 hover:bg-white/10"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M4 3.5v9l8-4.5-8-4.5z" fill="currentColor" />
+          </svg>
+          Watch first-time walkthrough
+        </button>
         <button
           type="button"
           onClick={downloadChromeExtension}

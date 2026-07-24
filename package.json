@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "record-demo": "node scripts/record-demo.js",
+    "record-walkthrough": "node scripts/record-walkthrough.js",
     "extension:pack": "node scripts/pack-extension.js",
     "extension:test": "node scripts/test-extension.js",
     "build": "npm run extension:pack && next build",
